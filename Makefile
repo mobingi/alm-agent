@@ -17,7 +17,7 @@ test: deps
 lint: setup
 	go vet $$(glide novendor)
 	for pkg in $$(glide novendor -x); do \
-		golint -set_exit_status $$okg || exit $$?; \
+		golint -set_exit_status $$pkg || exit $$?; \
 	done
 
 fmt: setup
