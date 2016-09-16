@@ -24,7 +24,7 @@ fmt: setup
 	gomimports -w $$(glide nv -x)
 
 build: test
-	go build -ldflags "$(LDFLAGS)" -o bin/go-modaemon
+	go build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
 
 clean:
-	rm bin/go-modaemon
+	rm bin/$(NAME)
