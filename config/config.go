@@ -5,8 +5,6 @@ import (
 	"io/ioutil"
 )
 
-const configFile = "/opt/modaemon/modaemon.cfg"
-
 // Config is a struct which has config data from modaemon.cfg
 type Config struct {
 	ServerConfigAPIEndPoint string
@@ -29,10 +27,10 @@ func Load(b []byte) (Config, error) {
 	return c, err
 }
 
-func LoadFromFile() (Config, error) {
+func LoadFromFile(file string) (Config, error) {
 	c := Config{}
 
-	dat, err := ioutil.ReadFile(configFile)
+	dat, err := ioutil.ReadFile(file)
 
 	if err != nil {
 		return c, err
