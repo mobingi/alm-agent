@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 )
 
 type Config struct {
-	DockerImageName string
+	Image             string
+	DockerHubUserName string
+	DockerHubPassword string
 }
 
-func Get(url url.URL) (Config, error) {
-	resp, err := http.Get(url.String())
+func Get(url string) (Config, error) {
+	resp, err := http.Get(url)
 	if err != nil {
 		return Config{}, err
 	}
