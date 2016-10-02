@@ -23,7 +23,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_, err = serverConfig.Get(c.ServerConfigAPIEndPoint)
+	s, err := serverConfig.Get(c.ServerConfigAPIEndPoint)
 
 	d, err := docker.New(s.Image, s.DockerHubUserName, s.DockerHubPassword)
 
