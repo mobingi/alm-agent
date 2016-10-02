@@ -13,10 +13,3 @@ machine:
 dependencies:
   cache_directories:
     - "/home/ubuntu/download"
-  override:
-    - go get github.com/Masterminds/glide
-    - glide install
-
-test:
-  override:
-    - go test -v -race $(glide novendor)
