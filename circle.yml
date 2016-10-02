@@ -1,0 +1,9 @@
+---
+dependencies:
+  override:
+    - go get github.com/Masterminds/glide
+    - glide install
+
+test:
+  override:
+    - go test -v -race $(glide novendor)
