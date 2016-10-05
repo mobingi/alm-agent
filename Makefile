@@ -12,7 +12,7 @@ deps: setup
 	glide install
 
 test: deps
-	go test $$(glide novendor)
+	go test -v -race $$(glide novendor)
 
 lint: setup
 	go vet $$(glide novendor)
