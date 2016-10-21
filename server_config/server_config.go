@@ -10,6 +10,8 @@ type Config struct {
 	Image             string
 	DockerHubUserName string
 	DockerHubPassword string
+	Code              string
+	GitReference      string
 }
 
 func Get(url string) (Config, error) {
