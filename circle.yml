@@ -5,10 +5,22 @@ machine:
     PATH: "$HOME/go/bin:$PATH"
     GODIST: "go1.7.1.linux-amd64.tar.gz"
     IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
+    LIBGIT2VERSION: "0.24.2"
+    LIBGIT2DIST: "libgit2-$LIBGIT2VERSION.tar.gz"
   post:
     - mkdir -p download
     - test -e download/$GODIST || curl -o download/$GODIST https://storage.googleapis.com/golang/$GODIST
-    - sudo tar -C $HOME -xzf download/$GODIST
+    - tar -C $HOME -xzf download/$GODIST
+    - sudo apt-get install -y pkgconf cmake
+    - test -e download/v0.24.2.tar.gz || curl -o download/$LIBGIT2DIST https://codeload.github.com/libgit2/libgit2/tar.gz/v$LIBGIT2VERSION
+    - tar -C ~/download -xzf ~/download/$LIBGIT2DIST
+    - cd ~/download/libgit2-$LIBGIT2VERSION && mkdir build
+    - cd ~/download/libgit2-$LIBGIT2VERSION/build && cmake ..
+    - cd ~/download/libgit2-$LIBGIT2VERSION/build && cmake --build .
+    - cd ~/download/libgit2-$LIBGIT2VERSION/build && cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+    - cd ~/download/libgit2-$LIBGIT2VERSION/build && sudo cmake --build . --target install
+    - test -e ~/.go_workspace/src/github.com/mobingilabs || mkdir -p ~/.go_workspace/src/github.com/mobingilabs
+    - test -e ~/.go_workspace/src/github.com/mobingilabs || ln -s ~/go-modaemon ~/.go_workspace/src/github.com/mobingilabs
 
 dependencies:
   cache_directories:
