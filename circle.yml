@@ -14,7 +14,7 @@ machine:
     - sudo apt-get install -y pkgconf cmake
     - test -e download/v0.24.2.tar.gz || curl -o download/$LIBGIT2DIST https://codeload.github.com/libgit2/libgit2/tar.gz/v$LIBGIT2VERSION
     - tar -C ~/download -xzf ~/download/$LIBGIT2DIST
-    - cd ~/download/libgit2-$LIBGIT2VERSION && mkdir build
+    - test -e ~/download/libgit2-$LIBGIT2VERSION/build || mkdir ~/download/libgit2-$LIBGIT2VERSION/build
     - cd ~/download/libgit2-$LIBGIT2VERSION/build && cmake ..
     - cd ~/download/libgit2-$LIBGIT2VERSION/build && cmake --build .
     - cd ~/download/libgit2-$LIBGIT2VERSION/build && cmake .. -DCMAKE_INSTALL_PREFIX=/usr
