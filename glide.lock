@@ -1,5 +1,5 @@
 hash: 5cbe299546a3a4d68be96d63b2ac2db727dea5baf23b902934fc3b40a9153b80
-updated: 2016-09-21T17:07:20.966248771+09:00
+updated: 2016-10-28T16:16:49.924616327Z
 imports:
 - name: github.com/docker/distribution
   version: 431cfa3179d9b3766e39f6a74283db8bb5a13209
@@ -40,9 +40,11 @@ imports:
 - name: github.com/pkg/errors
   version: a887431f7f6ef7687b556dbf718d9f351d4858a0
 - name: github.com/Sirupsen/logrus
-  version: 3ec0642a7fb6488f65b06f9040adc67e3990296a
+  version: 55eb11d21d2a31a3cc93838241d04800f52e823d
+  subpackages:
+  - formatters/logstash
 - name: golang.org/x/net
-  version: 71a035914f99bb58fe82eac0f1289f10963d876c
+  version: 4876518f9e71663000c348837735820161a42df7
   subpackages:
   - context
   - context/ctxhttp
@@ -52,4 +54,6 @@ imports:
   subpackages:
   - unix
   - windows
+- name: gopkg.in/libgit2/git2go.v24
+  version: 22091886372e73de5d66168e8665775676ec13c5
 testImports: []
