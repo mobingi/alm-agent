@@ -1,6 +1,6 @@
 package code
 
-import "github.com/libgit2/git2go"
+import git "gopkg.in/libgit2/git2go.v24"
 
 type Git struct {
 	url  string

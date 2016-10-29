@@ -25,3 +25,7 @@ machine:
 dependencies:
   cache_directories:
     - "/home/ubuntu/download"
+
+test:
+  override:
+    - make test
