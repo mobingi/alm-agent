@@ -25,7 +25,7 @@ type Docker struct {
 
 func New(image, username, password string) (*Docker, error) {
 	docker := &Docker{
-		image:    strings.Trim(image, "http://"),
+		image:    strings.TrimPrefix(image, "http://"),
 		username: username,
 		password: password,
 	}
