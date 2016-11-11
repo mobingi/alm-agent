@@ -1,4 +1,4 @@
-package docker
+package container
 
 import (
 	"bytes"
@@ -23,7 +23,7 @@ type Docker struct {
 	identityToken string
 }
 
-func New(image, username, password string) (*Docker, error) {
+func NewDocker(image, username, password string) (*Docker, error) {
 	docker := &Docker{
 		image:    strings.TrimPrefix(image, "http://"),
 		username: username,
@@ -54,23 +54,26 @@ func (d *Docker) ImagePull() error {
 	log.Infof("pulling image %s", d.image)
 	res, err := d.client.ImagePull(context.Background(), d.image, options)
 
+	if err != nil {
+		return err
+	}
+
 	// If you do not read from the response, ImagePull do nothing
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(res)
 	res.Close()
 
-	return err
+	return nil
 }
 
 func (d *Docker) ContainerCreate(name string) (types.ContainerCreateResponse, error) {
 	config := &container.Config{
-		Cmd:   []string{"/bin/bash"},
-		Image: name,
+		Image: d.image,
 	}
 	hostConfig := &container.HostConfig{}
 	networkingConfig := &network.NetworkingConfig{}
 
-	log.Infof("creating container %s", name)
+	log.Infof("creating container \"%s\" from image \"%s\"", name, d.image)
 	res, err := d.client.ContainerCreate(context.Background(), config, hostConfig, networkingConfig, name)
 	return res, err
 }
