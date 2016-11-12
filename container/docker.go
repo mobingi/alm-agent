@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"net"
-	"strconv"
 	"strings"
 	"time"
 
@@ -89,12 +87,8 @@ func (d *Docker) MapPort(c *Container) error {
 
 func (d *Docker) UnmapPort(c *Container) error {
 	for _, port := range d.ports {
-		key, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("0.0.0.0:%s", strconv.Itoa(port)))
-		if err != nil {
-			return err
-		}
-
-		err = d.pm.Unmap(key)
+		key := &net.TCPAddr{IP: net.IPv4(0, 0, 0, 0), Port: port}
+		err := d.pm.Unmap(key)
 		if err != nil {
 			return err
 		}
