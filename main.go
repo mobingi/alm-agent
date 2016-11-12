@@ -6,7 +6,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/mobingilabs/go-modaemon/config"
-	"github.com/mobingilabs/go-modaemon/container/docker"
+	"github.com/mobingilabs/go-modaemon/container"
 	"github.com/mobingilabs/go-modaemon/server_config"
 )
 
@@ -25,14 +25,31 @@ func main() {
 
 	s, err := serverConfig.Get(c.ServerConfigAPIEndPoint)
 
-	d, err := docker.New(s.Image, s.DockerHubUserName, s.DockerHubPassword)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	d, err := container.NewDocker(s)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = d.ImagePull()
+	greenContainer, err := d.StartContainer("green")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	err = d.MapPort(greenContainer)
+	if err != nil {
+		log.Error(err)
+	}
+
+	err = d.UnmapPort(greenContainer)
+	if err != nil {
+		log.Error(err)
+	}
+
+	d.StopContainer(greenContainer)
+	d.RemoveContainer(greenContainer)
 }

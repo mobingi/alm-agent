@@ -12,6 +12,7 @@ type Config struct {
 	DockerHubPassword string
 	Code              string
 	GitReference      string
+	Ports             []int
 }
 
 func Get(url string) (Config, error) {
