@@ -30,5 +30,4 @@ dependencies:
 
 test:
   override:
-    - make test:
-      pwd: ~/.go_workspace/src/github.com/mobingilabs/go-modaemon
+    - cd ~/.go_workspace/src/github.com/mobingilabs/go-modaemon && make test
