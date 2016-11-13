@@ -1,6 +1,6 @@
 package: github.com/mobingilabs/go-modaemon
 import:
 - package: github.com/docker/docker
-  version: b683958deeaae20463649085516d57df2fbdec53
+  version: febf53d91a43fe13fbb802d9e6b7b6732183cf21
   subpackages:
   - client

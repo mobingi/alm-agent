@@ -20,7 +20,7 @@ machine:
     - cd ~/download/libgit2-$LIBGIT2VERSION/build && cmake .. -DCMAKE_INSTALL_PREFIX=/usr
     - cd ~/download/libgit2-$LIBGIT2VERSION/build && sudo cmake --build . --target install
     - test -e ~/.go_workspace/src/github.com/mobingilabs || mkdir -p ~/.go_workspace/src/github.com/mobingilabs
-    - test -e ~/.go_workspace/src/github.com/mobingilabs || ln -s ~/go-modaemon ~/.go_workspace/src/github.com/mobingilabs
+    - test -e ~/.go_workspace/src/github.com/mobingilabs/go-modaemon || ln -s ~/go-modaemon ~/.go_workspace/src/github.com/mobingilabs
 
 dependencies:
   cache_directories:
@@ -30,4 +30,4 @@ dependencies:
 
 test:
   override:
-    - make test
+    - cd ~/.go_workspace/src/github.com/mobingilabs/go-modaemon && make test

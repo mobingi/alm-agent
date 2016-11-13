@@ -1,17 +1,18 @@
-hash: 5cbe299546a3a4d68be96d63b2ac2db727dea5baf23b902934fc3b40a9153b80
-updated: 2016-10-28T16:16:49.924616327Z
+hash: 290d75c8452e95d893bbddf11d7225788c2115ee57af59f2ea3693a95afb97bd
+updated: 2016-11-01T02:38:30.770753085Z
 imports:
 - name: github.com/docker/distribution
-  version: 431cfa3179d9b3766e39f6a74283db8bb5a13209
+  version: 93a48e361cbe06d1e77e9d17d02fa6db192a8ca5
   subpackages:
   - digest
   - reference
 - name: github.com/docker/docker
-  version: b683958deeaae20463649085516d57df2fbdec53
+  version: febf53d91a43fe13fbb802d9e6b7b6732183cf21
   subpackages:
   - api/types
   - api/types/blkiodev
   - api/types/container
+  - api/types/events
   - api/types/filters
   - api/types/mount
   - api/types/network
@@ -24,25 +25,31 @@ imports:
   - client
   - pkg/tlsconfig
 - name: github.com/docker/go-connections
-  version: 988efe982fdecb46f01d53465878ff1f2ff411ce
+  version: f512407a188ecb16f31a33dbc9c4e4814afc1b03
   subpackages:
   - nat
   - sockets
   - tlsconfig
 - name: github.com/docker/go-units
-  version: f2145db703495b2e525c59662db69a7344b00bb8
+  version: 8a7beacffa3009a9ac66bad506b18ffdd110cf97
+- name: github.com/docker/libnetwork
+  version: afa9396ba8c69f499e473be450bdb30a391c1cc9
+  subpackages:
+  - iptables
+  - portallocator
+  - portmapper
+- name: github.com/godbus/dbus
+  version: 9998ce8520caaa4a287fa5122ecb5d1ca1aeaede
 - name: github.com/Microsoft/go-winio
   version: ce2922f643c8fd76b46cadc7f404a06282678b34
 - name: github.com/opencontainers/runc
-  version: 52454cf90807727923b375afd7d84ac8fd523959
+  version: bc462c96bf7b15b68ab40e86335cefcb692707c1
   subpackages:
   - libcontainer/user
 - name: github.com/pkg/errors
-  version: a887431f7f6ef7687b556dbf718d9f351d4858a0
+  version: 248dadf4e9068a0b3e79f02ed0a610d935de5302
 - name: github.com/Sirupsen/logrus
   version: 55eb11d21d2a31a3cc93838241d04800f52e823d
-  subpackages:
-  - formatters/logstash
 - name: golang.org/x/net
   version: 4876518f9e71663000c348837735820161a42df7
   subpackages:
@@ -50,7 +57,7 @@ imports:
   - context/ctxhttp
   - proxy
 - name: golang.org/x/sys
-  version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
+  version: c200b10b5d5e122be351b67af224adc6128af5bf
   subpackages:
   - unix
   - windows
