@@ -5,6 +5,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
+	"github.com/mobingilabs/go-modaemon/code"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
 	"github.com/mobingilabs/go-modaemon/server_config"
@@ -29,13 +30,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	dir, err := code.Get(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	d, err := container.NewDocker(s)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	greenContainer, err := d.StartContainer("green", "/tmp")
+	greenContainer, err := d.StartContainer("green", dir)
 	if err != nil {
 		log.Fatal(err)
 	}
