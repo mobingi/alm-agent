@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net"
 	"strings"
 	"time"
@@ -27,6 +28,7 @@ type Docker struct {
 	password string
 	ports    []int
 	pm       *portmapper.PortMapper
+	codeDir  string
 }
 
 func NewDocker(s serverConfig.Config) (*Docker, error) {
@@ -36,6 +38,7 @@ func NewDocker(s serverConfig.Config) (*Docker, error) {
 		password: s.DockerHubPassword,
 		ports:    s.Ports,
 		pm:       portmapper.New(""),
+		codeDir:  s.CodeDir,
 	}
 
 	chain := &iptables.ChainInfo{Name: "DOCKER", Table: "nat"}
@@ -48,14 +51,14 @@ func NewDocker(s serverConfig.Config) (*Docker, error) {
 	return docker, err
 }
 
-func (d *Docker) StartContainer(name string) (*Container, error) {
+func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 
 	err := d.imagePull()
 	if err != nil {
 		return nil, err
 	}
 
-	c, err := d.containerCreate(name)
+	c, err := d.containerCreate(name, dir)
 	if err != nil {
 		return nil, err
 	}
@@ -126,11 +129,15 @@ func (d *Docker) imagePull() error {
 	return nil
 }
 
-func (d *Docker) containerCreate(name string) (*Container, error) {
+func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 	config := &container.Config{
 		Image: d.image,
 	}
+
 	hostConfig := &container.HostConfig{}
+	bind := fmt.Sprintf("%s:%s", dir, d.codeDir)
+	hostConfig.Binds = append(hostConfig.Binds, bind)
+
 	networkingConfig := &network.NetworkingConfig{}
 
 	log.Infof("creating container \"%s\" from image \"%s\"", name, d.image)

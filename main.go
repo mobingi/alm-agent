@@ -35,7 +35,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	greenContainer, err := d.StartContainer("green")
+	greenContainer, err := d.StartContainer("green", "/tmp")
 	if err != nil {
 		log.Fatal(err)
 	}
