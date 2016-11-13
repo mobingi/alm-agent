@@ -11,6 +11,7 @@ type Config struct {
 	DockerHubUserName string
 	DockerHubPassword string
 	Code              string
+	CodeDir           string
 	GitReference      string
 	Ports             []int
 }
