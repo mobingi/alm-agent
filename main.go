@@ -31,13 +31,13 @@ func main() {
 		},
 		{
 			Name:   "stop",
-			Usage:  "start active container",
+			Usage:  "stop active container",
 			Action: cmd.Stop,
 			Flags:  flags,
 		},
 		{
 			Name:   "update",
-			Usage:  "update active container",
+			Usage:  "update code and image, then switch container",
 			Action: cmd.Update,
 			Flags:  flags,
 		},
