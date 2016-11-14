@@ -16,6 +16,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/opts"
 	"github.com/docker/libnetwork/iptables"
 	"github.com/docker/libnetwork/portmapper"
 	"golang.org/x/net/context"
@@ -51,6 +52,24 @@ func NewDocker(s serverConfig.Config) (*Docker, error) {
 	return docker, err
 }
 
+func (d *Docker) GetContainer(name string) (*Container, error) {
+	filter := opts.NewFilterOpt()
+	filter.Set(fmt.Sprintf("name=%s", name))
+	options := types.ContainerListOptions{
+		Filter: filter.Value(),
+	}
+	res, err := d.client.ContainerList(context.Background(), options)
+
+	name = strings.TrimPrefix(res[0].Names[0], "/")
+
+	c := &Container{ID: res[0].ID, Name: name}
+	c.IP, err = d.getIPAddress(c)
+	if err != nil {
+		return nil, err
+	}
+	return c, err
+}
+
 func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 
 	err := d.imagePull()
@@ -68,12 +87,11 @@ func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 		return nil, err
 	}
 
-	inspect, err := d.inspectContainer(c)
+	c.IP, err = d.getIPAddress(c)
 	if err != nil {
 		return nil, err
 	}
 
-	c.IP = net.ParseIP(inspect.NetworkSettings.IPAddress)
 	return c, nil
 }
 
@@ -97,6 +115,14 @@ func (d *Docker) UnmapPort(c *Container) error {
 		}
 	}
 	return nil
+}
+
+func (d *Docker) getIPAddress(c *Container) (net.IP, error) {
+	inspect, err := d.inspectContainer(c)
+	if err != nil {
+		return nil, err
+	}
+	return net.ParseIP(inspect.NetworkSettings.IPAddress), nil
 }
 
 func (d *Docker) imagePull() error {

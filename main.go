@@ -1,61 +1,48 @@
 package main
 
 import (
-	"flag"
+	"os"
+	"sort"
 
-	log "github.com/Sirupsen/logrus"
-
-	"github.com/mobingilabs/go-modaemon/code"
-	"github.com/mobingilabs/go-modaemon/config"
-	"github.com/mobingilabs/go-modaemon/container"
-	"github.com/mobingilabs/go-modaemon/server_config"
+	"github.com/mobingilabs/go-modaemon/cmd"
+	"github.com/urfave/cli"
 )
 
 func main() {
-	const defaultModaemonConfig = "/opt/modaemon/modaemon.cfg"
+	app := cli.NewApp()
+	app.Name = "go-modaemon"
+	app.Version = "0.1.0"
+	app.Usage = ""
 
-	var modaemonConfig string
-	flag.StringVar(&modaemonConfig, "c", defaultModaemonConfig, "path of modaemon.cfg")
-	flag.Parse()
-
-	c, err := config.LoadFromFile(modaemonConfig)
-
-	if err != nil {
-		log.Fatal(err)
+	flags := []cli.Flag{
+		cli.StringFlag{
+			Name:  "config, c",
+			Value: "/opt/modaemon/modaemon.cfg",
+			Usage: "Load configuration from `FILE`",
+		},
 	}
 
-	s, err := serverConfig.Get(c.ServerConfigAPIEndPoint)
-
-	if err != nil {
-		log.Fatal(err)
+	app.Commands = []cli.Command{
+		{
+			Name:   "start",
+			Usage:  "start active container",
+			Action: cmd.Start,
+			Flags:  flags,
+		},
+		{
+			Name:   "stop",
+			Usage:  "start active container",
+			Action: cmd.Stop,
+			Flags:  flags,
+		},
 	}
 
-	dir, err := code.Get(s)
+	sort.Sort(cli.FlagsByName(app.Flags))
+
+	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		os.Exit(1)
+	} else {
+		os.Exit(0)
 	}
-
-	d, err := container.NewDocker(s)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	greenContainer, err := d.StartContainer("green", dir)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = d.MapPort(greenContainer)
-	if err != nil {
-		log.Error(err)
-	}
-
-	err = d.UnmapPort(greenContainer)
-	if err != nil {
-		log.Error(err)
-	}
-
-	d.StopContainer(greenContainer)
-	d.RemoveContainer(greenContainer)
 }
