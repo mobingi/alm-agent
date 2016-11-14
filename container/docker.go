@@ -106,7 +106,7 @@ func (d *Docker) MapPort(c *Container) error {
 	return nil
 }
 
-func (d *Docker) UnmapPort(c *Container) error {
+func (d *Docker) UnmapPort() error {
 	for _, port := range d.ports {
 		key := &net.TCPAddr{IP: net.IPv4(0, 0, 0, 0), Port: port}
 		err := d.pm.Unmap(key)
@@ -114,6 +114,15 @@ func (d *Docker) UnmapPort(c *Container) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func (d *Docker) RenameContainer(c *Container, name string) error {
+	err := d.client.ContainerRename(context.Background(), c.ID, name)
+	if err != nil {
+		return err
+	}
+	c.Name = name
 	return nil
 }
 

@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"github.com/mobingilabs/go-modaemon/code"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
 	"github.com/mobingilabs/go-modaemon/server_config"
 	"github.com/urfave/cli"
 )
 
-func Stop(c *cli.Context) error {
+func Update(c *cli.Context) error {
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {
 		return err
@@ -18,16 +19,28 @@ func Stop(c *cli.Context) error {
 		return err
 	}
 
+	dir, err := code.Get(s)
+	if err != nil {
+		return err
+	}
+
 	d, err := container.NewDocker(s)
 	if err != nil {
 		return err
 	}
 
-	activeContainer, err := d.GetContainer("active")
-	d.MapPort(activeContainer) // For regenerating port map information
+	oldContainer, err := d.GetContainer("active")
+	d.MapPort(oldContainer) // For regenerating port map information
+
+	newContainer, err := d.StartContainer("standby", dir)
+
 	d.UnmapPort()
-	d.StopContainer(activeContainer)
-	d.RemoveContainer(activeContainer)
+	d.MapPort(newContainer)
+
+	d.StopContainer(oldContainer)
+	d.RemoveContainer(oldContainer)
+
+	d.RenameContainer(newContainer, "active")
 
 	return nil
 }

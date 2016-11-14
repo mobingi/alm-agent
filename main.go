@@ -35,6 +35,12 @@ func main() {
 			Action: cmd.Stop,
 			Flags:  flags,
 		},
+		{
+			Name:   "update",
+			Usage:  "update active container",
+			Action: cmd.Update,
+			Flags:  flags,
+		},
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
