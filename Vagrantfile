@@ -32,18 +32,6 @@ Vagrant.configure("2") do |config|
     mkdir -p ~vagrant/src/github.com/mobingilabs/go-modaemon
     chown -R vagrant:vagrant ~vagrant/src
 
-    echo Installing libgit2 ...
-    if [ ! -f v0.24.2.tar.gz ]; then
-      wget -q https://github.com/libgit2/libgit2/archive/v0.24.2.tar.gz
-      tar zxvf v0.24.2.tar.gz
-      cd libgit2-0.24.2
-      mkdir build && cd build
-      cmake ..
-      cmake --build .
-      cmake .. -DCMAKE_INSTALL_PREFIX=/usr
-      cmake --build . --target install
-    fi
-
     apt-get install -y apt-transport-https ca-certificates
     apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual
     apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
