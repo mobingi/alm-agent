@@ -1,6 +1,6 @@
 package code
 
-import git "gopkg.in/libgit2/git2go.v24"
+import "os/exec"
 
 type Git struct {
 	url  string
@@ -9,7 +9,5 @@ type Git struct {
 }
 
 func (g *Git) get() error {
-	options := &git.CloneOptions{CheckoutBranch: g.ref}
-	_, err := git.Clone(g.url, g.path, options)
-	return err
+	return exec.Command("git", "clone", "-b", g.ref, g.url, g.path).Run()
 }
