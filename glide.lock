@@ -1,5 +1,5 @@
 hash: 290d75c8452e95d893bbddf11d7225788c2115ee57af59f2ea3693a95afb97bd
-updated: 2016-11-14T15:38:55.560831179+09:00
+updated: 2016-11-21T13:31:37.286396135+09:00
 imports:
 - name: github.com/docker/distribution
   version: 93a48e361cbe06d1e77e9d17d02fa6db192a8ca5
@@ -23,6 +23,7 @@ imports:
   - api/types/time
   - api/types/versions
   - client
+  - opts
   - pkg/tlsconfig
 - name: github.com/docker/go-connections
   version: f512407a188ecb16f31a33dbc9c4e4814afc1b03
@@ -62,6 +63,4 @@ imports:
   version: c200b10b5d5e122be351b67af224adc6128af5bf
   subpackages:
   - windows
-- name: gopkg.in/libgit2/git2go.v24
-  version: 22091886372e73de5d66168e8665775676ec13c5
 testImports: []
