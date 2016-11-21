@@ -1,5 +1,5 @@
 hash: 290d75c8452e95d893bbddf11d7225788c2115ee57af59f2ea3693a95afb97bd
-updated: 2016-11-01T02:38:30.770753085Z
+updated: 2016-11-14T15:38:55.560831179+09:00
 imports:
 - name: github.com/docker/distribution
   version: 93a48e361cbe06d1e77e9d17d02fa6db192a8ca5
@@ -50,6 +50,8 @@ imports:
   version: 248dadf4e9068a0b3e79f02ed0a610d935de5302
 - name: github.com/Sirupsen/logrus
   version: 55eb11d21d2a31a3cc93838241d04800f52e823d
+- name: github.com/urfave/cli
+  version: b4f4786f378c0c1d3336b5bb798094b166edf5a9
 - name: golang.org/x/net
   version: 4876518f9e71663000c348837735820161a42df7
   subpackages:
@@ -59,7 +61,6 @@ imports:
 - name: golang.org/x/sys
   version: c200b10b5d5e122be351b67af224adc6128af5bf
   subpackages:
-  - unix
   - windows
 - name: gopkg.in/libgit2/git2go.v24
   version: 22091886372e73de5d66168e8665775676ec13c5
