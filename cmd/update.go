@@ -19,9 +19,22 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
-	dir, err := code.Get(s)
+	code := code.Code{
+		URL: s.Code,
+		Ref: s.GitReference,
+	}
+
+	codeUpdated, err := code.CheckUpdate()
 	if err != nil {
 		return err
+	}
+
+	var dir string
+	if codeUpdated {
+		dir, err = code.Get()
+		if err != nil {
+			return err
+		}
 	}
 
 	d, err := container.NewDocker(s)

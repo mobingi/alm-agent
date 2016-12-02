@@ -19,7 +19,12 @@ func Start(c *cli.Context) error {
 		return err
 	}
 
-	dir, err := code.Get(s)
+	code := code.Code{
+		URL: s.Code,
+		Ref: s.GitReference,
+	}
+
+	dir, err := code.Get()
 	if err != nil {
 		return err
 	}
