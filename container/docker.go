@@ -52,6 +52,19 @@ func NewDocker(s serverConfig.Config) (*Docker, error) {
 	return docker, err
 }
 
+func (d *Docker) CheckImageUpdated() (bool, error) {
+	res, err := d.imagePull()
+	if err != nil {
+		return false, err
+	}
+
+	if strings.Contains(res, "Image is up to date for") {
+		return false, nil
+	} else {
+		return true, nil
+	}
+}
+
 func (d *Docker) GetContainer(name string) (*Container, error) {
 	filter := opts.NewFilterOpt()
 	filter.Set(fmt.Sprintf("name=%s", name))
@@ -59,6 +72,13 @@ func (d *Docker) GetContainer(name string) (*Container, error) {
 		Filter: filter.Value(),
 	}
 	res, err := d.client.ContainerList(context.Background(), options)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(res) == 0 {
+		return nil, nil
+	}
 
 	name = strings.TrimPrefix(res[0].Names[0], "/")
 
@@ -72,7 +92,7 @@ func (d *Docker) GetContainer(name string) (*Container, error) {
 
 func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 
-	err := d.imagePull()
+	_, err := d.imagePull()
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +154,7 @@ func (d *Docker) getIPAddress(c *Container) (net.IP, error) {
 	return net.ParseIP(inspect.NetworkSettings.IPAddress), nil
 }
 
-func (d *Docker) imagePull() error {
+func (d *Docker) imagePull() (string, error) {
 	authConfig := &types.AuthConfig{
 		Username: d.username,
 		Password: d.password,
@@ -142,7 +162,7 @@ func (d *Docker) imagePull() error {
 
 	b, err := json.Marshal(authConfig)
 	if err != nil {
-		return err
+		return "", err
 	}
 	encodedAuth := base64.URLEncoding.EncodeToString(b)
 
@@ -153,7 +173,7 @@ func (d *Docker) imagePull() error {
 	res, err := d.client.ImagePull(context.Background(), d.image, options)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// If you do not read from the response, ImagePull do nothing
@@ -161,7 +181,7 @@ func (d *Docker) imagePull() error {
 	buf.ReadFrom(res)
 	res.Close()
 
-	return nil
+	return buf.String(), nil
 }
 
 func (d *Docker) containerCreate(name string, dir string) (*Container, error) {

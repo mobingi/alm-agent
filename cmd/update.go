@@ -19,9 +19,24 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
-	dir, err := code.Get(s)
+	code := code.Code{
+		URL: s.Code,
+		Ref: s.GitReference,
+	}
+
+	codeUpdated, err := code.CheckUpdate()
 	if err != nil {
 		return err
+	}
+
+	var dir string
+	if codeUpdated {
+		dir, err = code.Get()
+		if err != nil {
+			return err
+		}
+	} else {
+		dir = code.Path
 	}
 
 	d, err := container.NewDocker(s)
@@ -29,7 +44,21 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
+	imageUpdated, err := d.CheckImageUpdated()
+
 	oldContainer, err := d.GetContainer("active")
+	if err != nil {
+		return err
+	}
+
+	if oldContainer == nil {
+		return Start(c)
+	}
+
+	if !codeUpdated && !imageUpdated {
+		return nil
+	}
+
 	d.MapPort(oldContainer) // For regenerating port map information
 
 	newContainer, err := d.StartContainer("standby", dir)
