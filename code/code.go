@@ -42,6 +42,15 @@ func (c *Code) CheckUpdate() (bool, error) {
 
 	sort.Sort(Dirs(dirs))
 
+	if len(dirs) > 10 {
+		for _, dir := range dirs[10:] {
+			err := os.RemoveAll(path.Join(base, dir.Name()))
+			if err != nil {
+				return false, err
+			}
+		}
+	}
+
 	g := &Git{
 		url:  c.URL,
 		path: path.Join(base, dirs[0].Name()),
