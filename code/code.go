@@ -51,9 +51,10 @@ func (c *Code) CheckUpdate() (bool, error) {
 		}
 	}
 
+	c.Path = path.Join(base, dirs[0].Name())
 	g := &Git{
 		url:  c.URL,
-		path: path.Join(base, dirs[0].Name()),
+		path: c.Path,
 		ref:  c.Ref,
 	}
 
