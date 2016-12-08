@@ -7,18 +7,16 @@ import (
 
 // Config is a struct which has config data from modaemon.cfg
 type Config struct {
-	ServerConfigAPIEndPoint string
-	UserID                  string
-	StackID                 string
-	LogicalStakID           string
-	AccessKey               string
-	SecretKey               string
-	APIHost                 string
-	AuthorizationToken      string
-	StorageService          string
-	LogBucket               string
-	ServerRole              string
-	HideAWSFromContainers   string
+	UserID             string
+	StackID            string
+	LogicalStakID      string
+	AccessKey          string
+	SecretKey          string
+	APIHost            string
+	AuthorizationToken string
+	StorageService     string
+	LogBucket          string
+	ServerRole         string
 }
 
 func Load(b []byte) (Config, error) {
