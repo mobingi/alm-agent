@@ -36,7 +36,9 @@ func NewClient(conf *config.Config) (*client, error) {
 		client: &http.Client{},
 	}
 
-	return c, nil
+	err := c.getAccessToken()
+
+	return c, err
 }
 
 func (c *client) GetServerConfig() (*serverConfig.Config, error) {
