@@ -23,6 +23,12 @@ type client struct {
 	token     string
 }
 
+type StsToken struct {
+	AccessKeyID     string
+	SecretAccessKey string
+	SessionToken    string
+}
+
 func NewClient(conf *config.Config) (*client, error) {
 	c := &client{
 		config: conf,
@@ -32,7 +38,7 @@ func NewClient(conf *config.Config) (*client, error) {
 	return c, nil
 }
 
-func (c *client) getServerConfig() (*serverConfig.Config, error) {
+func (c *client) GetServerConfig() (*serverConfig.Config, error) {
 	values := url.Values{}
 	values.Set("stack_id", c.config.StackID)
 
@@ -48,6 +54,25 @@ func (c *client) getServerConfig() (*serverConfig.Config, error) {
 	}
 
 	return conf.ServerConfig, nil
+}
+
+func (c *client) GetStsToken() (*StsToken, error) {
+	values := url.Values{}
+	values.Set("user_id", c.config.UserID)
+	values.Set("stack_id", c.config.StackID)
+
+	res, err := c.get("/v2/alm/sts", values)
+	if err != nil {
+		return nil, err
+	}
+
+	stsToken := &StsToken{}
+	err = json.Unmarshal(res, stsToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return stsToken, nil
 }
 
 func (c *client) get(path string, values url.Values) ([]byte, error) {
