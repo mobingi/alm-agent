@@ -36,5 +36,8 @@ func (g *Git) checkUpdate() (bool, error) {
 }
 
 func (g *Git) get() error {
+	if g.ref == "" {
+		g.ref = "master"
+	}
 	return exec.Command("git", "clone", "-b", g.ref, g.url, g.path).Run()
 }
