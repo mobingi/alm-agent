@@ -19,14 +19,14 @@ type Config struct {
 	ServerRole         string
 }
 
-func Load(b []byte) (Config, error) {
-	c := Config{}
+func Load(b []byte) (*Config, error) {
+	c := &Config{}
 	err := json.Unmarshal(b, &c)
 	return c, err
 }
 
-func LoadFromFile(file string) (Config, error) {
-	c := Config{}
+func LoadFromFile(file string) (*Config, error) {
+	c := &Config{}
 
 	dat, err := ioutil.ReadFile(file)
 

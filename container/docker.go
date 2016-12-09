@@ -32,7 +32,7 @@ type Docker struct {
 	codeDir  string
 }
 
-func NewDocker(s serverConfig.Config) (*Docker, error) {
+func NewDocker(s *serverConfig.Config) (*Docker, error) {
 	docker := &Docker{
 		image:    strings.TrimPrefix(s.Image, "http://"),
 		username: s.DockerHubUserName,
