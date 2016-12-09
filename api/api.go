@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/server_config"
@@ -51,9 +52,28 @@ func (c *client) getServerConfig() (*serverConfig.Config, error) {
 
 func (c *client) get(path string, values url.Values) ([]byte, error) {
 	req, err := http.NewRequest("GET", c.config.APIHost+path, nil)
-	req.Header.Add("Authorization", fmt.Sprintf("%s %s", c.tokenType, c.token))
+	if c.token != "" && c.tokenType != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("%s %s", c.tokenType, c.token))
+	}
 
 	req.URL.RawQuery = values.Encode()
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	res, err := ioutil.ReadAll(resp.Body)
+	return res, nil
+}
+
+func (c *client) post(path string, values url.Values) ([]byte, error) {
+	req, err := http.NewRequest("POST", c.config.APIHost+path, strings.NewReader(values.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if c.token != "" && c.tokenType != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("%s %s", c.tokenType, c.token))
+	}
 
 	resp, err := c.client.Do(req)
 	if err != nil {
@@ -71,21 +91,20 @@ func (c *client) getAccessToken() error {
 	values.Set("client_id", c.config.StackID)
 	values.Set("client_secret", c.config.AuthorizationToken)
 
-	resp, err := c.client.PostForm(c.config.APIHost+"/v2/access_token", values)
+	res, err := c.post("/v2/access_token", values)
 	if err != nil {
 		return err
 	}
 
-	defer resp.Body.Close()
+	var tokenInfo map[string]interface{}
 
-	var res map[string]interface{}
-
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+	err = json.Unmarshal(res, &tokenInfo)
+	if err != nil {
 		return err
 	}
 
-	c.tokenType = res["token_type"].(string)
-	c.token = res["access_token"].(string)
+	c.tokenType = tokenInfo["token_type"].(string)
+	c.token = tokenInfo["access_token"].(string)
 
 	return nil
 }
