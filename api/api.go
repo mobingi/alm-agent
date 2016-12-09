@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -75,6 +76,16 @@ func (c *client) GetStsToken() (*StsToken, error) {
 	return stsToken, nil
 }
 
+func (c *client) SendInstanceStatus(serverID, status string) error {
+	values := url.Values{}
+	values.Set("instance_id", serverID)
+	values.Set("stack_id", c.config.StackID)
+	values.Set("status", status)
+
+	_, err := c.post("/v2/alm/instance/status", values)
+	return err
+}
+
 func (c *client) get(path string, values url.Values) ([]byte, error) {
 	req, err := http.NewRequest("GET", c.config.APIHost+path, nil)
 	if c.token != "" && c.tokenType != "" {
@@ -90,7 +101,12 @@ func (c *client) get(path string, values url.Values) ([]byte, error) {
 
 	defer resp.Body.Close()
 	res, err := ioutil.ReadAll(resp.Body)
-	return res, nil
+
+	if resp.StatusCode != http.StatusOK {
+		return res, errors.New(resp.Status)
+	} else {
+		return res, nil
+	}
 }
 
 func (c *client) post(path string, values url.Values) ([]byte, error) {
@@ -107,7 +123,12 @@ func (c *client) post(path string, values url.Values) ([]byte, error) {
 
 	defer resp.Body.Close()
 	res, err := ioutil.ReadAll(resp.Body)
-	return res, nil
+
+	if resp.StatusCode != http.StatusOK {
+		return res, errors.New(resp.Status)
+	} else {
+		return res, nil
+	}
 }
 
 func (c *client) getAccessToken() error {
