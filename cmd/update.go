@@ -24,10 +24,7 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
-	code := code.Code{
-		URL: s.Code,
-		Ref: s.GitReference,
-	}
+	code := code.New(s)
 
 	codeUpdated, err := code.CheckUpdate()
 	if err != nil {

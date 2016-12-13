@@ -6,6 +6,8 @@ import (
 	"path"
 	"sort"
 	"time"
+
+	"github.com/mobingilabs/go-modaemon/server_config"
 )
 
 type Code struct {
@@ -25,6 +27,17 @@ func (d Dirs) Swap(i, j int) {
 }
 func (d Dirs) Less(i, j int) bool {
 	return d[j].ModTime().Unix() < d[i].ModTime().Unix()
+}
+
+func New(s *serverConfig.Config) *Code {
+	ref := s.GitReference
+	if ref == "" {
+		ref = "master"
+	}
+	return &Code{
+		URL: s.Code,
+		Ref: ref,
+	}
 }
 
 func (c *Code) CheckUpdate() (bool, error) {
