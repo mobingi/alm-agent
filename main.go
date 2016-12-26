@@ -45,10 +45,5 @@ func main() {
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 
-	err := app.Run(os.Args)
-	if err != nil {
-		os.Exit(1)
-	} else {
-		os.Exit(0)
-	}
+	app.Run(os.Args)
 }
