@@ -3,6 +3,8 @@ package code
 import (
 	"fmt"
 	"os/exec"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type Git struct {
@@ -36,5 +38,10 @@ func (g *Git) checkUpdate() (bool, error) {
 }
 
 func (g *Git) get() error {
-	return exec.Command("git", "clone", "-b", g.ref, g.url, g.path).Run()
+	log.Infof("Executing git clone -b %s %s %s", g.ref, g.url, g.path)
+	out, err := exec.Command("git", "clone", "-b", g.ref, g.url, g.path).CombinedOutput()
+	if err != nil {
+		log.Error(string(out))
+	}
+	return err
 }
