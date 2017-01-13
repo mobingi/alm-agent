@@ -1,10 +1,10 @@
 package cmd
 
 import (
+	"github.com/mobingilabs/go-modaemon/api"
 	"github.com/mobingilabs/go-modaemon/code"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
-	"github.com/mobingilabs/go-modaemon/server_config"
 	"github.com/urfave/cli"
 )
 
@@ -14,15 +14,17 @@ func Start(c *cli.Context) error {
 		return err
 	}
 
-	s, err := serverConfig.Get(conf.ServerConfigAPIEndPoint)
+	apiClient, err := api.NewClient(conf)
 	if err != nil {
 		return err
 	}
 
-	code := code.Code{
-		URL: s.Code,
-		Ref: s.GitReference,
+	s, err := apiClient.GetServerConfig()
+	if err != nil {
+		return err
 	}
+
+	code := code.New(s)
 
 	dir, err := code.Get()
 	if err != nil {
