@@ -13,10 +13,6 @@ import (
 	"github.com/mobingilabs/go-modaemon/server_config"
 )
 
-type conf struct {
-	ServerConfig *serverConfig.Config
-}
-
 type client struct {
 	client    *http.Client
 	config    *config.Config
@@ -50,13 +46,13 @@ func (c *client) GetServerConfig() (*serverConfig.Config, error) {
 		return nil, err
 	}
 
-	conf := &conf{}
+	conf := &serverConfig.Config{}
 	err = json.Unmarshal(res, conf)
 	if err != nil {
 		return nil, err
 	}
 
-	return conf.ServerConfig, nil
+	return conf, nil
 }
 
 func (c *client) GetStsToken() (*StsToken, error) {
