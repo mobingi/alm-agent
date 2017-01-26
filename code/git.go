@@ -1,8 +1,11 @@
 package code
 
 import (
+	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -14,9 +17,25 @@ type Git struct {
 }
 
 func (g *Git) checkUpdate() (bool, error) {
+	out, err := execPipeline(
+		g.path,
+		[]string{"git", "remote", "-v"},
+		[]string{"grep", "fetch"},
+		[]string{"awk", "{print $2}"},
+	)
+
+	if err != nil {
+		return false, err
+	}
+
+	url := strings.Trim(string(out), "\n")
+	if url != g.url {
+		return true, nil
+	}
+
 	cmd := exec.Command("git", "fetch")
 	cmd.Dir = g.path
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		return false, err
 	}
@@ -24,7 +43,7 @@ func (g *Git) checkUpdate() (bool, error) {
 	cmd = exec.Command("git", "diff", fmt.Sprintf("origin/%s", g.ref))
 	cmd.Dir = g.path
 
-	out, err := cmd.Output()
+	out, err = cmd.Output()
 
 	if err != nil {
 		return false, err
@@ -44,4 +63,35 @@ func (g *Git) get() error {
 		log.Error(string(out))
 	}
 	return err
+}
+
+func execPipeline(dir string, commands ...[]string) ([]byte, error) {
+	cmds := make([]*exec.Cmd, len(commands))
+	var err error
+
+	for i, c := range commands {
+		cmds[i] = exec.Command(c[0], c[1:]...)
+		if dir != "" {
+			cmds[i].Dir = dir
+		}
+		if i > 0 {
+			if cmds[i].Stdin, err = cmds[i-1].StdoutPipe(); err != nil {
+				return nil, err
+			}
+		}
+		cmds[i].Stderr = os.Stderr
+	}
+	var out bytes.Buffer
+	cmds[len(cmds)-1].Stdout = &out
+	for _, c := range cmds {
+		if err = c.Start(); err != nil {
+			return nil, err
+		}
+	}
+	for _, c := range cmds {
+		if err = c.Wait(); err != nil {
+			return nil, err
+		}
+	}
+	return out.Bytes(), nil
 }
