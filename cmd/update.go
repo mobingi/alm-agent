@@ -47,6 +47,9 @@ func Update(c *cli.Context) error {
 	}
 
 	imageUpdated, err := d.CheckImageUpdated()
+	if err != nil {
+		return err
+	}
 
 	oldContainer, err := d.GetContainer("active")
 	if err != nil {
@@ -64,6 +67,9 @@ func Update(c *cli.Context) error {
 	d.MapPort(oldContainer) // For regenerating port map information
 
 	newContainer, err := d.StartContainer("standby", dir)
+	if err != nil {
+		return err
+	}
 
 	d.UnmapPort()
 	d.MapPort(newContainer)
