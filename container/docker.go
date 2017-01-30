@@ -190,9 +190,10 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 	}
 
 	hostConfig := &container.HostConfig{}
-	bind := fmt.Sprintf("%s:%s", dir, d.codeDir)
-	hostConfig.Binds = append(hostConfig.Binds, bind)
-
+	if dir != "" {
+		bind := fmt.Sprintf("%s:%s", dir, d.codeDir)
+		hostConfig.Binds = append(hostConfig.Binds, bind)
+	}
 	networkingConfig := &network.NetworkingConfig{}
 
 	log.Infof("creating container \"%s\" from image \"%s\"", name, d.image)
