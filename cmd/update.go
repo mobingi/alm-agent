@@ -24,21 +24,24 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
-	code := code.New(s)
+	codeDir := ""
+	codeUpdated := false
+	if s.Code != "" {
+		code := code.New(s)
 
-	codeUpdated, err := code.CheckUpdate()
-	if err != nil {
-		return err
-	}
-
-	var dir string
-	if codeUpdated {
-		dir, err = code.Get()
+		codeUpdated, err := code.CheckUpdate()
 		if err != nil {
 			return err
 		}
-	} else {
-		dir = code.Path
+
+		if codeUpdated {
+			codeDir, err = code.Get()
+			if err != nil {
+				return err
+			}
+		} else {
+			codeDir = code.Path
+		}
 	}
 
 	d, err := container.NewDocker(s)
@@ -66,7 +69,7 @@ func Update(c *cli.Context) error {
 
 	d.MapPort(oldContainer) // For regenerating port map information
 
-	newContainer, err := d.StartContainer("standby", dir)
+	newContainer, err := d.StartContainer("standby", codeDir)
 	if err != nil {
 		return err
 	}

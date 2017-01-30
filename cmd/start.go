@@ -24,11 +24,13 @@ func Start(c *cli.Context) error {
 		return err
 	}
 
-	code := code.New(s)
-
-	dir, err := code.Get()
-	if err != nil {
-		return err
+	codeDir := ""
+	if s.Code != "" {
+		code := code.New(s)
+		codeDir, err = code.Get()
+		if err != nil {
+			return err
+		}
 	}
 
 	d, err := container.NewDocker(s)
@@ -36,7 +38,7 @@ func Start(c *cli.Context) error {
 		return err
 	}
 
-	newContainer, err := d.StartContainer("active", dir)
+	newContainer, err := d.StartContainer("active", codeDir)
 	if err != nil {
 		return err
 	}
