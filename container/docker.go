@@ -13,6 +13,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mobingilabs/go-modaemon/server_config"
+	"github.com/mobingilabs/go-modaemon/util"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -197,20 +198,20 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 		hostConfig.Binds = append(hostConfig.Binds, bind)
 
 		initScriptFile := ""
-		if fileExists(path.Join(dir, "mobingi-init.sh")) {
+		if util.FileExists(path.Join(dir, "mobingi-init.sh")) {
 			initScriptFile = path.Join(dir, "mobingi-init.sh")
-		} else if fileExists(path.Join(dir, "mobingi-install.sh")) {
+		} else if util.FileExists(path.Join(dir, "mobingi-install.sh")) {
 			initScriptFile = path.Join(dir, "mobingi-init.sh")
 		}
 
 		if initScriptFile != "" {
-			if !fileExists("/tmp/init") {
+			if !util.FileExists("/tmp/init") {
 				if err := os.Mkdir("/tmp/init", 0700); err != nil {
 					return nil, err
 				}
 			}
 
-			if fileExists("/tmp/init/init.sh") {
+			if util.FileExists("/tmp/init/init.sh") {
 				if err := os.Remove("/tmp/init/init.sh"); err != nil {
 					return nil, err
 				}
@@ -233,11 +234,6 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 	log.Infof("creating container \"%s\" from image \"%s\"", name, d.image)
 	res, err := d.client.ContainerCreate(context.Background(), config, hostConfig, networkingConfig, name)
 	return &Container{Name: name, ID: res.ID}, err
-}
-
-func fileExists(filename string) bool {
-	_, err := os.Stat(filename)
-	return err == nil
 }
 
 func (d *Docker) containerStart(c *Container) error {

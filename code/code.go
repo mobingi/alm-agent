@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/mobingilabs/go-modaemon/server_config"
+	"github.com/mobingilabs/go-modaemon/util"
 )
 
 type Code struct {
@@ -75,10 +76,17 @@ func (c *Code) CheckUpdate() (bool, error) {
 }
 
 func (c *Code) Get() (string, error) {
+	baseDir := path.Join("/srv", "code")
+	if !util.FileExists(baseDir) {
+		if err := os.MkdirAll(baseDir, 0755); err != nil {
+			return "", err
+		}
+	}
+
 	t := time.Now().Format("20060102150405")
 	g := &Git{
 		url:  c.URL,
-		path: path.Join("/srv", "code", t),
+		path: path.Join(baseDir, t),
 		ref:  c.Ref,
 	}
 	err := g.get()
