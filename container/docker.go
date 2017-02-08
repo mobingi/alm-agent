@@ -201,7 +201,7 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 		if util.FileExists(path.Join(dir, "mobingi-init.sh")) {
 			initScriptFile = path.Join(dir, "mobingi-init.sh")
 		} else if util.FileExists(path.Join(dir, "mobingi-install.sh")) {
-			initScriptFile = path.Join(dir, "mobingi-init.sh")
+			initScriptFile = path.Join(dir, "mobingi-install.sh")
 		}
 
 		if initScriptFile != "" {
