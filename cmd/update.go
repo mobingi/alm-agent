@@ -29,7 +29,7 @@ func Update(c *cli.Context) error {
 	if s.Code != "" {
 		code := code.New(s)
 
-		codeUpdated, err := code.CheckUpdate()
+		codeUpdated, err = code.CheckUpdate()
 		if err != nil {
 			return err
 		}
