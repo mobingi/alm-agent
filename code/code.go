@@ -43,6 +43,9 @@ func New(s *serverConfig.Config) *Code {
 
 func (c *Code) CheckUpdate() (bool, error) {
 	base := "/srv/code"
+	if !util.FileExists(base) {
+		return true, nil
+	}
 
 	dirs, err := ioutil.ReadDir(base)
 
