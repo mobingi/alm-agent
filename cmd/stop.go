@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/mobingilabs/go-modaemon/api"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
@@ -8,6 +9,10 @@ import (
 )
 
 func Stop(c *cli.Context) error {
+	if c.GlobalBool("verbose") {
+		log.SetLevel(log.DebugLevel)
+		log.Debug("Loglevel is set to DebugLevel.")
+	}
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {
 		return err

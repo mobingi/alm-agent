@@ -11,9 +11,18 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "go-modaemon"
-	app.Version = "0.1.0"
+	app.Version = "0.1.1.dev"
 	app.Usage = ""
 
+	// Gloabl Flags
+	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:  "verbose, V",
+			Usage: "show debug logs",
+		},
+	}
+
+	// Common Flags for commands
 	flags := []cli.Flag{
 		cli.StringFlag{
 			Name:  "config, c",
