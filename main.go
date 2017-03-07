@@ -45,6 +45,10 @@ func main() {
 			Value: "/opt/modaemon/modaemon.cfg",
 			Usage: "Load configuration from `FILE`",
 		},
+		cli.StringFlag{
+			Name:  "serverconfig, sc",
+			Usage: "Load ServerConfig from `URL`. ask to API by default",
+		},
 	}
 
 	app.Commands = []cli.Command{
