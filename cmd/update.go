@@ -19,7 +19,7 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
-	s, err := apiClient.GetServerConfig()
+	s, err := apiClient.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
 		return err
 	}
