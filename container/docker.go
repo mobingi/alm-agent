@@ -188,9 +188,11 @@ func (d *Docker) imagePull() (string, error) {
 }
 
 func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
+	// TODO: include Envs
 	config := &container.Config{
 		Image: d.image,
 	}
+	log.Debugf("ContainerConfig: %#v", config)
 
 	hostConfig := &container.HostConfig{}
 	if dir != "" {
@@ -233,6 +235,7 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 
 	log.Infof("creating container \"%s\" from image \"%s\"", name, d.image)
 	res, err := d.client.ContainerCreate(context.Background(), config, hostConfig, networkingConfig, name)
+	log.Debugf("hostConfig: %#v", hostConfig)
 	return &Container{Name: name, ID: res.ID}, err
 }
 
