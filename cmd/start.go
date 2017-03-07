@@ -27,7 +27,8 @@ func Start(c *cli.Context) error {
 	log.Debugf("%#v", apiClient)
 
 	log.Debug("Step: apiClient.GetServerConfig")
-	s, err := apiClient.GetServerConfig()
+	log.Debugf("Flag: %#v", c.String("serverconfig"))
+	s, err := apiClient.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
 		log.Debug(err)
 		return err

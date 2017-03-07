@@ -38,21 +38,46 @@ func NewClient(conf *config.Config) (*client, error) {
 	return c, err
 }
 
-func (c *client) GetServerConfig() (*serverConfig.Config, error) {
-	values := url.Values{}
-	values.Set("stack_id", c.config.StackID)
+func (c *client) GetServerConfig(sclocation string) (*serverConfig.Config, error) {
+	u, err := url.Parse(sclocation)
+	if err != nil {
+		return nil, err
+	}
+	log.Debugf("%#v", u)
 
-	log.Debug("Step: api: /v2/alm/serverconfig")
-	res, err := c.get("/v2/alm/serverconfig", values)
-	if err != nil {
-		return nil, err
-	}
-	log.Debugf("Response: %s", res)
 	conf := &serverConfig.Config{}
-	err = json.Unmarshal(res, conf)
-	if err != nil {
-		return nil, err
+	switch u.Scheme {
+	case "file":
+		log.Debug("Step: serverConfig.getFromFile")
+		b, err := ioutil.ReadFile(u.Path)
+		if err != nil {
+			return nil, err
+		}
+
+		log.Debugf("SCFfromfile: %s", b)
+
+		err = json.Unmarshal(b, conf)
+		if err != nil {
+			return nil, err
+		}
+	default:
+		log.Debug("Step: serverConfig.getFromHTTP")
+
+		values := url.Values{}
+		values.Set("stack_id", c.config.StackID)
+
+		log.Debug("Step: api: /v2/alm/serverconfig")
+		res, err := c.get("/v2/alm/serverconfig", values)
+		if err != nil {
+			return nil, err
+		}
+		log.Debugf("Response: %s", res)
+		err = json.Unmarshal(res, conf)
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	return conf, nil
 }
 
