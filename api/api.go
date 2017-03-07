@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strings"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/server_config"
 )
@@ -41,17 +42,17 @@ func (c *client) GetServerConfig() (*serverConfig.Config, error) {
 	values := url.Values{}
 	values.Set("stack_id", c.config.StackID)
 
+	log.Debug("Step: api: /v2/alm/serverconfig")
 	res, err := c.get("/v2/alm/serverconfig", values)
 	if err != nil {
 		return nil, err
 	}
-
+	log.Debugf("Response: %s", res)
 	conf := &serverConfig.Config{}
 	err = json.Unmarshal(res, conf)
 	if err != nil {
 		return nil, err
 	}
-
 	return conf, nil
 }
 

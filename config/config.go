@@ -22,6 +22,7 @@ type Config struct {
 func Load(b []byte) (*Config, error) {
 	c := &Config{}
 	err := json.Unmarshal(b, &c)
+
 	return c, err
 }
 

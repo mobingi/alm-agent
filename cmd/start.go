@@ -10,31 +10,36 @@ import (
 )
 
 func Start(c *cli.Context) error {
-	if c.GlobalBool("verbose") {
-		log.SetLevel(log.DebugLevel)
-		log.Debug("Loglevel is set to DebugLevel.")
-	}
-
+	log.Debug("Step: config.LoadFromFile")
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {
+		log.Error(err)
 		return err
 	}
+	log.Debugf("%#v", conf)
 
+	log.Debug("Step: api.NewClient")
 	apiClient, err := api.NewClient(conf)
 	if err != nil {
+		log.Debug(err)
 		return err
 	}
+	log.Debugf("%#v", apiClient)
 
+	log.Debug("Step: apiClient.GetServerConfig")
 	s, err := apiClient.GetServerConfig()
 	if err != nil {
+		log.Debug(err)
 		return err
 	}
+	log.Debugf("%#v", s)
 
 	codeDir := ""
 	if s.Code != "" {
 		code := code.New(s)
 		codeDir, err = code.Get()
 		if err != nil {
+			log.Error(err)
 			return err
 		}
 	}

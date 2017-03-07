@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision :shell, inline: <<-EOF
     echo Installing golang ...
-    archive=go1.7.3.linux-amd64.tar.gz
+    archive=go1.8.linux-amd64.tar.gz
     if [ ! -f $archive ]; then
       wget -q https://storage.googleapis.com/golang/$archive
     fi
