@@ -55,6 +55,7 @@ func Start(c *cli.Context) error {
 	}
 	log.Debugf("%#v", newContainer)
 
+	log.Debug("Step: d.MapPort")
 	err = d.MapPort(newContainer)
 	if err != nil {
 		return err

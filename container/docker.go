@@ -33,6 +33,7 @@ type Docker struct {
 	ports    []int
 	pm       *portmapper.PortMapper
 	codeDir  string
+	envs     []string
 }
 
 func NewDocker(s *serverConfig.Config) (*Docker, error) {
@@ -43,6 +44,14 @@ func NewDocker(s *serverConfig.Config) (*Docker, error) {
 		ports:    s.Ports,
 		pm:       portmapper.New(""),
 		codeDir:  s.CodeDir,
+		envs: func() []string {
+			var envs []string
+			for k, v := range s.EnvironmentVariables {
+				es := []string{k, v}
+				envs = append(envs, strings.Join(es, "="))
+			}
+			return envs
+		}(),
 	}
 
 	chain := &iptables.ChainInfo{Name: "DOCKER", Table: "nat"}
@@ -188,9 +197,9 @@ func (d *Docker) imagePull() (string, error) {
 }
 
 func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
-	// TODO: include Envs
 	config := &container.Config{
 		Image: d.image,
+		Env:   d.envs,
 	}
 	log.Debugf("ContainerConfig: %#v", config)
 
