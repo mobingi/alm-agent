@@ -8,5 +8,5 @@ type Config struct {
 	CodeDir              string
 	GitReference         string
 	Ports                []int
-	environmentVariables []string
+	EnvironmentVariables map[string]string
 }
