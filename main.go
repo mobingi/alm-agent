@@ -27,7 +27,7 @@ func globalOptions(c *cli.Context) error {
 func main() {
 	app := cli.NewApp()
 	app.Name = "go-modaemon"
-	app.Version = "0.1.1.dev"
+	app.Version = "0.1.1-dev"
 	app.Usage = ""
 
 	// Gloabl Flags

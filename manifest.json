@@ -1,0 +1,10 @@
+{
+    "dependencies": {
+        "github.com/docker/docker/...": {
+            "branch": "17.04.x"
+        },
+        "github.com/tcnksm/go-latest": {
+            "branch": "master"
+        }
+    }
+}

@@ -1,66 +1,100 @@
-hash: 290d75c8452e95d893bbddf11d7225788c2115ee57af59f2ea3693a95afb97bd
-updated: 2016-11-21T13:31:37.286396135+09:00
+hash: 453171e05899caa4adb6afec6dae6d8ea5bfe4812fc05c2e476da14bee365557
+updated: 2017-04-06T06:54:31.118104874Z
 imports:
 - name: github.com/docker/distribution
-  version: 93a48e361cbe06d1e77e9d17d02fa6db192a8ca5
+  version: 0700fa570d7bcc1b3e46ee127c4489fd25f4daa3
   subpackages:
-  - digest
+  - digestset
   - reference
 - name: github.com/docker/docker
-  version: febf53d91a43fe13fbb802d9e6b7b6732183cf21
+  version: e95f64d4f9922bb8eba0c62043acb7e0d8dd94fd
   subpackages:
+  - api
   - api/types
   - api/types/blkiodev
   - api/types/container
   - api/types/events
   - api/types/filters
+  - api/types/image
   - api/types/mount
   - api/types/network
-  - api/types/reference
   - api/types/registry
   - api/types/strslice
   - api/types/swarm
   - api/types/time
   - api/types/versions
+  - api/types/volume
   - client
   - opts
+  - pkg/ioutils
+  - pkg/longpath
+  - pkg/system
   - pkg/tlsconfig
 - name: github.com/docker/go-connections
-  version: f512407a188ecb16f31a33dbc9c4e4814afc1b03
+  version: e15c02316c12de00874640cd76311849de2aeed5
   subpackages:
   - nat
   - sockets
   - tlsconfig
 - name: github.com/docker/go-units
-  version: 8a7beacffa3009a9ac66bad506b18ffdd110cf97
+  version: 0dadbb0345b35ec7ef35e228dabb8de89a65bf52
 - name: github.com/docker/libnetwork
-  version: afa9396ba8c69f499e473be450bdb30a391c1cc9
+  version: f3c4ca8ce5c128e071bab198c4ed9fd0d08384eb
   subpackages:
   - iptables
   - portallocator
   - portmapper
+- name: github.com/docker/libtrust
+  version: aabc10ec26b754e797f9028f4589c5b7bd90dc20
 - name: github.com/godbus/dbus
-  version: 9998ce8520caaa4a287fa5122ecb5d1ca1aeaede
-- name: github.com/Microsoft/go-winio
-  version: ce2922f643c8fd76b46cadc7f404a06282678b34
-- name: github.com/opencontainers/runc
-  version: bc462c96bf7b15b68ab40e86335cefcb692707c1
+  version: b038411ec341afd52c6d36d8baae92a29e6e8a9e
+- name: github.com/golang/protobuf
+  version: 2bba0603135d7d7f5cb73b2125beeda19c09f4ef
   subpackages:
-  - libcontainer/user
+  - proto
+- name: github.com/google/go-github
+  version: 12363ffc10018c93407ebf303040586d55957271
+  subpackages:
+  - github
+- name: github.com/google/go-querystring
+  version: 53e6ce116135b80d037921a7fdd5138cf32d7a8a
+  subpackages:
+  - query
+- name: github.com/hashicorp/go-version
+  version: 03c5bf6be031b6dd45afec16b1cf94fc8938bc77
+- name: github.com/Microsoft/go-winio
+  version: fff283ad5116362ca252298cfc9b95828956d85d
+- name: github.com/opencontainers/go-digest
+  version: aa2ec055abd10d26d539eb630a92241b781ce4bc
 - name: github.com/pkg/errors
-  version: 248dadf4e9068a0b3e79f02ed0a610d935de5302
+  version: ff09b135c25aae272398c51a07235b90a75aa4f0
 - name: github.com/Sirupsen/logrus
-  version: 55eb11d21d2a31a3cc93838241d04800f52e823d
+  version: 10f801ebc38b33738c9d17d50860f484a0988ff5
+- name: github.com/tcnksm/go-latest
+  version: e3007ae9052ed85144087e7392e4c3fbc07962fa
 - name: github.com/urfave/cli
-  version: b4f4786f378c0c1d3336b5bb798094b166edf5a9
+  version: 8ba6f23b6e36d03666a14bd9421f5e3efcb59aca
 - name: golang.org/x/net
-  version: 4876518f9e71663000c348837735820161a42df7
+  version: ffcf1bedda3b04ebb15a168a59800a73d6dc0f4d
   subpackages:
   - context
   - context/ctxhttp
+  - html
+  - html/atom
   - proxy
 - name: golang.org/x/sys
-  version: c200b10b5d5e122be351b67af224adc6128af5bf
+  version: 39e3dc274464e7d2f663aa606a830611bae5f1db
   subpackages:
+  - unix
   - windows
+- name: google.golang.org/appengine
+  version: 56d253d1dd14aa01937e12c73a0971bcfd797ff2
+  subpackages:
+  - internal
+  - internal/app_identity
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/modules
+  - internal/remote_api
 testImports: []
