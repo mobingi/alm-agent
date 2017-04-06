@@ -81,7 +81,7 @@ func (d *Docker) GetContainer(name string) (*Container, error) {
 	filter := opts.NewFilterOpt()
 	filter.Set(fmt.Sprintf("name=%s", name))
 	options := types.ContainerListOptions{
-		Filter: filter.Value(),
+		Filters: filter.Value(),
 	}
 	res, err := d.client.ContainerList(context.Background(), options)
 	if err != nil {

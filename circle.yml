@@ -10,14 +10,16 @@ machine:
     - test -e download/$GODIST || curl -o download/$GODIST https://storage.googleapis.com/golang/$GODIST
     - tar -C $HOME -xzf download/$GODIST
     - sudo apt-get install -y pkgconf cmake
-    - test -e ~/.go_workspace/src/github.com/mobingilabs || mkdir -p ~/.go_workspace/src/github.com/mobingilabs
-    - test -e ~/.go_workspace/src/github.com/mobingilabs/go-modaemon || ln -s ~/go-modaemon ~/.go_workspace/src/github.com/mobingilabs
+    - test -e ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME} || mkdir -p ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}
+    - rm -f ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} && mv ~/${CIRCLE_PROJECT_REPONAME} ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/ && ln -s ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} ~/${CIRCLE_PROJECT_REPONAME}
 
 dependencies:
   cache_directories:
     - "/home/ubuntu/download"
   override:
-    - make deps
+    - |
+      cd ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+      make deps
 
 test:
   override:

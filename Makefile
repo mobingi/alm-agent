@@ -2,26 +2,27 @@ NAME := go-modaemon
 VERSION := $(shell git describe --tags --abbrev=0)
 REVISION := $(shell git rev-parse --short HEAD)
 LDFLAGS := -X 'main.version=$(VERSION)' -X 'main.revision=$(REVISION)'
+PACKAGES = $(shell go list ./... | grep -v '/vendor/')
 
 setup:
-	go get github.com/Masterminds/glide
+	go get github.com/golang/dep/...
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 
 deps: setup
-	glide install
+	dep ensure -v
 
 test: deps
-	go test -v -race $$(glide novendor)
+	go test -v -race ${PACKAGES}
 
 lint: setup
-	go vet $$(glide novendor)
-	for pkg in $$(glide novendor -x); do \
+	go vet ${PACKAGES}
+	for pkg in ${PACKAGES}; do \
 		golint -set_exit_status $$pkg || exit $$?; \
 	done
 
 fmt: setup
-	gomimports -w $$(glide nv -x)
+	goimports -v -w ${PACKAGES}
 
 build: test
 	go build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
