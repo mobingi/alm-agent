@@ -1,63 +1,10 @@
 {
-    "memo": "c473bf2ad849274e5d6662487a7b4d881fc0e38d5158ca174aef3bece4f0a74d",
+    "memo": "93b30acf3fa4a0fe62f4f22838dfa1f6da66f0026bb8960866b37fe68b7e3ee3",
     "projects": [
-        {
-            "name": "cloud.google.com/go",
-            "branch": "master",
-            "revision": "675fad27ef35e552d3708858ff337d54b3b6f4d3",
-            "packages": [
-                "compute/metadata",
-                "internal",
-                "internal/version",
-                "logging/apiv2",
-                "logging/internal"
-            ]
-        },
-        {
-            "name": "github.com/Azure/go-ansiterm",
-            "branch": "master",
-            "revision": "fa152c58bc15761d0200cb75fe958b89a9d4888e",
-            "packages": [
-                ".",
-                "winterm"
-            ]
-        },
-        {
-            "name": "github.com/BurntSushi/toml",
-            "version": "v0.3.0",
-            "revision": "b26d9c308763d68093482582cea63d69be07a0f0",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/Graylog2/go-gelf",
-            "branch": "master",
-            "revision": "7029da823dad4ef3a876df61065156acb703b2ea",
-            "packages": [
-                "gelf"
-            ]
-        },
         {
             "name": "github.com/Microsoft/go-winio",
             "version": "v0.3.8",
             "revision": "fff283ad5116362ca252298cfc9b95828956d85d",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/Microsoft/hcsshim",
-            "version": "v0.5.13",
-            "revision": "eb3470df7849886d6d40be84e2788d9d08fd40d2",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/RackSec/srslog",
-            "branch": "master",
-            "revision": "a974ba6f7fb527d2ddc73ee9c05d3e2ccc0af0dc",
             "packages": [
                 "."
             ]
@@ -71,134 +18,12 @@
             ]
         },
         {
-            "name": "github.com/armon/go-metrics",
-            "branch": "master",
-            "revision": "93f237eba9b0602f3e73710416558854a81d9337",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/armon/go-radix",
-            "branch": "master",
-            "revision": "4239b77079c7b5d1243b7b4736304ce8ddb6f0f2",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/aws/aws-sdk-go",
-            "version": "v1.8.9",
-            "revision": "e38d0c7788616fcbcdc2e97f9891be9d369382b8",
-            "packages": [
-                "aws",
-                "aws/awserr",
-                "aws/awsutil",
-                "aws/client",
-                "aws/client/metadata",
-                "aws/corehandlers",
-                "aws/credentials",
-                "aws/credentials/ec2rolecreds",
-                "aws/credentials/endpointcreds",
-                "aws/credentials/stscreds",
-                "aws/defaults",
-                "aws/ec2metadata",
-                "aws/endpoints",
-                "aws/request",
-                "aws/session",
-                "aws/signer/v4",
-                "private/protocol",
-                "private/protocol/json/jsonutil",
-                "private/protocol/jsonrpc",
-                "private/protocol/query",
-                "private/protocol/query/queryutil",
-                "private/protocol/rest",
-                "private/protocol/xml/xmlutil",
-                "service/cloudwatchlogs",
-                "service/sts"
-            ]
-        },
-        {
-            "name": "github.com/beorn7/perks",
-            "branch": "master",
-            "revision": "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9",
-            "packages": [
-                "quantile"
-            ]
-        },
-        {
-            "name": "github.com/boltdb/bolt",
-            "version": "v1.3.0",
-            "revision": "583e8937c61f1af6513608ccc75c97b6abdf4ff9",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/bsphere/le_go",
-            "branch": "master",
-            "revision": "7a984a84b5492ae539b79b62fb4a10afc63c7bcf",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/coreos/etcd",
-            "version": "v3.1.5",
-            "revision": "20490caaf0dcd96bb4a95e40625559def8ef5b04",
-            "packages": [
-                "client",
-                "pkg/pathutil",
-                "pkg/types",
-                "raft/raftpb"
-            ]
-        },
-        {
-            "name": "github.com/coreos/go-systemd",
-            "version": "v14",
-            "revision": "f5366d01ad57abda9ec7e1a0c50a111712aa7745",
-            "packages": [
-                "journal"
-            ]
-        },
-        {
-            "name": "github.com/deckarep/golang-set",
-            "version": "v1.6",
-            "revision": "fc8930a5e645572ee00bf66358ed3414f3c13b90",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/docker/containerd",
-            "version": "v0.2.5",
-            "revision": "2a5e70cbf65457815ee76b7e5dd2a01292d9eca8",
-            "packages": [
-                "api/grpc/types"
-            ]
-        },
-        {
             "name": "github.com/docker/distribution",
             "version": "v2.6.1",
             "revision": "a25b9ef0c9fe242ac04bb20d3a028442b7d266b6",
             "packages": [
-                ".",
-                "context",
                 "digest",
-                "manifest",
-                "manifest/manifestlist",
-                "manifest/schema1",
-                "manifest/schema2",
-                "reference",
-                "registry/api/errcode",
-                "registry/api/v2",
-                "registry/client",
-                "registry/client/auth",
-                "registry/client/auth/challenge",
-                "registry/client/transport",
-                "registry/storage/cache",
-                "registry/storage/cache/memory",
-                "uuid"
+                "reference"
             ]
         },
         {
@@ -206,11 +31,7 @@
             "version": "v1.13.1",
             "revision": "092cba3727bb9b4a2f0e922cd6c0f93ea270e363",
             "packages": [
-                "api",
-                "api/errors",
-                "api/server/httputils",
                 "api/types",
-                "api/types/backend",
                 "api/types/blkiodev",
                 "api/types/container",
                 "api/types/events",
@@ -223,105 +44,10 @@
                 "api/types/swarm",
                 "api/types/time",
                 "api/types/versions",
-                "api/types/versions/v1p19",
-                "api/types/versions/v1p20",
                 "api/types/volume",
-                "builder",
-                "builder/dockerfile",
-                "builder/dockerfile/command",
-                "builder/dockerfile/parser",
-                "builder/dockerignore",
                 "client",
-                "container",
-                "container/stream",
-                "daemon/caps",
-                "daemon/cluster/provider",
-                "daemon/exec",
-                "daemon/graphdriver",
-                "daemon/logger",
-                "daemon/logger/awslogs",
-                "daemon/logger/etwlogs",
-                "daemon/logger/fluentd",
-                "daemon/logger/gcplogs",
-                "daemon/logger/gelf",
-                "daemon/logger/journald",
-                "daemon/logger/jsonfilelog",
-                "daemon/logger/logentries",
-                "daemon/logger/loggerutils",
-                "daemon/logger/splunk",
-                "daemon/logger/syslog",
-                "daemon/network",
-                "distribution",
-                "distribution/metadata",
-                "distribution/utils",
-                "distribution/xfer",
-                "dockerversion",
-                "image",
-                "image/tarexport",
-                "image/v1",
-                "layer",
-                "libcontainerd",
-                "oci",
                 "opts",
-                "pkg/archive",
-                "pkg/broadcaster",
-                "pkg/chrootarchive",
-                "pkg/directory",
-                "pkg/discovery",
-                "pkg/discovery/kv",
-                "pkg/filenotify",
-                "pkg/fileutils",
-                "pkg/gitutils",
-                "pkg/graphdb",
-                "pkg/httputils",
-                "pkg/idtools",
-                "pkg/ioutils",
-                "pkg/jsonlog",
-                "pkg/jsonmessage",
-                "pkg/locker",
-                "pkg/longpath",
-                "pkg/mount",
-                "pkg/namesgenerator",
-                "pkg/parsers",
-                "pkg/parsers/kernel",
-                "pkg/parsers/operatingsystem",
-                "pkg/platform",
-                "pkg/plugingetter",
-                "pkg/plugins",
-                "pkg/plugins/transport",
-                "pkg/pools",
-                "pkg/progress",
-                "pkg/promise",
-                "pkg/pubsub",
-                "pkg/random",
-                "pkg/reexec",
-                "pkg/registrar",
-                "pkg/signal",
-                "pkg/stdcopy",
-                "pkg/streamformatter",
-                "pkg/stringid",
-                "pkg/stringutils",
-                "pkg/symlink",
-                "pkg/sysinfo",
-                "pkg/system",
-                "pkg/tailfile",
-                "pkg/tarsum",
-                "pkg/term",
-                "pkg/term/windows",
-                "pkg/tlsconfig",
-                "pkg/urlutil",
-                "pkg/useragent",
-                "plugin/v2",
-                "reference",
-                "registry",
-                "restartmanager",
-                "runconfig",
-                "runconfig/opts",
-                "utils",
-                "utils/templates",
-                "volume",
-                "volume/drivers",
-                "volume/store"
+                "pkg/tlsconfig"
             ]
         },
         {
@@ -335,22 +61,6 @@
             ]
         },
         {
-            "name": "github.com/docker/go-events",
-            "branch": "master",
-            "revision": "aa2e3b613fbbfdddbe055a7b9e3ce271cfd83eca",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/docker/go-metrics",
-            "branch": "master",
-            "revision": "8fd5772bf1584597834c6f7961a530f06cbfbb87",
-            "packages": [
-                "."
-            ]
-        },
-        {
             "name": "github.com/docker/go-units",
             "version": "v0.3.1",
             "revision": "f2d77a61e3c169b43402a0a1e84f06daf29b8190",
@@ -359,114 +69,13 @@
             ]
         },
         {
-            "name": "github.com/docker/libkv",
-            "version": "v0.2.1",
-            "revision": "aabc039ad04deb721e234f99cd1b4aa28ac71a40",
-            "packages": [
-                ".",
-                "store",
-                "store/boltdb",
-                "store/consul",
-                "store/etcd",
-                "store/zookeeper"
-            ]
-        },
-        {
             "name": "github.com/docker/libnetwork",
             "branch": "master",
             "revision": "f3c4ca8ce5c128e071bab198c4ed9fd0d08384eb",
             "packages": [
-                ".",
-                "bitseq",
-                "cluster",
-                "config",
-                "datastore",
-                "discoverapi",
-                "driverapi",
-                "drivers/bridge",
-                "drivers/host",
-                "drivers/ipvlan",
-                "drivers/macvlan",
-                "drivers/null",
-                "drivers/overlay",
-                "drivers/remote",
-                "drivers/remote/api",
-                "drivers/solaris/bridge",
-                "drivers/solaris/overlay",
-                "drivers/windows",
-                "drivers/windows/overlay",
-                "drvregistry",
-                "etchosts",
-                "hostdiscovery",
-                "idm",
-                "ipam",
-                "ipamapi",
-                "ipams/builtin",
-                "ipams/null",
-                "ipams/remote",
-                "ipams/remote/api",
-                "ipams/windowsipam",
-                "ipamutils",
                 "iptables",
-                "ipvs",
-                "netlabel",
-                "netutils",
-                "networkdb",
-                "ns",
-                "options",
-                "osl",
                 "portallocator",
-                "portmapper",
-                "resolvconf",
-                "resolvconf/dns",
-                "types"
-            ]
-        },
-        {
-            "name": "github.com/docker/libtrust",
-            "branch": "master",
-            "revision": "aabc10ec26b754e797f9028f4589c5b7bd90dc20",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/docker/swarmkit",
-            "version": "v1.12.0",
-            "revision": "9d4c2f73124e70f8fa85f9076635b827d17b109f",
-            "packages": [
-                "agent/exec",
-                "api",
-                "api/duration",
-                "api/timestamp",
-                "log",
-                "manager/raftpicker",
-                "protobuf/plugin",
-                "protobuf/ptypes"
-            ]
-        },
-        {
-            "name": "github.com/fluent/fluent-logger-golang",
-            "version": "v1.2.1",
-            "revision": "28bdb662295c1b7aca09c1a4edbf9430010775a9",
-            "packages": [
-                "fluent"
-            ]
-        },
-        {
-            "name": "github.com/fsnotify/fsnotify",
-            "version": "v1.4.2",
-            "revision": "629574ca2a5df945712d3079857300b5e4da0236",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/go-ini/ini",
-            "version": "v1.27.0",
-            "revision": "e7fea39b01aea8d5671f6858f0532f56e8bff3a5",
-            "packages": [
-                "."
+                "portmapper"
             ]
         },
         {
@@ -478,197 +87,11 @@
             ]
         },
         {
-            "name": "github.com/gogo/protobuf",
-            "version": "v0.4",
-            "revision": "100ba4e885062801d56799d78530b73b178a78f3",
-            "packages": [
-                "gogoproto",
-                "proto",
-                "protoc-gen-gogo/descriptor",
-                "sortkeys"
-            ]
-        },
-        {
-            "name": "github.com/golang/mock",
-            "branch": "master",
-            "revision": "bd3c8e81be01eef76d4b503f5e687d2d1354d2d9",
-            "packages": [
-                "gomock"
-            ]
-        },
-        {
-            "name": "github.com/golang/protobuf",
-            "branch": "master",
-            "revision": "2bba0603135d7d7f5cb73b2125beeda19c09f4ef",
-            "packages": [
-                "proto",
-                "protoc-gen-go/descriptor",
-                "ptypes",
-                "ptypes/any",
-                "ptypes/duration",
-                "ptypes/empty",
-                "ptypes/struct",
-                "ptypes/timestamp"
-            ]
-        },
-        {
-            "name": "github.com/googleapis/gax-go",
-            "branch": "master",
-            "revision": "9af46dd5a1713e8b5cd71106287eba3cefdde50b",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/gorilla/context",
-            "version": "v1.1",
-            "revision": "a85d2e53ba63bdea074dbbbb5983f0516974e87b",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/gorilla/mux",
-            "version": "v1.3.0",
-            "revision": "392c28fe23e1c45ddba891b0320b3b5df220beea",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/hashicorp/consul",
-            "version": "v0.8.0",
-            "revision": "402636ff2db998edef392ac6d59210d2170b3ebf",
-            "packages": [
-                "api"
-            ]
-        },
-        {
-            "name": "github.com/hashicorp/errwrap",
-            "branch": "master",
-            "revision": "7554cd9344cec97297fa6649b055a8c98c2a1e55",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/hashicorp/go-cleanhttp",
-            "branch": "master",
-            "revision": "3573b8b52aa7b37b9358d966a898feb387f62437",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/hashicorp/go-msgpack",
-            "branch": "master",
-            "revision": "fa3f63826f7c23912c15263591e65d54d080b458",
-            "packages": [
-                "codec"
-            ]
-        },
-        {
-            "name": "github.com/hashicorp/go-multierror",
-            "branch": "master",
-            "revision": "ed905158d87462226a13fe39ddf685ea65f1c11f",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/hashicorp/go-sockaddr",
-            "branch": "master",
-            "revision": "acd314c5781ea706c710d9ea70069fd2e110d61d",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/hashicorp/memberlist",
-            "branch": "master",
-            "revision": "6cc6075ba9fba1915fa0416f00d2b4efa9dc2262",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/hashicorp/serf",
-            "version": "v0.8.1",
-            "revision": "d6574a5bb1226678d7010325fb6c985db20ee458",
-            "packages": [
-                "coordinate",
-                "serf"
-            ]
-        },
-        {
-            "name": "github.com/jmespath/go-jmespath",
-            "version": "0.2.2",
-            "revision": "3433f3ea46d9f8019119e7dd41274e112a2359a9",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/mattn/go-shellwords",
-            "version": "v1.0.2",
-            "revision": "005a0944d84452842197c2108bd9168ced206f78",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/mattn/go-sqlite3",
-            "version": "v1.2.0",
-            "revision": "ca5e3819723d8eeaf170ad510e7da1d6d2e94a08",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/matttproud/golang_protobuf_extensions",
-            "version": "v1.0.0",
-            "revision": "3247c84500bff8d9fb6d579d800f20b3e091582c",
-            "packages": [
-                "pbutil"
-            ]
-        },
-        {
-            "name": "github.com/miekg/dns",
-            "branch": "master",
-            "revision": "dcffd061aaeef4f0ab8369d0443146462b64ea6d",
-            "packages": [
-                "."
-            ]
-        },
-        {
             "name": "github.com/opencontainers/runc",
             "version": "v0.1.1",
             "revision": "baf6536d6259209c3edfa2b22237af82942d3dfa",
             "packages": [
-                "libcontainer/apparmor",
-                "libcontainer/cgroups",
-                "libcontainer/configs",
-                "libcontainer/devices",
-                "libcontainer/label",
-                "libcontainer/selinux",
-                "libcontainer/system",
                 "libcontainer/user"
-            ]
-        },
-        {
-            "name": "github.com/opencontainers/runtime-spec",
-            "version": "v0.5.0",
-            "revision": "78e6667ae2d67aad100b28ee9580b41b7a24e667",
-            "packages": [
-                "specs-go"
-            ]
-        },
-        {
-            "name": "github.com/philhofer/fwd",
-            "branch": "master",
-            "revision": "98c11a7a6ec829d672b03833c3d69a7fae1ca972",
-            "packages": [
-                "."
             ]
         },
         {
@@ -680,127 +103,9 @@
             ]
         },
         {
-            "name": "github.com/prometheus/client_golang",
-            "version": "v0.8.0",
-            "revision": "c5b7fccd204277076155f10851dad72b76a49317",
-            "packages": [
-                "prometheus"
-            ]
-        },
-        {
-            "name": "github.com/prometheus/client_model",
-            "branch": "master",
-            "revision": "6f3806018612930941127f2a7c6c453ba2c527d2",
-            "packages": [
-                "go"
-            ]
-        },
-        {
-            "name": "github.com/prometheus/common",
-            "branch": "master",
-            "revision": "49fee292b27bfff7f354ee0f64e1bc4850462edf",
-            "packages": [
-                "expfmt",
-                "internal/bitbucket.org/ww/goautoneg",
-                "model"
-            ]
-        },
-        {
-            "name": "github.com/prometheus/procfs",
-            "branch": "master",
-            "revision": "a1dba9ce8baed984a2495b658c82687f8157b98f",
-            "packages": [
-                ".",
-                "xfs"
-            ]
-        },
-        {
-            "name": "github.com/samuel/go-zookeeper",
-            "branch": "master",
-            "revision": "1d7be4effb13d2d908342d349d71a284a7542693",
-            "packages": [
-                "zk"
-            ]
-        },
-        {
-            "name": "github.com/sean-/seed",
-            "branch": "master",
-            "revision": "e2103e2c35297fb7e17febb81e49b312087a2372",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/spf13/pflag",
-            "branch": "master",
-            "revision": "9a906f17374922ed0f74e1b2f593d3723f2ffb00",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/syndtr/gocapability",
-            "branch": "master",
-            "revision": "e7cb7fa329f456b3855136a2642b197bad7366ba",
-            "packages": [
-                "capability"
-            ]
-        },
-        {
-            "name": "github.com/tinylib/msgp",
-            "version": "v1.0",
-            "revision": "38a6f61a768dc24552dad94611923841b53acc4f",
-            "packages": [
-                "msgp"
-            ]
-        },
-        {
-            "name": "github.com/tonistiigi/fifo",
-            "branch": "master",
-            "revision": "8cf41abe4d87641cd48738771bf25a20d06ca0b2",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/ugorji/go",
-            "branch": "master",
-            "revision": "708a42d246822952f38190a8d8c4e6b16a0e600c",
-            "packages": [
-                "codec"
-            ]
-        },
-        {
             "name": "github.com/urfave/cli",
             "version": "v1.19.1",
             "revision": "0bdeddeeb0f650497d603c4ad7b20cfe685682f6",
-            "packages": [
-                "."
-            ]
-        },
-        {
-            "name": "github.com/vbatts/tar-split",
-            "version": "v0.10.1",
-            "revision": "809b755cafaf89fe267c12a944754d29d1dede27",
-            "packages": [
-                "archive/tar",
-                "tar/asm",
-                "tar/storage"
-            ]
-        },
-        {
-            "name": "github.com/vishvananda/netlink",
-            "branch": "master",
-            "revision": "0ac4d252c6b07d40c01eea51382988e863bc2249",
-            "packages": [
-                ".",
-                "nl"
-            ]
-        },
-        {
-            "name": "github.com/vishvananda/netns",
-            "branch": "master",
-            "revision": "54f0e4339ce73702a0607f49922aaa1e749b418d",
             "packages": [
                 "."
             ]
@@ -812,33 +117,7 @@
             "packages": [
                 "context",
                 "context/ctxhttp",
-                "http2",
-                "http2/hpack",
-                "idna",
-                "internal/timeseries",
-                "lex/httplex",
-                "proxy",
-                "trace"
-            ]
-        },
-        {
-            "name": "golang.org/x/oauth2",
-            "branch": "master",
-            "revision": "7fdf09982454086d5570c7db3e11f360194830ca",
-            "packages": [
-                ".",
-                "google",
-                "internal",
-                "jws",
-                "jwt"
-            ]
-        },
-        {
-            "name": "golang.org/x/sync",
-            "branch": "master",
-            "revision": "5a06fca2c336a4b2b2fcb45702e8c47621b2aa2c",
-            "packages": [
-                "semaphore"
+                "proxy"
             ]
         },
         {
@@ -848,107 +127,6 @@
             "packages": [
                 "unix",
                 "windows"
-            ]
-        },
-        {
-            "name": "golang.org/x/text",
-            "branch": "master",
-            "revision": "f4b4367115ec2de254587813edaa901bc1c723a8",
-            "packages": [
-                "internal/gen",
-                "internal/triegen",
-                "internal/ucd",
-                "secure/bidirule",
-                "transform",
-                "unicode/bidi",
-                "unicode/cldr",
-                "unicode/norm",
-                "unicode/rangetable"
-            ]
-        },
-        {
-            "name": "golang.org/x/time",
-            "branch": "master",
-            "revision": "f51c12702a4d776e4c1fa9b0fabab841babae631",
-            "packages": [
-                "rate"
-            ]
-        },
-        {
-            "name": "google.golang.org/api",
-            "branch": "master",
-            "revision": "48e49d1645e228d1c50c3d54fb476b2224477303",
-            "packages": [
-                "googleapi/transport",
-                "internal",
-                "iterator",
-                "option",
-                "support/bundler",
-                "transport"
-            ]
-        },
-        {
-            "name": "google.golang.org/appengine",
-            "version": "v1.0.0",
-            "revision": "150dc57a1b433e64154302bdc40b6bb8aefa313a",
-            "packages": [
-                ".",
-                "internal",
-                "internal/app_identity",
-                "internal/base",
-                "internal/datastore",
-                "internal/log",
-                "internal/modules",
-                "internal/remote_api",
-                "internal/socket",
-                "internal/urlfetch",
-                "socket",
-                "urlfetch"
-            ]
-        },
-        {
-            "name": "google.golang.org/cloud",
-            "version": "v0.7.0",
-            "revision": "2e6a95edb1071d750f6d7db777bf66cd2997af6c",
-            "packages": [
-                "compute/metadata",
-                "logging"
-            ]
-        },
-        {
-            "name": "google.golang.org/genproto",
-            "branch": "master",
-            "revision": "411e09b969b1170a9f0c467558eb4c4c110d9c77",
-            "packages": [
-                "googleapis/api/annotations",
-                "googleapis/api/distribution",
-                "googleapis/api/label",
-                "googleapis/api/metric",
-                "googleapis/api/monitoredres",
-                "googleapis/logging/type",
-                "googleapis/logging/v2",
-                "googleapis/rpc/status"
-            ]
-        },
-        {
-            "name": "google.golang.org/grpc",
-            "version": "v1.2.0",
-            "revision": "cdee119ee21e61eef7093a41ba148fa83585e143",
-            "packages": [
-                ".",
-                "codes",
-                "credentials",
-                "credentials/oauth",
-                "grpclog",
-                "health/grpc_health_v1",
-                "internal",
-                "keepalive",
-                "metadata",
-                "naming",
-                "peer",
-                "stats",
-                "tap",
-                "transport"
             ]
         }
     ]
