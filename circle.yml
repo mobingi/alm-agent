@@ -18,8 +18,8 @@ dependencies:
     - "/home/ubuntu/download"
   override:
     - |
-    cd ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
-    make deps
+      cd ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+      make deps
 
 test:
   override:
