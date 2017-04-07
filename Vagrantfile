@@ -16,6 +16,7 @@ Vagrant.configure("2") do |config|
     c.vm.provider :aws do |aws, override|
       aws.aws_profile = ENV['AWS_PROFILE']
       aws.keypair_name = ENV['AWS_KEYPAIR_NAME']
+      override.ssh.username = 'ec2-user'
       override.ssh.private_key_path = ENV['AWS_KEYPAIR_PATH']
       # Amazon Linux AMI 2017.03.0.20170401 x86_64 HVM
       aws.region = 'ap-northeast-1'
