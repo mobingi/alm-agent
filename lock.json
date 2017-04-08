@@ -1,5 +1,5 @@
 {
-    "memo": "93b30acf3fa4a0fe62f4f22838dfa1f6da66f0026bb8960866b37fe68b7e3ee3",
+    "memo": "e7987501c040d756ffb063571afb267bf54ad2fa999d25b4fed598cc1793eba1",
     "projects": [
         {
             "name": "github.com/Microsoft/go-winio",
@@ -15,6 +15,35 @@
             "revision": "ba1b36c82c5e05c4f912a88eab0dcd91a171688f",
             "packages": [
                 "."
+            ]
+        },
+        {
+            "name": "github.com/aws/aws-sdk-go",
+            "version": "v1.8.11",
+            "revision": "200fde3f632bb9f036ec0b8cb29fbc8588155ea5",
+            "packages": [
+                "aws",
+                "aws/awserr",
+                "aws/awsutil",
+                "aws/client",
+                "aws/client/metadata",
+                "aws/corehandlers",
+                "aws/credentials",
+                "aws/credentials/ec2rolecreds",
+                "aws/credentials/endpointcreds",
+                "aws/credentials/stscreds",
+                "aws/defaults",
+                "aws/ec2metadata",
+                "aws/endpoints",
+                "aws/request",
+                "aws/session",
+                "aws/signer/v4",
+                "private/protocol",
+                "private/protocol/query",
+                "private/protocol/query/queryutil",
+                "private/protocol/rest",
+                "private/protocol/xml/xmlutil",
+                "service/sts"
             ]
         },
         {
@@ -79,9 +108,25 @@
             ]
         },
         {
+            "name": "github.com/go-ini/ini",
+            "version": "v1.27.0",
+            "revision": "e7fea39b01aea8d5671f6858f0532f56e8bff3a5",
+            "packages": [
+                "."
+            ]
+        },
+        {
             "name": "github.com/godbus/dbus",
             "version": "v4.0.0",
             "revision": "4d52d18b0cda8f9de27e636479accad383a1b8f0",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/jmespath/go-jmespath",
+            "version": "0.2.2",
+            "revision": "3433f3ea46d9f8019119e7dd41274e112a2359a9",
             "packages": [
                 "."
             ]
