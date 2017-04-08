@@ -1,6 +1,6 @@
 #!/bin/bash
 
-yum install -y git gcc
+yum install -y git gcc tmux
 
 archive=go1.8.linux-amd64.tar.gz
 if [ ! -f $archive ]; then

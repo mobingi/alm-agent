@@ -3,6 +3,9 @@
         "github.com/docker/docker/...": {
             "branch": "17.04.x"
         },
+        "github.com/aws/aws-sdk-go/aws": {
+            "branch": "master"
+        },
         "github.com/tcnksm/go-latest": {
             "branch": "master"
         }
