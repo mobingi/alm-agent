@@ -77,7 +77,7 @@ func main() {
 	instance.DeregisterInstancesFromELB(sess, moConfig)
 	instance.CleanupCrontabs()
 	instance.SendLifeCycleAction(sess, moConfig, "CONTINUE") // InScale Only
+	instance.ExecShutdownTaskOnAppContainers(svConfig)
 
-	// TODO: exec_shutdown_tasks_on_app_containers => Machine
 	// TODO: send_notification_to_api // SPOT Only
 }
