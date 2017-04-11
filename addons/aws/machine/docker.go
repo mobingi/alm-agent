@@ -23,11 +23,11 @@ func (m *Machine) ExecShutdownTaskOnAppContainers(s *serverConfig.Config) {
 	defer cancel()
 
 	filter := opts.NewFilterOpt()
-	filter.Set(fmt.Sprintf("image=%s", s.Image))
+	filter.Set(fmt.Sprintf("ancestor=%s", s.Image))
 	options := types.ContainerListOptions{
 		Filters: filter.Value(),
 	}
-	lsres, err := d.client.ContainerList(context.Background(), options)
+	lsres, err := d.client.ContainerList(context.TODO(), options)
 	if err != nil {
 		log.Debugf("%#v", err)
 	}
@@ -37,7 +37,7 @@ func (m *Machine) ExecShutdownTaskOnAppContainers(s *serverConfig.Config) {
 		Cmd: []string{"/pre_shutdown.sh"},
 	}
 
-	res, err := d.client.ContainerExecCreate(ctx, "5543721c64e0127d2273f654601f4a511928344d6190ed0c1bab1b145dd9ef68", exc)
+	res, err := d.client.ContainerExecCreate(ctx, lsres[0].ID, exc)
 	if err != nil {
 		log.Debugf("%#v", err)
 	}
