@@ -150,26 +150,16 @@ func isTerminateWait(sess *session.Session, instance *machine.Machine) bool {
 		log.Debugf("%#v", err)
 		return false
 	}
-	if asState != "Terminating:Wait" {
+	if asState == "Terminating:Wait" {
 		return true
 	}
 
 	return false
 }
 
-func finalizeInstance(sess *session.Session, instance *machine.Machine, moConfig *config.Config, svConfig *serverConfig.Config) bool {
+func finalizeInstance(sess *session.Session, instance *machine.Machine, moConfig *config.Config, svConfig *serverConfig.Config) {
 	instance.DeregisterInstancesFromELB(sess, moConfig)
 	instance.CleanupCrontabs()
 	instance.ExecShutdownTaskOnAppContainers(svConfig)
-
-	asState, err := instance.GetCurrentStateOfAS(sess)
-	if err != nil {
-		log.Debugf("%#v", err)
-		return false
-	}
-	if asState != "Terminating:Wait" {
-		return true
-	}
-
-	return false
+	return
 }

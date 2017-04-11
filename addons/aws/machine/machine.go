@@ -84,6 +84,7 @@ func (m *Machine) DetectSpotTerminationState() bool {
 		return false
 	}
 
+	log.Debugf("%d", resp.StatusCode)
 	if resp.StatusCode != 404 {
 		return true
 	}

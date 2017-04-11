@@ -14,7 +14,7 @@ fi
 
 if ! grep GOPATH /home/ec2-user/.bashrc; then
   echo 'export GOROOT=/home/ec2-user/go' >> /home/ec2-user/.bashrc
-  echo 'export PATH=$PATH:$GOROOT/bin:$HOME/bin' >> /home/ec2-user/.bashrc
-  echo 'export GOPATH=$HOME' >> /home/ec2-user/.bashrc
-  echo 'sudo chown -R ec2-user.ec2-user $HOME/src' >> /home/ec2-user/.bashrc
+  echo 'export PATH=$PATH:$GOROOT/bin:/home/ec2-user/bin' >> /home/ec2-user/.bashrc
+  echo 'export GOPATH=/home/ec2-user' >> /home/ec2-user/.bashrc
+  echo 'sudo chown -R ec2-user.ec2-user /home/ec2-user/src' >> /home/ec2-user/.bashrc
 fi

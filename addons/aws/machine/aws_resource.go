@@ -45,7 +45,7 @@ func (m *Machine) DeregisterInstancesFromELB(sess *session.Session, moConfig *co
 		log.Debugf("%#v", err)
 		return
 	}
-	log.Debugf("%#v", cfnresp)
+	// log.Debugf("%#v", cfnresp)
 
 	myelbID := ""
 	for _, x := range cfnresp.StackResources {
@@ -84,9 +84,9 @@ func (m *Machine) SendLifeCycleAction(sess *session.Session, moConfig *config.Co
 	asClient := autoscaling.New(sess)
 
 	asparams := &autoscaling.CompleteLifecycleActionInput{
-		AutoScalingGroupName:  aws.String(moConfig.StackID),
+		AutoScalingGroupName:  aws.String(m.ASName),
 		LifecycleActionResult: aws.String(action),
-		LifecycleHookName:     aws.String(m.ASName),
+		LifecycleHookName:     aws.String(moConfig.StackID + "-lch-ists-tmnt"),
 		InstanceId:            aws.String(m.InstanceID),
 	}
 
