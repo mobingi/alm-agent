@@ -3,6 +3,7 @@ package machine
 import (
 	"io/ioutil"
 	"net/http"
+	"os/exec"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -71,5 +72,11 @@ func isSpot() bool {
 		return true
 	}
 
+	return false
+}
+
+// CleanupCrontabs removes all jobs.
+func (m *Machine) CleanupCrontabs() bool {
+	exec.Command("crontab -r -u root").Run()
 	return false
 }
