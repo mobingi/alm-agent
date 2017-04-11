@@ -102,6 +102,20 @@ func (d *Docker) GetContainer(name string) (*Container, error) {
 	return c, err
 }
 
+func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
+	filter := opts.NewFilterOpt()
+	filter.Set(fmt.Sprintf("ancestor=%s", ancestor))
+	options := types.ContainerListOptions{
+		Filters: filter.Value(),
+	}
+	res, err := d.client.ContainerList(context.Background(), options)
+	if err != nil {
+		return nil, err
+	}
+
+	return res[0].ID, nil
+}
+
 func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 
 	_, err := d.imagePull()
@@ -266,4 +280,12 @@ func (d *Docker) StopContainer(c *Container) error {
 func (d *Docker) RemoveContainer(c *Container) error {
 	options := types.ContainerRemoveOptions{}
 	return d.client.ContainerRemove(context.Background(), c.ID, options)
+}
+
+func (d *Docker) CreateContainerExec(id string, cmd []string) *types.ContainerExecCreateResponse, error {
+	return d.client.ContainerExecCreate(context.Background(), id, cmd)
+}
+
+func (d *Docker) StartContainerExec(id string, esc types.ExecStartCheck) *types.ContainerExecCreateResponse, error {
+	return d.client.ContainerExecStart(context.Background(), id, esc)
 }
