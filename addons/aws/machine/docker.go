@@ -16,7 +16,7 @@ import (
 
 // ExecShutdownTaskOnAppContainers runs final tasks before shutdown instance.
 func (m *Machine) ExecShutdownTaskOnAppContainers(s *serverConfig.Config) {
-	d := container.NewDocker(s)
+	d, _ := container.NewDocker(s)
 	log.Debugf("%#v", d)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -27,6 +27,7 @@ func (m *Machine) ExecShutdownTaskOnAppContainers(s *serverConfig.Config) {
 	options := types.ContainerListOptions{
 		Filters: filter.Value(),
 	}
+
 	lsres, err := d.client.ContainerList(context.TODO(), options)
 	if err != nil {
 		log.Debugf("%#v", err)
