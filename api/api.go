@@ -110,6 +110,16 @@ func (c *client) SendInstanceStatus(serverID, status string) error {
 	return err
 }
 
+func (c *client) SendSpotShutdownEvent(serverID string) error {
+	values := url.Values{}
+	values.Set("user_id", c.config.UserID)
+	values.Set("stack_id", c.config.StackID)
+	values.Set("instance_id", serverID)
+
+	_, err := c.post("/v2/event/spot/shutdown", values)
+	return err
+}
+
 func (c *client) get(path string, values url.Values) ([]byte, error) {
 	req, err := http.NewRequest("GET", c.config.APIHost+path, nil)
 	if c.token != "" && c.tokenType != "" {

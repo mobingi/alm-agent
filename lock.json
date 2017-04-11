@@ -1,5 +1,5 @@
 {
-    "memo": "e7987501c040d756ffb063571afb267bf54ad2fa999d25b4fed598cc1793eba1",
+    "memo": "708b3bb4ce26f42603b147d51f87650f2ba60fa7de9c9e7c5f5269f65d795055",
     "projects": [
         {
             "name": "github.com/Microsoft/go-winio",
@@ -43,6 +43,9 @@
                 "private/protocol/query/queryutil",
                 "private/protocol/rest",
                 "private/protocol/xml/xmlutil",
+                "service/autoscaling",
+                "service/cloudformation",
+                "service/elb",
                 "service/sts"
             ]
         },

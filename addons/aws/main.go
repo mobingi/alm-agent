@@ -78,6 +78,5 @@ func main() {
 	instance.CleanupCrontabs()
 	instance.SendLifeCycleAction(sess, moConfig, "CONTINUE") // InScale Only
 	instance.ExecShutdownTaskOnAppContainers(svConfig)
-
-	// TODO: send_notification_to_api // SPOT Only
+	apiClient.SendSpotShutdownEvent(instance.InstanceID)
 }
