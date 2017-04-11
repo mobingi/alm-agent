@@ -76,9 +76,8 @@ func main() {
 	log.Infof("Detected: Terminating:Wait")
 	instance.DeregisterInstancesFromELB(sess, moConfig)
 	instance.CleanupCrontabs()
+	instance.SendLifeCycleAction(sess, moConfig, "CONTINUE") // InScale Only
 
-	// TODO: cleanup crontab => Machine
 	// TODO: exec_shutdown_tasks_on_app_containers => Machine
-	// TODO: complete_lifecycle_action `CONTINUE``
-	// TODO: send_notification_to_api
+	// TODO: send_notification_to_api // SPOT Only
 }

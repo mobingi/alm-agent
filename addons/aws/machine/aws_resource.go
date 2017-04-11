@@ -28,6 +28,7 @@ func (m *Machine) GetCurrentStateOfAS(sess *session.Session) string {
 	}
 
 	log.Debugf("%#v", asresp)
+	m.ASName = *asresp.AutoScalingInstances[0].AutoScalingGroupName
 	return *asresp.AutoScalingInstances[0].LifecycleState
 }
 
@@ -77,4 +78,26 @@ func (m *Machine) DeregisterInstancesFromELB(sess *session.Session, moConfig *co
 	log.Debugf("%#v", elbresp)
 	log.Info("Instance deregistered from ELB.")
 	return
+}
+
+// GetCurrentStateOfAS returns Instance State on AutoScalling
+// eg. InService, Terminating:Wait
+func (m *Machine) SendLifeCycleAction(sess *session.Session, moConfig *config.Config, action string) bool {
+	asClient := autoscaling.New(sess)
+
+	asparams := &autoscaling.CompleteLifecycleActionInput{
+		AutoScalingGroupName:  aws.String(moConfig.StackID),
+		LifecycleActionResult: aws.String(action),
+		LifecycleHookName:     aws.String(m.ASName),
+		InstanceId:            aws.String(m.InstanceID),
+	}
+
+	asresp, err := asClient.CompleteLifecycleAction(asparams)
+	if err != nil {
+		log.Debugf("%#v", err)
+		return false
+	}
+
+	log.Debugf("%#v", asresp)
+	return true
 }

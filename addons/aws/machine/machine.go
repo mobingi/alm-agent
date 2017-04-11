@@ -17,6 +17,7 @@ type Machine struct {
 	InstanceID string
 	Region     string
 	IsSpot     bool
+	ASName     string
 }
 
 // NewMachine as constructor.
