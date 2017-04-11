@@ -23,5 +23,5 @@ dependencies:
 
 test:
   override:
-    - cd ~/.go_workspace/src/github.com/mobingilabs/go-modaemon && make build
+    - cd ~/.go_workspace/src/github.com/mobingilabs/go-modaemon && make build && make addon
     - cp ~/.go_workspace/src/github.com/mobingilabs/go-modaemon/bin/* $CIRCLE_ARTIFACTS/
