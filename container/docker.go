@@ -110,7 +110,7 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 	}
 	res, err := d.client.ContainerList(context.Background(), options)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	return res[0].ID, nil
@@ -282,10 +282,13 @@ func (d *Docker) RemoveContainer(c *Container) error {
 	return d.client.ContainerRemove(context.Background(), c.ID, options)
 }
 
-func (d *Docker) CreateContainerExec(id string, cmd []string) *types.ContainerExecCreateResponse, error {
-	return d.client.ContainerExecCreate(context.Background(), id, cmd)
+func (d *Docker) CreateContainerExec(id string, cmd []string) (types.IDResponse, error) {
+	exc := types.ExecConfig{
+		Cmd: cmd,
+	}
+	return d.client.ContainerExecCreate(context.Background(), id, exc)
 }
 
-func (d *Docker) StartContainerExec(id string, esc types.ExecStartCheck) *types.ContainerExecCreateResponse, error {
+func (d *Docker) StartContainerExec(id string, esc types.ExecStartCheck) error {
 	return d.client.ContainerExecStart(context.Background(), id, esc)
 }

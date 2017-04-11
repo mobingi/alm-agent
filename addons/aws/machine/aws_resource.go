@@ -80,8 +80,7 @@ func (m *Machine) DeregisterInstancesFromELB(sess *session.Session, moConfig *co
 	return
 }
 
-// GetCurrentStateOfAS returns Instance State on AutoScalling
-// eg. InService, Terminating:Wait
+// SendLifeCycleAction tell dying to API
 func (m *Machine) SendLifeCycleAction(sess *session.Session, moConfig *config.Config, action string) bool {
 	asClient := autoscaling.New(sess)
 

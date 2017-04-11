@@ -1,9 +1,6 @@
 package machine
 
 import (
-	"context"
-	"time"
-
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/docker/docker/api/types"
@@ -16,20 +13,13 @@ func (m *Machine) ExecShutdownTaskOnAppContainers(s *serverConfig.Config) {
 	d, _ := container.NewDocker(s)
 	log.Debugf("%#v", d)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	conID := d.GetContainerIDbyImage(s.Image)
+	conID, err := d.GetContainerIDbyImage(s.Image)
 	if err != nil {
 		log.Debugf("%#v", err)
 	}
-	log.Debugf("%#v", lsles)
+	log.Debugf("%#v", conID)
 
-	exc := types.ExecConfig{
-		Cmd: []string{"/pre_shutdown.sh"},
-	}
-
-	res, err := d.CreateContainerExec(conID, exc)
+	res, err := d.CreateContainerExec(conID, []string{"/pre_shutdown.sh"})
 	if err != nil {
 		log.Debugf("%#v", err)
 	}
