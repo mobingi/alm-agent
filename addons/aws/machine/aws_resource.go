@@ -13,7 +13,7 @@ import (
 
 // GetCurrentStateOfAS returns Instance State on AutoScalling
 // eg. InService, Terminating:Wait
-func (m *Machine) GetCurrentStateOfAS(sess *session.Session) string {
+func (m *Machine) GetCurrentStateOfAS(sess *session.Session) (string, error) {
 	asClient := autoscaling.New(sess)
 	asparams := &autoscaling.DescribeAutoScalingInstancesInput{
 		InstanceIds: []*string{
@@ -24,12 +24,12 @@ func (m *Machine) GetCurrentStateOfAS(sess *session.Session) string {
 	asresp, err := asClient.DescribeAutoScalingInstances(asparams)
 	if err != nil {
 		log.Debugf("%#v", err)
-		return "UNKONWN"
+		return "UNKONWN", err
 	}
 
 	log.Debugf("%#v", asresp)
 	m.ASName = *asresp.AutoScalingInstances[0].AutoScalingGroupName
-	return *asresp.AutoScalingInstances[0].LifecycleState
+	return *asresp.AutoScalingInstances[0].LifecycleState, nil
 }
 
 // DeregisterInstancesFromELB removes instance from ELB backend servers.
@@ -49,7 +49,6 @@ func (m *Machine) DeregisterInstancesFromELB(sess *session.Session, moConfig *co
 
 	myelbID := ""
 	for _, x := range cfnresp.StackResources {
-		log.Debugf("%#v", *x.ResourceType)
 		if *x.ResourceType == "AWS::ElasticLoadBalancing::LoadBalancer" {
 			myelbID = *x.PhysicalResourceId
 			break

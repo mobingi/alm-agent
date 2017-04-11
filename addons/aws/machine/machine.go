@@ -76,6 +76,21 @@ func isSpot() bool {
 	return false
 }
 
+// DetectSpotTerminationState returns Spot Instance is terminating or not.
+func (m *Machine) DetectSpotTerminationState() bool {
+	resp, err := http.Get(METAENDPOINT + "/latest/meta-data/spot/termination-time")
+	if err != nil {
+		log.Debugf("%#v", err)
+		return false
+	}
+
+	if resp.StatusCode != 404 {
+		return true
+	}
+
+	return false
+}
+
 // CleanupCrontabs removes all jobs.
 func (m *Machine) CleanupCrontabs() bool {
 	exec.Command("crontab -r -u root").Run()

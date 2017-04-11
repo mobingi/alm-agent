@@ -113,6 +113,10 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 		return "", err
 	}
 
+	if len(res) < 1 {
+		return "", nil
+	}
+
 	return res[0].ID, nil
 }
 
