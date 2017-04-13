@@ -1,6 +1,14 @@
 {
-    "memo": "708b3bb4ce26f42603b147d51f87650f2ba60fa7de9c9e7c5f5269f65d795055",
+    "memo": "5783c3427f325fcd4c16b10ef2aa661f37d5b8612f99686ddfe7e10ab8eb141a",
     "projects": [
+        {
+            "name": "github.com/BurntSushi/toml",
+            "version": "v0.3.0",
+            "revision": "b26d9c308763d68093482582cea63d69be07a0f0",
+            "packages": [
+                "."
+            ]
+        },
         {
             "name": "github.com/Microsoft/go-winio",
             "version": "v0.3.8",
@@ -19,8 +27,8 @@
         },
         {
             "name": "github.com/aws/aws-sdk-go",
-            "version": "v1.8.11",
-            "revision": "200fde3f632bb9f036ec0b8cb29fbc8588155ea5",
+            "version": "v1.8.12",
+            "revision": "7be45195c3af1b54a609812f90c05a7e492e2491",
             "packages": [
                 "aws",
                 "aws/awserr",
@@ -103,7 +111,7 @@
         {
             "name": "github.com/docker/libnetwork",
             "branch": "master",
-            "revision": "f3c4ca8ce5c128e071bab198c4ed9fd0d08384eb",
+            "revision": "4dd9c0603ab3c0cf34e165f9678511c18b4f4f17",
             "packages": [
                 "iptables",
                 "portallocator",
@@ -121,7 +129,7 @@
         {
             "name": "github.com/godbus/dbus",
             "version": "v4.0.0",
-            "revision": "4d52d18b0cda8f9de27e636479accad383a1b8f0",
+            "revision": "5f6efc7ef2759c81b7ba876593971bfce311eab3",
             "packages": [
                 "."
             ]
@@ -145,7 +153,7 @@
         {
             "name": "github.com/pkg/errors",
             "version": "v0.8.0",
-            "revision": "3866ebc348c54054262feae422da428fe6cf147d",
+            "revision": "645ef00459ed84a119197bfb8d8205042c6df63d",
             "packages": [
                 "."
             ]
@@ -159,9 +167,26 @@
             ]
         },
         {
+            "name": "github.com/vishvananda/netlink",
+            "branch": "master",
+            "revision": "1d1fee5b1873b5396355214125b824ca3409c64a",
+            "packages": [
+                ".",
+                "nl"
+            ]
+        },
+        {
+            "name": "github.com/vishvananda/netns",
+            "branch": "master",
+            "revision": "54f0e4339ce73702a0607f49922aaa1e749b418d",
+            "packages": [
+                "."
+            ]
+        },
+        {
             "name": "golang.org/x/net",
             "branch": "master",
-            "revision": "ffcf1bedda3b04ebb15a168a59800a73d6dc0f4d",
+            "revision": "d1e1b351919c6738fdeb9893d5c998b161464f0c",
             "packages": [
                 "context",
                 "context/ctxhttp",
@@ -171,7 +196,7 @@
         {
             "name": "golang.org/x/sys",
             "branch": "master",
-            "revision": "39e3dc274464e7d2f663aa606a830611bae5f1db",
+            "revision": "f3918c30c5c2cb527c0b071a27c35120a6c0719a",
             "packages": [
                 "unix",
                 "windows"
