@@ -76,10 +76,9 @@ func main() {
 	go func() {
 		defer wg.Done()
 		log.Debugf("Start checking inscale event.")
+		// Run first check
 		if isTerminateWait(sess, instance) {
-			log.Infof("Detected: Terminating:Wait")
-			finalizeInstance(sess, instance, moConfig, svConfig)
-			instance.SendLifeCycleAction(sess, moConfig, "CONTINUE")
+			finalizeNormalInstance(sess, instance, moConfig, svConfig)
 			return
 		}
 		t := time.NewTicker(20 * time.Second)
@@ -89,9 +88,7 @@ func main() {
 			case <-t.C:
 				log.Debugf("Start checking inscale event.")
 				if isTerminateWait(sess, instance) {
-					log.Infof("Detected: Terminating:Wait")
-					finalizeInstance(sess, instance, moConfig, svConfig)
-					instance.SendLifeCycleAction(sess, moConfig, "CONTINUE")
+					finalizeNormalInstance(sess, instance, moConfig, svConfig)
 					return
 				}
 			}
@@ -105,9 +102,9 @@ func main() {
 			return
 		}
 		log.Debugf("Start checking spot termination event.")
+		// Run first check
 		if instance.DetectSpotTerminationState() {
-			log.Infof("Detected: Spot Instance Terminating")
-			finalizeInstance(sess, instance, moConfig, svConfig)
+			finalizeSpotInstance(sess, instance, moConfig, svConfig)
 			apiClient.SendSpotShutdownEvent(instance.InstanceID)
 			return
 		}
@@ -118,8 +115,7 @@ func main() {
 			case <-t.C:
 				log.Debugf("Start checking spot termination event.")
 				if instance.DetectSpotTerminationState() {
-					log.Infof("Detected: Spot Instance Terminating")
-					finalizeInstance(sess, instance, moConfig, svConfig)
+					finalizeSpotInstance(sess, instance, moConfig, svConfig)
 					apiClient.SendSpotShutdownEvent(instance.InstanceID)
 					return
 				}
@@ -148,5 +144,18 @@ func finalizeInstance(sess *session.Session, instance *machine.Machine, moConfig
 	instance.DeregisterInstancesFromELB(sess, moConfig)
 	instance.CleanupCrontabs()
 	instance.ExecShutdownTaskOnAppContainers(svConfig)
+	return
+}
+
+func finalizeNormalInstance(sess *session.Session, instance *machine.Machine, moConfig *config.Config, svConfig *serverConfig.Config) {
+	log.Infof("Detected: Terminating:Wait")
+	finalizeInstance(sess, instance, moConfig, svConfig)
+	instance.SendLifeCycleAction(sess, moConfig, "CONTINUE")
+	return
+}
+
+func finalizeSpotInstance(sess *session.Session, instance *machine.Machine, moConfig *config.Config, svConfig *serverConfig.Config) {
+	log.Infof("Detected: Spot Instance Terminating")
+	finalizeInstance(sess, instance, moConfig, svConfig)
 	return
 }
