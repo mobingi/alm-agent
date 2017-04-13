@@ -12,6 +12,37 @@ import (
 // we can update machine.METAENDPOINT on build.
 var METAENDPOINT = "http://169.254.169.254/"
 
+var getInstanceID = func(m *Machine) string {
+	resp, err := http.Get(METAENDPOINT + "/latest/meta-data/instance-id")
+	if err != nil {
+		log.Fatalf("%#v", err)
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("%#v", err)
+	}
+	return string(body)
+}
+
+var getRegion = func(m *Machine) string {
+	resp, err := http.Get(METAENDPOINT + "/latest/meta-data/placement/availability-zone")
+	if err != nil {
+		log.Fatalf("%#v", err)
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("%#v", err)
+	}
+	az := string(body)
+	return az[0:(len(az) - 1)]
+}
+
 // Machine means EC2 Insatnce.
 type Machine struct {
 	InstanceID string
@@ -27,37 +58,6 @@ func NewMachine() *Machine {
 	machine.Region = getRegion(machine)
 	machine.IsSpot = isSpot()
 	return machine
-}
-
-func getInstanceID(m *Machine) string {
-	resp, err := http.Get(METAENDPOINT + "/latest/meta-data/instance-id")
-	if err != nil {
-		log.Fatalf("%#v", err)
-	}
-
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("%#v", err)
-	}
-	return string(body)
-}
-
-func getRegion(m *Machine) string {
-	resp, err := http.Get(METAENDPOINT + "/latest/meta-data/placement/availability-zone")
-	if err != nil {
-		log.Fatalf("%#v", err)
-	}
-
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("%#v", err)
-	}
-	az := string(body)
-	return az[0:(len(az) - 1)]
 }
 
 func isSpot() bool {

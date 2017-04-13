@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"sync"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
@@ -13,6 +14,8 @@ import (
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/server_config"
 )
+
+var wg sync.WaitGroup
 
 func debug() bool {
 	if os.Getenv("DEBUG") != "" {
@@ -69,19 +72,19 @@ func main() {
 	sess := session.Must(session.NewSession(awsconfig))
 	log.Debugf("%#v", sess)
 
-	tmquit := make(chan bool)
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		log.Debugf("Start checking inscale event.")
 		if isTerminateWait(sess, instance) {
 			log.Infof("Detected: Terminating:Wait")
 			finalizeInstance(sess, instance, moConfig, svConfig)
 			instance.SendLifeCycleAction(sess, moConfig, "CONTINUE")
-			tmquit <- true
 			return
 		}
-		tmcount := 0
 		t := time.NewTicker(20 * time.Second)
-		for {
+		defer t.Stop()
+		for tmcount := 0; tmcount < 2; tmcount++ {
 			select {
 			case <-t.C:
 				log.Debugf("Start checking inscale event.")
@@ -89,23 +92,16 @@ func main() {
 					log.Infof("Detected: Terminating:Wait")
 					finalizeInstance(sess, instance, moConfig, svConfig)
 					instance.SendLifeCycleAction(sess, moConfig, "CONTINUE")
-					tmquit <- true
 					return
 				}
 			}
-			tmcount++
-			if tmcount == 2 {
-				break
-			}
 		}
-		t.Stop()
-		tmquit <- true
 	}()
 
-	spquit := make(chan bool)
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		if !instance.IsSpot {
-			spquit <- true
 			return
 		}
 		log.Debugf("Start checking spot termination event.")
@@ -113,12 +109,11 @@ func main() {
 			log.Infof("Detected: Spot Instance Terminating")
 			finalizeInstance(sess, instance, moConfig, svConfig)
 			apiClient.SendSpotShutdownEvent(instance.InstanceID)
-			spquit <- true
 			return
 		}
-		spcount := 0
 		t := time.NewTicker(15 * time.Second)
-		for {
+		defer t.Stop()
+		for spcount := 0; spcount < 3; spcount++ {
 			select {
 			case <-t.C:
 				log.Debugf("Start checking spot termination event.")
@@ -126,21 +121,13 @@ func main() {
 					log.Infof("Detected: Spot Instance Terminating")
 					finalizeInstance(sess, instance, moConfig, svConfig)
 					apiClient.SendSpotShutdownEvent(instance.InstanceID)
-					spquit <- true
 					return
 				}
 			}
-			spcount++
-			if spcount == 3 {
-				break
-			}
 		}
-		t.Stop()
-		spquit <- true
 	}()
 
-	<-spquit
-	<-tmquit
+	wg.Wait()
 	os.Exit(0)
 }
 
