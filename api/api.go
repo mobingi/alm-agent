@@ -100,6 +100,20 @@ func (c *client) GetStsToken() (*StsToken, error) {
 	return stsToken, nil
 }
 
+func (c *client) WriteTempToken(token *StsToken) error {
+	creadsTemplate := `[tempcreds]
+aws_access_key_id=%s
+aws_secret_access_key=%s
+aws_session_token=%s
+`
+	creadsContent := fmt.Sprintf(creadsTemplate, token.AccessKeyID, token.SecretAccessKey, token.SessionToken)
+	err := ioutil.WriteFile("/root/.aws/credentials", []byte(creadsContent), 0600)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *client) SendInstanceStatus(serverID, status string) error {
 	values := url.Values{}
 	values.Set("instance_id", serverID)
