@@ -24,6 +24,13 @@ func Start(c *cli.Context) error {
 	}
 	log.Debugf("%#v", apiClient)
 
+	stsToken, err := apiClient.GetStsToken()
+	if err != nil {
+		return err
+	}
+
+	apiClient.WriteTempToken(stsToken)
+
 	log.Debug("Step: apiClient.GetServerConfig")
 	log.Debugf("Flag: %#v", c.String("serverconfig"))
 	s, err := apiClient.GetServerConfig(c.String("serverconfig"))
