@@ -16,6 +16,7 @@ machine:
 dependencies:
   cache_directories:
     - "/home/ubuntu/download"
+    - "/home/ubuntu/go"
   override:
     - |
       cd ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}

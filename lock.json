@@ -1,14 +1,6 @@
 {
-    "memo": "5783c3427f325fcd4c16b10ef2aa661f37d5b8612f99686ddfe7e10ab8eb141a",
+    "memo": "708b3bb4ce26f42603b147d51f87650f2ba60fa7de9c9e7c5f5269f65d795055",
     "projects": [
-        {
-            "name": "github.com/BurntSushi/toml",
-            "version": "v0.3.0",
-            "revision": "b26d9c308763d68093482582cea63d69be07a0f0",
-            "packages": [
-                "."
-            ]
-        },
         {
             "name": "github.com/Microsoft/go-winio",
             "version": "v0.3.8",
