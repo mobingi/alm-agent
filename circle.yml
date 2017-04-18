@@ -20,9 +20,9 @@ dependencies:
   override:
     - |
       cd ~/.go_workspace/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
-      make deps
+      make cideps
 
 test:
   override:
-    - cd ~/.go_workspace/src/github.com/mobingilabs/go-modaemon && make build && make addon
+    - cd ~/.go_workspace/src/github.com/mobingilabs/go-modaemon && make cibuild && make addon
     - cp ~/.go_workspace/src/github.com/mobingilabs/go-modaemon/bin/* $CIRCLE_ARTIFACTS/

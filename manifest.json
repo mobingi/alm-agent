@@ -4,7 +4,7 @@
             "branch": "master"
         },
         "github.com/docker/docker/...": {
-            "version": "v17.04.0-ce"
+            "branch": "17.04.x"
         },
         "github.com/tcnksm/go-latest": {
             "branch": "master"

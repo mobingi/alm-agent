@@ -13,10 +13,16 @@ setup:
 deps: setup
 	dep ensure -v
 
+cideps: setup
+	dep ensure -v --update
+
 test: deps
 	go test -v ${PACKAGES_ALL}
 
-race: deps
+citest: cideps
+	go test -v ${PACKAGES_ALL}
+
+race: cideps
 	go test -v -race ${PACKAGES_ALL}
 
 lint: setup
@@ -28,7 +34,10 @@ lint: setup
 fmt: setup
 	goimports -v -w ${PACKAGES}
 
-build: race
+build: test
+	go build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
+
+cibuild: race
 	go build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
 
 clean:
