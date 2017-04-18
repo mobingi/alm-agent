@@ -19,6 +19,13 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
+	stsToken, err := apiClient.GetStsToken()
+	if err != nil {
+		return err
+	}
+
+	apiClient.WriteTempToken(stsToken)
+
 	s, err := apiClient.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
 		return err
