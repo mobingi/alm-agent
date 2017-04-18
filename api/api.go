@@ -7,11 +7,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/server_config"
+	"github.com/mobingilabs/go-modaemon/util"
 )
 
 type client struct {
@@ -106,6 +108,10 @@ aws_access_key_id=%s
 aws_secret_access_key=%s
 aws_session_token=%s
 `
+	if !util.FileExists("/root/.aws") {
+		os.Mkdir("/root/.aws", 0700)
+	}
+
 	creadsContent := fmt.Sprintf(creadsTemplate, token.AccessKeyID, token.SecretAccessKey, token.SessionToken)
 	err := ioutil.WriteFile("/root/.aws/credentials", []byte(creadsContent), 0600)
 	if err != nil {
