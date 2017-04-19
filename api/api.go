@@ -102,18 +102,34 @@ func (c *client) GetStsToken() (*StsToken, error) {
 	return stsToken, nil
 }
 
-func (c *client) WriteTempToken(token *StsToken) error {
+func (c *client) WriteTempToken(token *StsToken, region string) error {
 	creadsTemplate := `[tempcreds]
 aws_access_key_id=%s
 aws_secret_access_key=%s
 aws_session_token=%s
+region=%s
 `
+
+	creadsForlogs := `[plugins]
+cwlogs = cwlogs
+[default]
+aws_access_key_id=%s
+aws_secret_access_key=%s
+aws_session_token=%s
+region=%s
+`
+
 	if !util.FileExists("/root/.aws") {
 		os.Mkdir("/root/.aws", 0700)
 	}
 
-	creadsContent := fmt.Sprintf(creadsTemplate, token.AccessKeyID, token.SecretAccessKey, token.SessionToken)
-	err := ioutil.WriteFile("/root/.aws/credentials", []byte(creadsContent), 0600)
+	tempcreadsContent := fmt.Sprintf(creadsTemplate, token.AccessKeyID, token.SecretAccessKey, token.SessionToken, region)
+	logscreadsContent := fmt.Sprintf(creadsForlogs, token.AccessKeyID, token.SecretAccessKey, token.SessionToken, region)
+	err := ioutil.WriteFile("/root/.aws/credentials", []byte(tempcreadsContent), 0600)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile("/root/.aws/awslogs_creds.conf", []byte(logscreadsContent), 0600)
 	if err != nil {
 		return err
 	}
