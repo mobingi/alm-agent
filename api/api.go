@@ -16,6 +16,8 @@ import (
 	"github.com/mobingilabs/go-modaemon/util"
 )
 
+var logregion = "ap-northeast-1"
+
 type client struct {
 	client    *http.Client
 	config    *config.Config
@@ -102,7 +104,9 @@ func (c *client) GetStsToken() (*StsToken, error) {
 	return stsToken, nil
 }
 
-func (c *client) WriteTempToken(token *StsToken, region string) error {
+func (c *client) WriteTempToken(token *StsToken) error {
+	region := logregion
+
 	creadsTemplate := `[tempcreds]
 aws_access_key_id=%s
 aws_secret_access_key=%s
