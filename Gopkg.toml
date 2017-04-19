@@ -1,0 +1,16 @@
+
+[[dependencies]]
+  name = "github.com/BurntSushi/toml"
+  version = "v0.3.0"
+
+[[dependencies]]
+  branch = "master"
+  name = "github.com/aws/aws-sdk-go/aws/..."
+
+[[dependencies]]
+  branch = "17.05.x"
+  name = "github.com/docker/docker/..."
+
+[[dependencies]]
+  branch = "master"
+  name = "github.com/tcnksm/go-latest"
