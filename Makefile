@@ -13,16 +13,10 @@ setup:
 deps: setup
 	dep ensure -v
 
-cideps: setup
-	dep ensure -v --update
-
 test: deps
 	go test -v ${PACKAGES_ALL}
 
-citest: cideps
-	go test -v ${PACKAGES_ALL}
-
-race: cideps
+race: deps
 	go test -v -race ${PACKAGES_ALL}
 
 lint: setup
