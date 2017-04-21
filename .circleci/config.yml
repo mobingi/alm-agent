@@ -10,9 +10,6 @@ jobs:
       - restore_cache:
           key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
       - run:
-          name: resolve depends
-          command: make cideps
-      - run:
           name: test and build maincli
           command: make cibuild
       - run:
@@ -22,3 +19,6 @@ jobs:
           key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
           paths:
             - "/go/src"
+      - store_artifacts:
+          path: bin/
+          destination: bin
