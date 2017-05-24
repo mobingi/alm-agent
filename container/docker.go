@@ -258,6 +258,9 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 		}
 	}
 
+	bind_log := "/var/modaemon/containerlogs/log:/var/log"
+	hostConfig.Binds = append(hostConfig.Binds, bind_log)
+
 	networkingConfig := &network.NetworkingConfig{}
 
 	log.Infof("creating container \"%s\" from image \"%s\"", name, d.image)
