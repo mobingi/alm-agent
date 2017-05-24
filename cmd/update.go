@@ -51,7 +51,7 @@ func Update(c *cli.Context) error {
 		}
 	}
 
-	d, err := container.NewDocker(s)
+	d, err := container.NewDocker(conf, s)
 	if err != nil {
 		return err
 	}

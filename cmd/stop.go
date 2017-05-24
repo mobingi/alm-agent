@@ -23,7 +23,7 @@ func Stop(c *cli.Context) error {
 		return err
 	}
 
-	d, err := container.NewDocker(s)
+	d, err := container.NewDocker(conf, s)
 	if err != nil {
 		return err
 	}
