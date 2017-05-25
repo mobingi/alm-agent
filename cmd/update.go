@@ -5,10 +5,12 @@ import (
 	"github.com/mobingilabs/go-modaemon/code"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
+	"github.com/mobingilabs/go-modaemon/util"
 	"github.com/urfave/cli"
 )
 
 func Update(c *cli.Context) error {
+	serverid, err := util.GetServerID()
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {
 		return err
@@ -74,6 +76,7 @@ func Update(c *cli.Context) error {
 		return nil
 	}
 
+	apiClient.SendInstanceStatus(serverid, "updating")
 	d.MapPort(oldContainer) // For regenerating port map information
 
 	newContainer, err := d.StartContainer("standby", codeDir)

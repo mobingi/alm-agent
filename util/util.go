@@ -9,7 +9,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-var METAENDPOINT = "http://169.254.169.254/"
+var (
+	ec2METAENDPOINT       = "http://169.254.169.254/"
+	containerLogsLocation = "/var/modaemon/containerlogs"
+)
 
 func FileExists(filename string) bool {
 	_, err := os.Stat(filename)
@@ -17,12 +20,12 @@ func FileExists(filename string) bool {
 }
 
 func FetchContainerState() string {
-	var container_status string = "/var/modaemon/containerlogs/log/container_status"
-	if !FileExists(container_status) {
+	containerStatus := containerLogsLocation + "/log/container_status"
+	if !FileExists(containerStatus) {
 		return ""
 	}
 
-	dat, err := ioutil.ReadFile(container_status)
+	dat, err := ioutil.ReadFile(containerStatus)
 	if err != nil {
 		return ""
 	}
@@ -49,7 +52,7 @@ func GetServerID(s ...string) (string, error) {
 }
 
 func getServerIDforEC2() string {
-	resp, err := http.Get(METAENDPOINT + "/latest/meta-data/instance-id")
+	resp, err := http.Get(ec2METAENDPOINT + "/latest/meta-data/instance-id")
 	if err != nil {
 		log.Fatalf("%#v", err)
 	}
@@ -60,5 +63,6 @@ func getServerIDforEC2() string {
 	if err != nil {
 		log.Fatalf("%#v", err)
 	}
+
 	return string(body)
 }
