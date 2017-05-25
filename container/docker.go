@@ -12,6 +12,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/server_config"
 	"github.com/mobingilabs/go-modaemon/util"
 
@@ -36,7 +37,7 @@ type Docker struct {
 	envs     []string
 }
 
-func NewDocker(s *serverConfig.Config) (*Docker, error) {
+func NewDocker(c *config.Config, s *serverConfig.Config) (*Docker, error) {
 	docker := &Docker{
 		image:    strings.TrimPrefix(s.Image, "http://"),
 		username: s.DockerHubUserName,
@@ -46,6 +47,7 @@ func NewDocker(s *serverConfig.Config) (*Docker, error) {
 		codeDir:  s.CodeDir,
 		envs: func() []string {
 			var envs []string
+			envs = append(envs, "MO_USER_ID="+c.UserID, "MO_STACK_ID="+c.StackID)
 			for k, v := range s.EnvironmentVariables {
 				es := []string{k, v}
 				envs = append(envs, strings.Join(es, "="))
