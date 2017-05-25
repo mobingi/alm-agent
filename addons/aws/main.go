@@ -143,7 +143,7 @@ func isTerminateWait(sess *session.Session, instance *machine.Machine) bool {
 func finalizeInstance(sess *session.Session, instance *machine.Machine, moConfig *config.Config, svConfig *serverConfig.Config) {
 	instance.DeregisterInstancesFromELB(sess, moConfig)
 	instance.CleanupCrontabs()
-	instance.ExecShutdownTaskOnAppContainers(svConfig)
+	instance.ExecShutdownTaskOnAppContainers(moConfig, svConfig)
 	return
 }
 

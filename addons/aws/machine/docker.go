@@ -4,13 +4,14 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/docker/docker/api/types"
+	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
 	"github.com/mobingilabs/go-modaemon/server_config"
 )
 
 // ExecShutdownTaskOnAppContainers runs final tasks before shutdown instance.
-func (m *Machine) ExecShutdownTaskOnAppContainers(s *serverConfig.Config) {
-	d, _ := container.NewDocker(s)
+func (m *Machine) ExecShutdownTaskOnAppContainers(c *config.Config, s *serverConfig.Config) {
+	d, _ := container.NewDocker(c, s)
 	log.Debugf("%#v", d)
 
 	conID, err := d.GetContainerIDbyImage(s.Image)
