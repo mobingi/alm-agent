@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -31,14 +32,14 @@ func FetchContainerState() string {
 	}
 
 	log.Debugf("FetchContainerState: %s", string(dat))
-	return string(dat)
+	return strings.TrimSpace(string(dat))
 }
 
 func GetServerID(s ...string) (string, error) {
 	var sid string
 
 	if len(s) == 0 {
-		s[0] = "aws"
+		s = append(s, "aws")
 	}
 
 	switch s[0] {

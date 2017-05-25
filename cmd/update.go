@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"sync"
+
 	"github.com/mobingilabs/go-modaemon/api"
 	"github.com/mobingilabs/go-modaemon/code"
 	"github.com/mobingilabs/go-modaemon/config"
@@ -92,5 +94,21 @@ func Update(c *cli.Context) error {
 
 	d.RenameContainer(newContainer, "active")
 
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var state string
+		for {
+			state = util.FetchContainerState()
+			apiClient.SendInstanceStatus(serverid, state)
+			if state == "complete" {
+				break
+			}
+		}
+	}()
+
+	wg.Wait()
 	return nil
 }

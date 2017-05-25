@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"sync"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/mobingilabs/go-modaemon/api"
 	"github.com/mobingilabs/go-modaemon/code"
@@ -72,7 +74,6 @@ func Start(c *cli.Context) error {
 	}
 	log.Debugf("%#v", newContainer)
 
-	apiClient.SendInstanceStatus(serverid, util.FetchContainerState())
 	log.Debug("Step: d.MapPort")
 	err = d.MapPort(newContainer)
 	if err != nil {
@@ -80,5 +81,21 @@ func Start(c *cli.Context) error {
 		return err
 	}
 
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var state string
+		for {
+			state = util.FetchContainerState()
+			apiClient.SendInstanceStatus(serverid, state)
+			if state == "complete" {
+				break
+			}
+		}
+	}()
+
+	wg.Wait()
 	return nil
 }
