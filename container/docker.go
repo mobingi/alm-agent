@@ -277,7 +277,7 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 		}
 	}
 
-	bindLog := containerLogsLocation + "/log"
+	bindLog := containerLogsLocation + "/log:/var/log"
 	hostConfig.Binds = append(hostConfig.Binds, bindLog)
 
 	networkingConfig := &network.NetworkingConfig{}
@@ -321,7 +321,7 @@ func (d *Docker) prepareLogsDir() error {
 		log.Errorf("prepareLogsDir.ContainerStart: %#v", err)
 	}
 
-	// dummyResult = `docker cp #{containerId}:/var/log #{containerLogsLocation} 2>&1`
+	os.MkdirAll(containerLogsLocation, 0755)
 
 	err = exec.Command("docker", "cp", res.ID+":/var/log", containerLogsLocation).Run()
 	if err != nil {
