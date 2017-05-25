@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"sync"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mobingilabs/go-modaemon/api"
@@ -93,6 +94,7 @@ func Start(c *cli.Context) error {
 			if state == "complete" {
 				break
 			}
+			time.Sleep(2 * time.Second)
 		}
 	}()
 

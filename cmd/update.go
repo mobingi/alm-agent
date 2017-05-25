@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"sync"
+	"time"
 
 	"github.com/mobingilabs/go-modaemon/api"
 	"github.com/mobingilabs/go-modaemon/code"
@@ -106,6 +107,7 @@ func Update(c *cli.Context) error {
 			if state == "complete" {
 				break
 			}
+			time.Sleep(2 * time.Second)
 		}
 	}()
 
