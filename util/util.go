@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -46,23 +47,30 @@ func GetServerID(s ...string) (string, error) {
 	case "aws":
 		sid = getServerIDforEC2()
 	default:
-		return sid, errors.New("Provider is not supported.")
+		return sid, errors.New("Provider `" + s[0] + "` is not supported.")
 	}
 
 	return sid, nil
 }
 
 func getServerIDforEC2() string {
-	resp, err := http.Get(ec2METAENDPOINT + "/latest/meta-data/instance-id")
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+
+	resp, err := client.Get(ec2METAENDPOINT + "/latest/meta-data/instance-id")
 	if err != nil {
-		log.Fatalf("%#v", err)
+		log.Warnf("%#v", err)
+		return ""
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("%#v", err)
+		log.Warnf("%#v", err)
+		return ""
 	}
 
 	return string(body)
