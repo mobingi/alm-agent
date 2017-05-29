@@ -83,20 +83,41 @@ func Start(c *cli.Context) error {
 	}
 
 	var wg sync.WaitGroup
+	timer := time.NewTimer(180 * time.Second)
+	state := make(chan string)
+	done := make(chan bool)
+	cancel := make(chan bool)
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		var state string
 		for {
-			state = util.FetchContainerState()
-			apiClient.SendInstanceStatus(serverid, state)
-			if state == "complete" {
-				break
+			select {
+			case <-cancel:
+				log.Error("Container start processing timed out.")
+				return
+			case s := <-state:
+				apiClient.SendInstanceStatus(serverid, s)
+				if s == "complete" {
+					done <- true
+					return
+				}
 			}
-			time.Sleep(2 * time.Second)
 		}
 	}()
+
+LOOP:
+	for {
+		select {
+		case <-timer.C:
+			cancel <- true
+			break LOOP
+		case <-done:
+			break LOOP
+		case state <- util.FetchContainerState():
+			time.Sleep(2 * time.Second)
+		}
+	}
 
 	wg.Wait()
 	return nil
