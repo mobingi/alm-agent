@@ -290,8 +290,7 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 
 // to keep compatibility with older modaemon
 func (d *Docker) prepareLogsDir() error {
-	var dmsgPath = containerLogsLocation + "/dmesg"
-	if util.FileExists(dmsgPath) {
+	if util.FileExists(containerLogsLocation) {
 		return nil
 	}
 
