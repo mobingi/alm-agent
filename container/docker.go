@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 	"time"
@@ -36,6 +37,10 @@ type Docker struct {
 	codeDir  string
 	envs     []string
 }
+
+var (
+	containerLogsLocation = "/var/modaemon/containerlogs"
+)
 
 func NewDocker(c *config.Config, s *serverConfig.Config) (*Docker, error) {
 	docker := &Docker{
@@ -74,9 +79,9 @@ func (d *Docker) CheckImageUpdated() (bool, error) {
 
 	if strings.Contains(res, "Image is up to date for") {
 		return false, nil
-	} else {
-		return true, nil
 	}
+
+	return true, nil
 }
 
 func (d *Docker) GetContainer(name string) (*Container, error) {
@@ -137,6 +142,16 @@ func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 	err = d.containerStart(c)
 	if err != nil {
 		return nil, err
+	}
+
+	ct, _ := d.client.ContainerInspect(context.Background(), c.ID)
+	if err == nil {
+		log.Debugf("ContainerInspect: %#v", ct)
+	}
+
+	cp, _ := d.client.ContainerStatPath(context.Background(), c.ID, "/")
+	if err == nil {
+		log.Debugf("ContainerInspect: %#v", cp)
 	}
 
 	c.IP, err = d.getIPAddress(c)
@@ -217,6 +232,8 @@ func (d *Docker) imagePull() (string, error) {
 }
 
 func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
+	d.prepareLogsDir()
+
 	config := &container.Config{
 		Image: d.image,
 		Env:   d.envs,
@@ -260,12 +277,65 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 		}
 	}
 
+	bindLog := containerLogsLocation + "/log:/var/log"
+	hostConfig.Binds = append(hostConfig.Binds, bindLog)
+
 	networkingConfig := &network.NetworkingConfig{}
 
 	log.Infof("creating container \"%s\" from image \"%s\"", name, d.image)
 	res, err := d.client.ContainerCreate(context.Background(), config, hostConfig, networkingConfig, name)
 	log.Debugf("hostConfig: %#v", hostConfig)
 	return &Container{Name: name, ID: res.ID}, err
+}
+
+// to keep compatibility with older modaemon
+func (d *Docker) prepareLogsDir() error {
+	if util.FileExists(containerLogsLocation) {
+		return nil
+	}
+
+	log.Debug("prepareLogsDir: Start")
+	ep := []string{
+		"/bin/sh",
+	}
+	cmd := []string{
+		"-c",
+		"while true ; do sleep 1 ; done",
+	}
+	config := &container.Config{
+		Image:      d.image,
+		Entrypoint: ep,
+		Cmd:        cmd,
+	}
+
+	hostConfig := &container.HostConfig{}
+	res, err := d.client.ContainerCreate(context.Background(), config, hostConfig, &network.NetworkingConfig{}, "preparelogs")
+	if err != nil {
+		log.Errorf("prepareLogsDir.ContainerCreate: %#v", err)
+	}
+
+	options := types.ContainerStartOptions{}
+	err = d.client.ContainerStart(context.Background(), res.ID, options)
+	if err != nil {
+		log.Errorf("prepareLogsDir.ContainerStart: %#v", err)
+	}
+
+	os.MkdirAll(containerLogsLocation, 0755)
+
+	err = exec.Command("docker", "cp", res.ID+":/var/log", containerLogsLocation).Run()
+	if err != nil {
+		log.Errorf("prepareLogsDir.copyFromContainerLogsLocation: %#v", err)
+	}
+	//	tmpcID := strings.TrimSpace(string(out))
+	err = d.client.ContainerKill(context.Background(), "preparelogs", "KILL")
+	if err != nil {
+		log.Errorf("prepareLogsDir.ContainerKill: %#v", err)
+	}
+	err = d.client.ContainerRemove(context.Background(), "preparelogs", types.ContainerRemoveOptions{})
+	if err != nil {
+		log.Errorf("prepareLogsDir.ContainerRemove: %#v", err)
+	}
+	return nil
 }
 
 func (d *Docker) containerStart(c *Container) error {

@@ -146,6 +146,12 @@ func (c *client) SendInstanceStatus(serverID, status string) error {
 	values.Set("stack_id", c.config.StackID)
 	values.Set("status", status)
 
+	// use for debug enviromnent
+	if serverID == "" {
+		log.Warnf("Skiped sending status to API(serverid is empty): %s", status)
+		return nil
+	}
+
 	_, err := c.post("/v2/alm/instance/status", values)
 	return err
 }
@@ -178,9 +184,9 @@ func (c *client) get(path string, values url.Values) ([]byte, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		return res, errors.New(resp.Status)
-	} else {
-		return res, nil
 	}
+
+	return res, nil
 }
 
 func (c *client) post(path string, values url.Values) ([]byte, error) {
@@ -200,9 +206,9 @@ func (c *client) post(path string, values url.Values) ([]byte, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		return res, errors.New(resp.Status)
-	} else {
-		return res, nil
 	}
+
+	return res, nil
 }
 
 func (c *client) getAccessToken() error {

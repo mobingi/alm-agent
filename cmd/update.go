@@ -1,14 +1,20 @@
 package cmd
 
 import (
+	"sync"
+	"time"
+
+	log "github.com/Sirupsen/logrus"
 	"github.com/mobingilabs/go-modaemon/api"
 	"github.com/mobingilabs/go-modaemon/code"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
+	"github.com/mobingilabs/go-modaemon/util"
 	"github.com/urfave/cli"
 )
 
 func Update(c *cli.Context) error {
+	serverid, err := util.GetServerID()
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {
 		return err
@@ -56,6 +62,7 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
+	apiClient.SendInstanceStatus(serverid, util.FetchContainerState())
 	imageUpdated, err := d.CheckImageUpdated()
 	if err != nil {
 		return err
@@ -74,6 +81,7 @@ func Update(c *cli.Context) error {
 		return nil
 	}
 
+	apiClient.SendInstanceStatus(serverid, "updating")
 	d.MapPort(oldContainer) // For regenerating port map information
 
 	newContainer, err := d.StartContainer("standby", codeDir)
@@ -89,5 +97,43 @@ func Update(c *cli.Context) error {
 
 	d.RenameContainer(newContainer, "active")
 
+	var wg sync.WaitGroup
+	timer := time.NewTimer(180 * time.Second)
+	state := make(chan string)
+	done := make(chan bool)
+	cancel := make(chan bool)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for {
+			select {
+			case <-cancel:
+				log.Error("Container update processing timed out.")
+				return
+			case s := <-state:
+				apiClient.SendInstanceStatus(serverid, s)
+				if s == "complete" {
+					done <- true
+					return
+				}
+			}
+		}
+	}()
+
+LOOP:
+	for {
+		select {
+		case <-timer.C:
+			cancel <- true
+			break LOOP
+		case <-done:
+			break LOOP
+		case state <- util.FetchContainerState():
+			time.Sleep(2 * time.Second)
+		}
+	}
+
+	wg.Wait()
 	return nil
 }
