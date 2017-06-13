@@ -151,5 +151,14 @@ func (c *Code) ParseURL() (*url.URL, error) {
 		return url, err
 	}
 
+	if url.Scheme == "git" && url.Host == "github.com" {
+		return convertGithubGitURLToSSH(url)
+	}
+
 	return url, nil
+}
+
+func convertGithubGitURLToSSH(url *url.URL) (*url.URL, error) {
+	sshURL := fmt.Sprintf("ssh://git@github.com/%s", url.Path)
+	return url.Parse(sshURL)
 }
