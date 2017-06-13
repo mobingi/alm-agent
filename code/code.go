@@ -1,9 +1,12 @@
 package code
 
 import (
+	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path"
+	"regexp"
 	"sort"
 	"time"
 
@@ -120,4 +123,33 @@ func (c *Code) CreateIdentityFile() error {
 		}
 	}
 	return nil
+}
+
+// ref. `man git-clone`
+// The following syntaxes may be used.
+// - ssh://[user@]host.xz[:port]/path/to/repo.git/
+// - git://host.xz[:port]/path/to/repo.git/
+// - http[s]://host.xz[:port]/path/to/repo.git/
+// - ftp[s]://host.xz[:port]/path/to/repo.git/
+// - [user@]host.xz:path/to/repo.git/
+var hasSchemeSyntax = regexp.MustCompile("^[^:]+://")
+var scpLikeSyntax = regexp.MustCompile("^([^@]+@)?([^:]+):/?(.+)$")
+
+func (c *Code) ParseURL() (*url.URL, error) {
+	rawURL := c.URL
+
+	if !hasSchemeSyntax.MatchString(rawURL) && scpLikeSyntax.MatchString(rawURL) {
+		matched := scpLikeSyntax.FindStringSubmatch(rawURL)
+		user := matched[1]
+		host := matched[2]
+		path := matched[3]
+		rawURL = fmt.Sprintf("ssh://%s%s/%s", user, host, path)
+	}
+
+	url, err := url.Parse(rawURL)
+	if err != nil {
+		return url, err
+	}
+
+	return url, nil
 }
