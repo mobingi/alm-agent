@@ -15,6 +15,7 @@ type Code struct {
 	URL  string
 	Ref  string
 	Path string
+	Key  string
 }
 
 type Dirs []os.FileInfo
@@ -38,6 +39,7 @@ func New(s *serverConfig.Config) *Code {
 	return &Code{
 		URL: s.Code,
 		Ref: ref,
+		Key: s.GitPrivateKey,
 	}
 }
 
@@ -94,4 +96,28 @@ func (c *Code) Get() (string, error) {
 	}
 	err := g.get()
 	return g.path, err
+}
+
+func (c *Code) CreateIdentityFile() error {
+	if c.Key != "" {
+		sshDir := "/root/.ssh"
+		sshKey := path.Join(sshDir, "id_code")
+
+		if !util.FileExists(sshDir) {
+			if err := os.Mkdir(sshDir, 0700); err != nil {
+				return err
+			}
+		}
+		if util.FileExists(sshKey) {
+			if err := os.Remove(sshKey); err != nil {
+				return err
+			}
+		}
+
+		err := ioutil.WriteFile(sshKey, []byte(c.Key), 0600)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
