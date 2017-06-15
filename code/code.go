@@ -188,3 +188,24 @@ func checkKnownHosts(url *url.URL) error {
 	}
 	return nil
 }
+
+func writeSshConfig(url *url.URL) error {
+	c := `Host %s
+  IdentityFile /root/.ssh/id_code
+`
+	configPath := "/root/.ssh/config"
+
+	if util.FileExists(configPath) {
+		if err := os.Remove(configPath); err != nil {
+			return err
+		}
+	}
+
+	config := fmt.Sprintf(c, url.Host)
+	err := ioutil.WriteFile(configPath, []byte(config), 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
