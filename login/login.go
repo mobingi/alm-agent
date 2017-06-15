@@ -6,7 +6,9 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"syscall"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mobingilabs/go-modaemon/util"
@@ -53,6 +55,8 @@ func setLogin(username string, sshkey string) {
 	if err != nil {
 		log.Errorf("Faild adding user: %s\n", username)
 	}
-	owner := fmt.Sprintf("%s:%s", username, username)
-	exec.Command("chown", owner, filepath.Join(sshDirpath(username), "authorized_keys")).Run()
+	currentUser, _ := user.Lookup(username)
+	uid, _ := strconv.Atoi(currentUser.Uid)
+	gid, _ := strconv.Atoi(currentUser.Gid)
+	syscall.Chown(filepath.Join(sshDirpath(username), "authorized_keys"), uid, gid)
 }
