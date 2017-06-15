@@ -9,6 +9,7 @@ import (
 	"github.com/mobingilabs/go-modaemon/code"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
+	"github.com/mobingilabs/go-modaemon/login"
 	"github.com/mobingilabs/go-modaemon/util"
 	"github.com/urfave/cli"
 )
@@ -35,6 +36,10 @@ func Update(c *cli.Context) error {
 	s, err := apiClient.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
 		return err
+	}
+
+	for x, y := range s.Users {
+		login.EnsureUser(x, y.PublicKey)
 	}
 
 	codeDir := ""

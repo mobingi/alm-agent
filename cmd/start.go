@@ -9,6 +9,7 @@ import (
 	"github.com/mobingilabs/go-modaemon/code"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
+	"github.com/mobingilabs/go-modaemon/login"
 	"github.com/mobingilabs/go-modaemon/util"
 	"github.com/urfave/cli"
 )
@@ -49,6 +50,10 @@ func Start(c *cli.Context) error {
 		return err
 	}
 	log.Debugf("%#v", s)
+
+	for x, y := range s.Users {
+		login.EnsureUser(x, y.PublicKey)
+	}
 
 	codeDir := ""
 	if s.Code != "" {
