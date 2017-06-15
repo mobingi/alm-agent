@@ -2,9 +2,11 @@ package code
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/url"
 	"os"
+	"os/exec"
 	"path"
 	"regexp"
 	"sort"
@@ -161,4 +163,28 @@ func (c *Code) ParseURL() (*url.URL, error) {
 func convertGithubGitURLToSSH(url *url.URL) (*url.URL, error) {
 	sshURL := fmt.Sprintf("ssh://git@github.com/%s", url.Path)
 	return url.Parse(sshURL)
+}
+
+func checkKnownHosts(url *url.URL) error {
+	if _, err := exec.Command("ssh-keygen", "-F", url.Host).Output(); err != nil {
+		out, err := exec.Command("ssh-keyscan", url.Host).Output()
+		if err != nil {
+			return err
+		}
+		if string(out) == "" {
+			return fmt.Errorf("%s's ssh public key is empty", url.Host)
+		}
+
+		kh := "/root/.ssh/known_hosts"
+		file, err := os.OpenFile(kh, os.O_RDWR|os.O_APPEND, 0644)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		io.WriteString(file, string(out))
+
+		return nil
+	}
+	return nil
 }
