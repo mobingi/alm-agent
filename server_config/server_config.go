@@ -1,5 +1,9 @@
 package serverConfig
 
+type PubKey struct {
+	PublicKey string
+}
+
 type Config struct {
 	Image                string
 	DockerHubUserName    string
@@ -8,5 +12,6 @@ type Config struct {
 	CodeDir              string
 	GitReference         string
 	Ports                []int
+	Users                map[string]*PubKey
 	EnvironmentVariables map[string]string
 }
