@@ -14,8 +14,45 @@ import (
 	"github.com/mobingilabs/go-modaemon/util"
 )
 
+var protectedUsers = []string{
+	"adm",
+	"bin",
+	"daemon",
+	"dbus",
+	"ec2-user",
+	"ftp",
+	"games",
+	"gopher",
+	"halt",
+	"k5user",
+	"lp",
+	"mail",
+	"mailnull",
+	"nfsnobody",
+	"nobody",
+	"ntp",
+	"operator",
+	"root",
+	"rpc",
+	"rpcuser",
+	"saslauth",
+	"shutdown",
+	"smmsp",
+	"sshd",
+	"sync",
+	"uucp",
+}
+
 func EnsureUser(username string, sshkey string) {
+
 	log.Debug("Step: ensureUser")
+
+	for _, u := range protectedUsers {
+		if u == username {
+			log.Warnf("%s is protected user. Setup skipped.\n", username)
+			return
+		}
+	}
 
 	_, err := user.Lookup(username)
 	if err != nil {
