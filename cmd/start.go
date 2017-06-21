@@ -42,6 +42,13 @@ func Start(c *cli.Context) error {
 	codeDir := ""
 	if s.Code != "" {
 		code := code.New(s)
+		if code.Key != "" {
+			err = code.PrivateRepo()
+			if err != nil {
+				return err
+			}
+		}
+
 		codeDir, err = code.Get()
 		if err != nil {
 			return err

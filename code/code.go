@@ -103,26 +103,52 @@ func (c *Code) Get() (string, error) {
 	return g.path, err
 }
 
-func (c *Code) CreateIdentityFile() error {
-	if c.Key != "" {
-		sshDir := "/root/.ssh"
-		sshKey := path.Join(sshDir, "id_code")
+func (c *Code) PrivateRepo() error {
+	err := createIdentityFile(c.Key)
+	if err != nil {
+		return err
+	}
 
-		if !util.FileExists(sshDir) {
-			if err := os.Mkdir(sshDir, 0700); err != nil {
-				return err
-			}
-		}
-		if util.FileExists(sshKey) {
-			if err := os.Remove(sshKey); err != nil {
-				return err
-			}
-		}
+	url, err := parseURL(c.URL)
+	if err != nil {
+		return err
+	}
 
-		err := ioutil.WriteFile(sshKey, []byte(c.Key), 0600)
-		if err != nil {
+	if url.Scheme == "git" && url.Host == "github.com" {
+		c.URL = convertGithubGitURLToSSH(url)
+	}
+
+	err = checkKnownHosts(url)
+	if err != nil {
+		return err
+	}
+
+	err = writeSshConfig(url)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func createIdentityFile(key string) error {
+	sshDir := "/root/.ssh"
+	sshKey := path.Join(sshDir, "id_code")
+
+	if !util.FileExists(sshDir) {
+		if err := os.Mkdir(sshDir, 0700); err != nil {
 			return err
 		}
+	}
+	if util.FileExists(sshKey) {
+		if err := os.Remove(sshKey); err != nil {
+			return err
+		}
+	}
+
+	err := ioutil.WriteFile(sshKey, []byte(key), 0600)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -137,9 +163,7 @@ func (c *Code) CreateIdentityFile() error {
 var hasSchemeSyntax = regexp.MustCompile("^[^:]+://")
 var scpLikeSyntax = regexp.MustCompile("^([^@]+@)?([^:]+):/?(.+)$")
 
-func (c *Code) ParseURL() (*url.URL, error) {
-	rawURL := c.URL
-
+func parseURL(rawURL string) (*url.URL, error) {
 	if !hasSchemeSyntax.MatchString(rawURL) && scpLikeSyntax.MatchString(rawURL) {
 		matched := scpLikeSyntax.FindStringSubmatch(rawURL)
 		user := matched[1]
@@ -153,16 +177,11 @@ func (c *Code) ParseURL() (*url.URL, error) {
 		return url, err
 	}
 
-	if url.Scheme == "git" && url.Host == "github.com" {
-		return convertGithubGitURLToSSH(url)
-	}
-
 	return url, nil
 }
 
-func convertGithubGitURLToSSH(url *url.URL) (*url.URL, error) {
-	sshURL := fmt.Sprintf("ssh://git@github.com/%s", url.Path)
-	return url.Parse(sshURL)
+func convertGithubGitURLToSSH(url *url.URL) string {
+	return fmt.Sprintf("ssh://git@github.com/%s", url.Path)
 }
 
 func checkKnownHosts(url *url.URL) error {
