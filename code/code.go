@@ -191,8 +191,9 @@ func convertGithubGitURLToSSH(url *url.URL) string {
 
 func checkKnownHosts(url *url.URL) error {
 	log.Debug("Step: checkKnownHosts")
-	if _, err := exec.Command("ssh-keygen", "-F", url.Host).Output(); err != nil {
-		out, err := exec.Command("ssh-keyscan", url.Host).Output()
+	out, err := exec.Command("ssh-keygen", "-F", url.Host).Output()
+	if string(out) == "" && err != nil {
+		out, err = exec.Command("ssh-keyscan", url.Host).Output()
 		if err != nil {
 			return err
 		}
@@ -208,9 +209,7 @@ func checkKnownHosts(url *url.URL) error {
 			return err
 		}
 		defer file.Close()
-
 		io.WriteString(file, string(out))
-
 		return nil
 	}
 	return nil
