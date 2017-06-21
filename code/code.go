@@ -12,6 +12,7 @@ import (
 	"sort"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/mobingilabs/go-modaemon/server_config"
 	"github.com/mobingilabs/go-modaemon/util"
 )
@@ -116,6 +117,7 @@ func (c *Code) PrivateRepo() error {
 
 	if url.Scheme == "git" && url.Host == "github.com" {
 		c.URL = convertGithubGitURLToSSH(url)
+		log.Debugf("Converted URL is %s.", c.URL)
 	}
 
 	err = checkKnownHosts(url)
@@ -132,6 +134,7 @@ func (c *Code) PrivateRepo() error {
 }
 
 func createIdentityFile(key string) error {
+	jog.Debug("Step: createIdentityFile")
 	sshDir := "/root/.ssh"
 	sshKey := path.Join(sshDir, "id_code")
 
@@ -146,6 +149,7 @@ func createIdentityFile(key string) error {
 		}
 	}
 
+	log.Debugf("Create IdentityFile %s", sshKey)
 	err := ioutil.WriteFile(sshKey, []byte(key), 0600)
 	if err != nil {
 		return err
@@ -164,6 +168,7 @@ var hasSchemeSyntax = regexp.MustCompile("^[^:]+://")
 var scpLikeSyntax = regexp.MustCompile("^([^@]+@)?([^:]+):/?(.+)$")
 
 func parseURL(rawURL string) (*url.URL, error) {
+	log.Debug("Step: parseURL")
 	if !hasSchemeSyntax.MatchString(rawURL) && scpLikeSyntax.MatchString(rawURL) {
 		matched := scpLikeSyntax.FindStringSubmatch(rawURL)
 		user := matched[1]
@@ -185,6 +190,7 @@ func convertGithubGitURLToSSH(url *url.URL) string {
 }
 
 func checkKnownHosts(url *url.URL) error {
+	log.Debug("Step: checkKnownHosts")
 	if _, err := exec.Command("ssh-keygen", "-F", url.Host).Output(); err != nil {
 		out, err := exec.Command("ssh-keyscan", url.Host).Output()
 		if err != nil {
@@ -195,6 +201,8 @@ func checkKnownHosts(url *url.URL) error {
 		}
 
 		kh := "/root/.ssh/known_hosts"
+		log.Debugf("Add %s's public key to %s", url.Host, kh)
+
 		file, err := os.OpenFile(kh, os.O_RDWR|os.O_APPEND, 0644)
 		if err != nil {
 			return err
@@ -209,6 +217,7 @@ func checkKnownHosts(url *url.URL) error {
 }
 
 func writeSshConfig(url *url.URL) error {
+	log.Debug("Step: writeSshConfig")
 	c := `Host %s
   IdentityFile /root/.ssh/id_code
 `

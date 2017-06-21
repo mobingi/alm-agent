@@ -43,6 +43,7 @@ func Start(c *cli.Context) error {
 	if s.Code != "" {
 		code := code.New(s)
 		if code.Key != "" {
+			log.Debug("Step: code.PrivateRepo")
 			err = code.PrivateRepo()
 			if err != nil {
 				return err
