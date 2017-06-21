@@ -134,7 +134,7 @@ func (c *Code) PrivateRepo() error {
 }
 
 func createIdentityFile(key string) error {
-	jog.Debug("Step: createIdentityFile")
+	log.Debug("Step: createIdentityFile")
 	sshDir := "/root/.ssh"
 	sshKey := path.Join(sshDir, "id_code")
 
