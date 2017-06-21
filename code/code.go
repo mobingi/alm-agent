@@ -186,7 +186,7 @@ func parseURL(rawURL string) (*url.URL, error) {
 }
 
 func convertGithubGitURLToSSH(url *url.URL) string {
-	return fmt.Sprintf("ssh://git@github.com/%s", url.Path)
+	return fmt.Sprintf("ssh://git@github.com%s", url.Path)
 }
 
 func checkKnownHosts(url *url.URL) error {
