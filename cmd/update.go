@@ -46,6 +46,12 @@ func Update(c *cli.Context) error {
 	codeUpdated := false
 	if s.Code != "" {
 		code := code.New(s)
+		if code.Key != "" {
+			err = code.PrivateRepo()
+			if err != nil {
+				return err
+			}
+		}
 
 		codeUpdated, err = code.CheckUpdate()
 		if err != nil {

@@ -11,6 +11,7 @@ type Config struct {
 	Code                 string
 	CodeDir              string
 	GitReference         string
+	GitPrivateKey        string
 	Ports                []int
 	Users                map[string]*PubKey
 	EnvironmentVariables map[string]string
