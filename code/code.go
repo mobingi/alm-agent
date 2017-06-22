@@ -177,12 +177,12 @@ func parseURL(rawURL string) (*url.URL, error) {
 		rawURL = fmt.Sprintf("ssh://%s%s/%s", user, host, path)
 	}
 
-	url, err := url.Parse(rawURL)
+	u, err := url.Parse(rawURL)
 	if err != nil {
-		return url, err
+		return u, err
 	}
 
-	return url, nil
+	return u, nil
 }
 
 func convertGithubGitURLToSSH(url *url.URL) string {
