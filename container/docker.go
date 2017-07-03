@@ -72,7 +72,7 @@ func NewDocker(c *config.Config, s *serverConfig.Config) (*Docker, error) {
 }
 
 func (d *Docker) CheckImageUpdated() (bool, error) {
-	res, err := d.imagePull()
+	res, err := d.ImagePull()
 	if err != nil {
 		return false, err
 	}
@@ -129,7 +129,7 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 
 func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 
-	_, err := d.imagePull()
+	_, err := d.ImagePull()
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +139,7 @@ func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 		return nil, err
 	}
 
-	err = d.containerStart(c)
+	err = d.ContainerStart(c)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func (d *Docker) getIPAddress(c *Container) (net.IP, error) {
 	return net.ParseIP(inspect.NetworkSettings.IPAddress), nil
 }
 
-func (d *Docker) imagePull() (string, error) {
+func (d *Docker) ImagePull() (string, error) {
 	authConfig := &types.AuthConfig{
 		Username: d.username,
 		Password: d.password,
@@ -338,7 +338,7 @@ func (d *Docker) prepareLogsDir() error {
 	return nil
 }
 
-func (d *Docker) containerStart(c *Container) error {
+func (d *Docker) ContainerStart(c *Container) error {
 	options := types.ContainerStartOptions{}
 	log.Infof("starting container %s", c.ID)
 	return d.client.ContainerStart(context.Background(), c.ID, options)
