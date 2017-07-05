@@ -4,10 +4,13 @@ import (
 	"github.com/mobingilabs/go-modaemon/api"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
+	molog "github.com/mobingilabs/go-modaemon/log"
+	"github.com/mobingilabs/go-modaemon/util"
 	"github.com/urfave/cli"
 )
 
 func Stop(c *cli.Context) error {
+	serverid, err := util.GetServerID()
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {
 		return err
@@ -33,6 +36,15 @@ func Stop(c *cli.Context) error {
 	d.UnmapPort()
 	d.StopContainer(activeContainer)
 	d.RemoveContainer(activeContainer)
+
+	ld, err := molog.NewDocker(conf, serverid)
+	if err != nil {
+		return err
+	}
+
+	logContainer, err := ld.GetContainer("mo-awslogs")
+	ld.StopContainer(logContainer)
+	ld.RemoveContainer(logContainer)
 
 	return nil
 }
