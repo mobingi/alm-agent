@@ -9,6 +9,7 @@ import (
 	"github.com/mobingilabs/go-modaemon/code"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
+	molog "github.com/mobingilabs/go-modaemon/log"
 	"github.com/mobingilabs/go-modaemon/login"
 	"github.com/mobingilabs/go-modaemon/util"
 	"github.com/urfave/cli"
@@ -68,6 +69,21 @@ func Update(c *cli.Context) error {
 		}
 	}
 
+	ld, err := molog.NewDocker(conf, serverid)
+	if err != nil {
+		return err
+	}
+
+	logImageUpdated, err := ld.CheckImageUpdated()
+	if err != nil {
+		return err
+	}
+
+	logContainer, err := ld.GetContainer("mo-awslogs")
+	if err != nil {
+		return err
+	}
+
 	d, err := container.NewDocker(conf, s)
 	if err != nil {
 		return err
@@ -86,6 +102,22 @@ func Update(c *cli.Context) error {
 
 	if oldContainer == nil {
 		return Start(c)
+	}
+
+	if logContainer == nil {
+		_, err := ld.StartContainer("mo-awslogs", "", false)
+		if err != nil {
+			return err
+		}
+	}
+
+	if logImageUpdated {
+		ld.StopContainer(logContainer)
+		ld.RemoveContainer(logContainer)
+		_, err := ld.StartContainer("mo-awslogs", "", false)
+		if err != nil {
+			return err
+		}
 	}
 
 	if !codeUpdated && !imageUpdated {
