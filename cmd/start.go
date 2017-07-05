@@ -82,7 +82,7 @@ func Start(c *cli.Context) error {
 	log.Debugf("%#v", ld)
 
 	log.Debug("Step: ld.StartContainer")
-	logContainer, err := ld.StartContainer("mo-awslogs")
+	logContainer, err := ld.StartContainer("mo-awslogs", "", false)
 	if err != nil {
 		return err
 	}
@@ -97,7 +97,7 @@ func Start(c *cli.Context) error {
 	log.Debugf("%#v", d)
 
 	log.Debug("Step: d.StartContainer")
-	newContainer, err := d.StartContainer("active", codeDir)
+	newContainer, err := d.StartContainer("active", codeDir, true)
 	if err != nil {
 		apiClient.SendInstanceStatus(serverid, "error")
 		return err
