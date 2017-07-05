@@ -95,7 +95,7 @@ func Update(c *cli.Context) error {
 	apiClient.SendInstanceStatus(serverid, "updating")
 	d.MapPort(oldContainer) // For regenerating port map information
 
-	newContainer, err := d.StartContainer("standby", codeDir)
+	newContainer, err := d.StartContainer("standby", codeDir, true)
 	if err != nil {
 		return err
 	}
