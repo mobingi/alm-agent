@@ -1,16 +1,18 @@
 package cmd
 
 import (
+	"time"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 	"github.com/mobingilabs/go-modaemon/api"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
-	molog "github.com/mobingilabs/go-modaemon/log"
-	"github.com/mobingilabs/go-modaemon/util"
 	"github.com/urfave/cli"
+	"golang.org/x/net/context"
 )
 
 func Stop(c *cli.Context) error {
-	serverid, err := util.GetServerID()
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {
 		return err
@@ -34,17 +36,26 @@ func Stop(c *cli.Context) error {
 	activeContainer, err := d.GetContainer("active")
 	d.MapPort(activeContainer) // For regenerating port map information
 	d.UnmapPort()
-	d.StopContainer(activeContainer)
-	d.RemoveContainer(activeContainer)
 
-	ld, err := molog.NewDocker(conf, serverid)
+	cli, err := client.NewEnvClient()
 	if err != nil {
 		return err
 	}
 
-	logContainer, err := ld.GetContainer("mo-awslogs")
-	ld.StopContainer(logContainer)
-	ld.RemoveContainer(logContainer)
+	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
+	if err != nil {
+		return err
+	}
+
+	timeout := 3 * time.Second
+	for _, c := range containers {
+		if err := cli.ContainerStop(context.Background(), c.ID, &timeout); err != nil {
+			return err
+		}
+		if err := cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{}); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
