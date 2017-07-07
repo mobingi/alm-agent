@@ -28,14 +28,14 @@ import (
 )
 
 type Docker struct {
-	client   *client.Client
-	image    string
-	username string
-	password string
-	ports    []int
-	pm       *portmapper.PortMapper
-	codeDir  string
-	envs     []string
+	Client   *client.Client
+	Image    string
+	Username string
+	Password string
+	Ports    []int
+	Pm       *portmapper.PortMapper
+	CodeDir  string
+	Envs     []string
 }
 
 var (
@@ -44,29 +44,29 @@ var (
 
 func NewDocker(c *config.Config, s *serverConfig.Config) (*Docker, error) {
 	docker := &Docker{
-		image:    strings.TrimPrefix(s.Image, "http://"),
-		username: s.DockerHubUserName,
-		password: s.DockerHubPassword,
-		ports:    s.Ports,
-		pm:       portmapper.New(""),
-		codeDir:  s.CodeDir,
-		envs: func() []string {
-			var envs []string
-			envs = append(envs, "MO_USER_ID="+c.UserID, "MO_STACK_ID="+c.StackID)
+		Image:    strings.TrimPrefix(s.Image, "http://"),
+		Username: s.DockerHubUserName,
+		Password: s.DockerHubPassword,
+		Ports:    s.Ports,
+		Pm:       portmapper.New(""),
+		CodeDir:  s.CodeDir,
+		Envs: func() []string {
+			var Envs []string
+			Envs = append(Envs, "MO_USER_ID="+c.UserID, "MO_STACK_ID="+c.StackID)
 			for k, v := range s.EnvironmentVariables {
 				es := []string{k, v}
-				envs = append(envs, strings.Join(es, "="))
+				Envs = append(Envs, strings.Join(es, "="))
 			}
-			return envs
+			return Envs
 		}(),
 	}
 
 	chain := &iptables.ChainInfo{Name: "DOCKER", Table: "nat"}
-	docker.pm.SetIptablesChain(chain, "docker0")
+	docker.Pm.SetIptablesChain(chain, "docker0")
 
 	defaultHeaders := map[string]string{"User-Agent": "modaemon"}
 	cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.24", nil, defaultHeaders)
-	docker.client = cli
+	docker.Client = cli
 
 	return docker, err
 }
@@ -90,7 +90,7 @@ func (d *Docker) GetContainer(name string) (*Container, error) {
 	options := types.ContainerListOptions{
 		Filters: filter.Value(),
 	}
-	res, err := d.client.ContainerList(context.Background(), options)
+	res, err := d.Client.ContainerList(context.Background(), options)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 	options := types.ContainerListOptions{
 		Filters: filter.Value(),
 	}
-	res, err := d.client.ContainerList(context.Background(), options)
+	res, err := d.Client.ContainerList(context.Background(), options)
 	if err != nil {
 		return "", err
 	}
@@ -127,14 +127,14 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 	return res[0].ID, nil
 }
 
-func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
+func (d *Docker) StartContainer(name string, dir string, isApp bool) (*Container, error) {
 
 	_, err := d.imagePull()
 	if err != nil {
 		return nil, err
 	}
 
-	c, err := d.containerCreate(name, dir)
+	c, err := d.containerCreate(name, dir, isApp)
 	if err != nil {
 		return nil, err
 	}
@@ -144,12 +144,12 @@ func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 		return nil, err
 	}
 
-	ct, _ := d.client.ContainerInspect(context.Background(), c.ID)
+	ct, _ := d.Client.ContainerInspect(context.Background(), c.ID)
 	if err == nil {
 		log.Debugf("ContainerInspect: %#v", ct)
 	}
 
-	cp, _ := d.client.ContainerStatPath(context.Background(), c.ID, "/")
+	cp, _ := d.Client.ContainerStatPath(context.Background(), c.ID, "/")
 	if err == nil {
 		log.Debugf("ContainerInspect: %#v", cp)
 	}
@@ -163,9 +163,9 @@ func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 }
 
 func (d *Docker) MapPort(c *Container) error {
-	for _, port := range d.ports {
+	for _, port := range d.Ports {
 		dest := &net.TCPAddr{IP: c.IP, Port: port}
-		_, err := d.pm.Map(dest, net.IPv4(0, 0, 0, 0), port, true)
+		_, err := d.Pm.Map(dest, net.IPv4(0, 0, 0, 0), port, true)
 		if err != nil {
 			return err
 		}
@@ -174,9 +174,9 @@ func (d *Docker) MapPort(c *Container) error {
 }
 
 func (d *Docker) UnmapPort() error {
-	for _, port := range d.ports {
+	for _, port := range d.Ports {
 		key := &net.TCPAddr{IP: net.IPv4(0, 0, 0, 0), Port: port}
-		err := d.pm.Unmap(key)
+		err := d.Pm.Unmap(key)
 		if err != nil {
 			return err
 		}
@@ -185,7 +185,7 @@ func (d *Docker) UnmapPort() error {
 }
 
 func (d *Docker) RenameContainer(c *Container, name string) error {
-	err := d.client.ContainerRename(context.Background(), c.ID, name)
+	err := d.Client.ContainerRename(context.Background(), c.ID, name)
 	if err != nil {
 		return err
 	}
@@ -203,8 +203,8 @@ func (d *Docker) getIPAddress(c *Container) (net.IP, error) {
 
 func (d *Docker) imagePull() (string, error) {
 	authConfig := &types.AuthConfig{
-		Username: d.username,
-		Password: d.password,
+		Username: d.Username,
+		Password: d.Password,
 	}
 
 	b, err := json.Marshal(authConfig)
@@ -216,8 +216,8 @@ func (d *Docker) imagePull() (string, error) {
 	options := types.ImagePullOptions{
 		RegistryAuth: encodedAuth,
 	}
-	log.Infof("pulling image %s", d.image)
-	res, err := d.client.ImagePull(context.Background(), d.image, options)
+	log.Infof("pulling image %s", d.Image)
+	res, err := d.Client.ImagePull(context.Background(), d.Image, options)
 
 	if err != nil {
 		return "", err
@@ -231,18 +231,20 @@ func (d *Docker) imagePull() (string, error) {
 	return buf.String(), nil
 }
 
-func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
-	d.prepareLogsDir()
+func (d *Docker) containerCreate(name string, dir string, isApp bool) (*Container, error) {
+	if isApp {
+		d.prepareLogsDir()
+	}
 
 	config := &container.Config{
-		Image: d.image,
-		Env:   d.envs,
+		Image: d.Image,
+		Env:   d.Envs,
 	}
 	log.Debugf("ContainerConfig: %#v", config)
 
 	hostConfig := &container.HostConfig{}
 	if dir != "" {
-		bind := fmt.Sprintf("%s:%s", dir, d.codeDir)
+		bind := fmt.Sprintf("%s:%s", dir, d.CodeDir)
 		hostConfig.Binds = append(hostConfig.Binds, bind)
 
 		initScriptFile := ""
@@ -277,13 +279,23 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 		}
 	}
 
-	bindLog := containerLogsLocation + "/log:/var/log"
-	hostConfig.Binds = append(hostConfig.Binds, bindLog)
+	if isApp {
+		bindLog := containerLogsLocation + "/log:/var/log"
+		hostConfig.Binds = append(hostConfig.Binds, bindLog)
+	} else {
+		hostConfig.Binds = append(
+			hostConfig.Binds,
+			"/root/.aws/awslogs_creds.conf:/etc/awslogs/awscli.conf",
+			"/var/log:/var/log",
+			"/var/modaemon/containerlogs:/var/containerlogs",
+			"/opt/awslogs:/var/lib/awslogs",
+		)
+	}
 
 	networkingConfig := &network.NetworkingConfig{}
 
-	log.Infof("creating container \"%s\" from image \"%s\"", name, d.image)
-	res, err := d.client.ContainerCreate(context.Background(), config, hostConfig, networkingConfig, name)
+	log.Infof("creating container \"%s\" from image \"%s\"", name, d.Image)
+	res, err := d.Client.ContainerCreate(context.Background(), config, hostConfig, networkingConfig, name)
 	log.Debugf("hostConfig: %#v", hostConfig)
 	return &Container{Name: name, ID: res.ID}, err
 }
@@ -303,19 +315,19 @@ func (d *Docker) prepareLogsDir() error {
 		"while true ; do sleep 1 ; done",
 	}
 	config := &container.Config{
-		Image:      d.image,
+		Image:      d.Image,
 		Entrypoint: ep,
 		Cmd:        cmd,
 	}
 
 	hostConfig := &container.HostConfig{}
-	res, err := d.client.ContainerCreate(context.Background(), config, hostConfig, &network.NetworkingConfig{}, "preparelogs")
+	res, err := d.Client.ContainerCreate(context.Background(), config, hostConfig, &network.NetworkingConfig{}, "preparelogs")
 	if err != nil {
 		log.Errorf("prepareLogsDir.ContainerCreate: %#v", err)
 	}
 
 	options := types.ContainerStartOptions{}
-	err = d.client.ContainerStart(context.Background(), res.ID, options)
+	err = d.Client.ContainerStart(context.Background(), res.ID, options)
 	if err != nil {
 		log.Errorf("prepareLogsDir.ContainerStart: %#v", err)
 	}
@@ -327,11 +339,11 @@ func (d *Docker) prepareLogsDir() error {
 		log.Errorf("prepareLogsDir.copyFromContainerLogsLocation: %#v", err)
 	}
 	//	tmpcID := strings.TrimSpace(string(out))
-	err = d.client.ContainerKill(context.Background(), "preparelogs", "KILL")
+	err = d.Client.ContainerKill(context.Background(), "preparelogs", "KILL")
 	if err != nil {
 		log.Errorf("prepareLogsDir.ContainerKill: %#v", err)
 	}
-	err = d.client.ContainerRemove(context.Background(), "preparelogs", types.ContainerRemoveOptions{})
+	err = d.Client.ContainerRemove(context.Background(), "preparelogs", types.ContainerRemoveOptions{})
 	if err != nil {
 		log.Errorf("prepareLogsDir.ContainerRemove: %#v", err)
 	}
@@ -341,30 +353,30 @@ func (d *Docker) prepareLogsDir() error {
 func (d *Docker) containerStart(c *Container) error {
 	options := types.ContainerStartOptions{}
 	log.Infof("starting container %s", c.ID)
-	return d.client.ContainerStart(context.Background(), c.ID, options)
+	return d.Client.ContainerStart(context.Background(), c.ID, options)
 }
 
 func (d *Docker) inspectContainer(c *Container) (types.ContainerJSON, error) {
-	return d.client.ContainerInspect(context.Background(), c.ID)
+	return d.Client.ContainerInspect(context.Background(), c.ID)
 }
 
 func (d *Docker) StopContainer(c *Container) error {
 	timeout := 3 * time.Second
-	return d.client.ContainerStop(context.Background(), c.ID, &timeout)
+	return d.Client.ContainerStop(context.Background(), c.ID, &timeout)
 }
 
 func (d *Docker) RemoveContainer(c *Container) error {
 	options := types.ContainerRemoveOptions{}
-	return d.client.ContainerRemove(context.Background(), c.ID, options)
+	return d.Client.ContainerRemove(context.Background(), c.ID, options)
 }
 
 func (d *Docker) CreateContainerExec(id string, cmd []string) (types.IDResponse, error) {
 	exc := types.ExecConfig{
 		Cmd: cmd,
 	}
-	return d.client.ContainerExecCreate(context.Background(), id, exc)
+	return d.Client.ContainerExecCreate(context.Background(), id, exc)
 }
 
 func (d *Docker) StartContainerExec(id string, esc types.ExecStartCheck) error {
-	return d.client.ContainerExecStart(context.Background(), id, esc)
+	return d.Client.ContainerExecStart(context.Background(), id, esc)
 }

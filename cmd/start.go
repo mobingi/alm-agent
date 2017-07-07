@@ -5,10 +5,12 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+
 	"github.com/mobingilabs/go-modaemon/api"
 	"github.com/mobingilabs/go-modaemon/code"
 	"github.com/mobingilabs/go-modaemon/config"
 	"github.com/mobingilabs/go-modaemon/container"
+	molog "github.com/mobingilabs/go-modaemon/log"
 	"github.com/mobingilabs/go-modaemon/login"
 	"github.com/mobingilabs/go-modaemon/util"
 	"github.com/urfave/cli"
@@ -72,6 +74,20 @@ func Start(c *cli.Context) error {
 		}
 	}
 
+	log.Debug("Step: molog.NewDocker")
+	ld, err := molog.NewDocker(conf, serverid)
+	if err != nil {
+		return err
+	}
+	log.Debugf("%#v", ld)
+
+	log.Debug("Step: ld.StartContainer")
+	logContainer, err := ld.StartContainer("mo-awslogs", "", false)
+	if err != nil {
+		return err
+	}
+	log.Debugf("%#v", logContainer)
+
 	log.Debug("Step: container.NewDocker")
 	d, err := container.NewDocker(conf, s)
 	if err != nil {
@@ -81,7 +97,7 @@ func Start(c *cli.Context) error {
 	log.Debugf("%#v", d)
 
 	log.Debug("Step: d.StartContainer")
-	newContainer, err := d.StartContainer("active", codeDir)
+	newContainer, err := d.StartContainer("active", codeDir, true)
 	if err != nil {
 		apiClient.SendInstanceStatus(serverid, "error")
 		return err
