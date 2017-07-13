@@ -62,6 +62,7 @@ func WriteUpdated(c *Config) error {
 	}
 
 	v := fmt.Sprintf("%d", c.Updated)
+	log.Debugf("Write %s to %s", v, path)
 	err := ioutil.WriteFile(path, []byte(v), 0644)
 	if err != nil {
 		return err
