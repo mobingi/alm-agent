@@ -12,6 +12,7 @@ import (
 	"github.com/mobingilabs/go-modaemon/container"
 	molog "github.com/mobingilabs/go-modaemon/log"
 	"github.com/mobingilabs/go-modaemon/login"
+	"github.com/mobingilabs/go-modaemon/server_config"
 	"github.com/mobingilabs/go-modaemon/util"
 	"github.com/urfave/cli"
 )
@@ -108,6 +109,11 @@ func Start(c *cli.Context) error {
 	err = d.MapPort(newContainer)
 	if err != nil {
 		apiClient.SendInstanceStatus(serverid, "error")
+		return err
+	}
+
+	log.Debug("Step: serverConfig.WriteUpdated")
+	if err := serverConfig.WriteUpdated(s); err != nil {
 		return err
 	}
 
