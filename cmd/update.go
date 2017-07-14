@@ -11,6 +11,7 @@ import (
 	"github.com/mobingilabs/go-modaemon/container"
 	molog "github.com/mobingilabs/go-modaemon/log"
 	"github.com/mobingilabs/go-modaemon/login"
+	"github.com/mobingilabs/go-modaemon/server_config"
 	"github.com/mobingilabs/go-modaemon/util"
 	"github.com/urfave/cli"
 )
@@ -37,6 +38,52 @@ func Update(c *cli.Context) error {
 	s, err := apiClient.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
 		return err
+	}
+
+	ld, err := molog.NewDocker(conf, serverid)
+	if err != nil {
+		return err
+	}
+
+	logImageUpdated, err := ld.CheckImageUpdated()
+	if err != nil {
+		return err
+	}
+
+	logContainer, err := ld.GetContainer("mo-awslogs")
+	if err != nil {
+		return err
+	}
+
+	d, err := container.NewDocker(conf, s)
+	if err != nil {
+		return err
+	}
+
+	oldContainer, err := d.GetContainer("active")
+	if err != nil {
+		return err
+	}
+
+	if logContainer == nil && oldContainer == nil {
+		return Start(c)
+	}
+
+	if logImageUpdated {
+		ld.StopContainer(logContainer)
+		ld.RemoveContainer(logContainer)
+		_, err := ld.StartContainer("mo-awslogs", "", false)
+		if err != nil {
+			return err
+		}
+	}
+
+	update, err := serverConfig.NeedsUpdate(s)
+	if err != nil {
+		return err
+	}
+	if !update {
+		return nil
 	}
 
 	for x, y := range s.Users {
@@ -69,61 +116,6 @@ func Update(c *cli.Context) error {
 		}
 	}
 
-	ld, err := molog.NewDocker(conf, serverid)
-	if err != nil {
-		return err
-	}
-
-	logImageUpdated, err := ld.CheckImageUpdated()
-	if err != nil {
-		return err
-	}
-
-	logContainer, err := ld.GetContainer("mo-awslogs")
-	if err != nil {
-		return err
-	}
-
-	d, err := container.NewDocker(conf, s)
-	if err != nil {
-		return err
-	}
-
-	apiClient.SendInstanceStatus(serverid, util.FetchContainerState())
-	imageUpdated, err := d.CheckImageUpdated()
-	if err != nil {
-		return err
-	}
-
-	oldContainer, err := d.GetContainer("active")
-	if err != nil {
-		return err
-	}
-
-	if oldContainer == nil {
-		return Start(c)
-	}
-
-	if logContainer == nil {
-		_, err := ld.StartContainer("mo-awslogs", "", false)
-		if err != nil {
-			return err
-		}
-	}
-
-	if logImageUpdated {
-		ld.StopContainer(logContainer)
-		ld.RemoveContainer(logContainer)
-		_, err := ld.StartContainer("mo-awslogs", "", false)
-		if err != nil {
-			return err
-		}
-	}
-
-	if !codeUpdated && !imageUpdated {
-		return nil
-	}
-
 	apiClient.SendInstanceStatus(serverid, "updating")
 	d.MapPort(oldContainer) // For regenerating port map information
 
@@ -139,6 +131,10 @@ func Update(c *cli.Context) error {
 	d.RemoveContainer(oldContainer)
 
 	d.RenameContainer(newContainer, "active")
+
+	if err := serverConfig.WriteUpdated(s); err != nil {
+		return err
+	}
 
 	var wg sync.WaitGroup
 	timer := time.NewTimer(180 * time.Second)
