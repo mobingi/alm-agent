@@ -3,7 +3,6 @@ package serverConfig
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -55,12 +54,6 @@ func NeedsUpdate(c *Config) (bool, error) {
 }
 
 func WriteUpdated(c *Config) error {
-	if util.FileExists(path) {
-		if err := os.Remove(path); err != nil {
-			return err
-		}
-	}
-
 	v := fmt.Sprintf("%d", c.Updated)
 	log.Debugf("Write %s to %s", v, path)
 	err := ioutil.WriteFile(path, []byte(v), 0644)
