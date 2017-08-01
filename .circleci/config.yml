@@ -7,6 +7,9 @@ jobs:
       - image: golang:1.8.1
     steps:
       - checkout
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
       - run:
@@ -23,7 +26,7 @@ jobs:
           path: bin/
           destination: bin
       - save_cache:
-          key: binaries-{{ checksum ".circle-sha" }}
+          key: binaries-{{ checksum "~/.circle-sha" }}
           paths:
             - ~/bin
   deploy:
@@ -32,9 +35,12 @@ jobs:
     working_directory: /tmp/workspace
     steps:
       - checkout
+      - run:
+          name: save SHA to a file
+          command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - binaries-{{ checksum ".circle-sha" }}
+            - binaries-{{ checksum "~/.circle-sha" }}
       - run:
           name: build release infomation
           command: ./.circleci/release_info.sh
