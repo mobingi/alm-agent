@@ -22,18 +22,19 @@ jobs:
       - store_artifacts:
           path: bin/
           destination: bin
-      - persist_to_workspace:
-          root: ./
+      - save_cache:
+          key: binaries-{{ checksum ".circle-sha" }}
           paths:
-            - bin
-            - .circleci
+            - ~/bin
   deploy:
     machine:
         enabled: true
     working_directory: /tmp/workspace
     steps:
-      - attach_workspace:
-          at: /tmp/workspace
+      - checkout
+      - restore_cache:
+          keys:
+            - binaries-{{ checksum ".circle-sha" }}
       - run:
           name: build release infomation
           command: ./.circleci/release_info.sh
