@@ -23,9 +23,9 @@ jobs:
           path: bin/
           destination: bin
       - persist_to_workspace:
-          root: bin
+          root: ./
           paths:
-            - binaries
+            - bin
   deploy:
     machine:
         enabled: true
