@@ -1,7 +1,8 @@
 NAME := go-modaemon
 VERSION := $(shell git describe --tags --abbrev=0)
-REVISION := $(shell git rev-parse --short HEAD)
-LDFLAGS := -X 'main.version=$(VERSION)' -X 'main.revision=$(REVISION)'
+# REVISION := $(shell git rev-parse --short HEAD)
+REVISION := $(shell date +%s)
+LDFLAGS := -X 'main.version=$(VERSION).$(REVISION)'
 PACKAGES_ALL = $(shell go list ./... | grep -v '/vendor/')
 PACKAGES_MAIN = $(shell go list ./... | grep -v '/vendor/' | grep -v '/addons/')
 

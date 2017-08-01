@@ -24,10 +24,13 @@ func globalOptions(c *cli.Context) error {
 	return nil
 }
 
+// could be overwritten by LDFLAGS e.g) 'main.version=$(VERSION)'
+var version = "0.1.1-dev"
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "go-modaemon"
-	app.Version = "0.1.1-dev"
+	app.Version = version
 	app.Usage = ""
 
 	// Gloabl Flags

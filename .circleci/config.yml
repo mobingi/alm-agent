@@ -28,7 +28,7 @@ jobs:
       - save_cache:
           key: binaries-{{ checksum ".circle-sha" }}
           paths:
-            - ~/bin
+            - bin
   deploy:
     machine:
         enabled: true
