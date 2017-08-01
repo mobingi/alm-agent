@@ -22,11 +22,18 @@ jobs:
       - store_artifacts:
           path: bin/
           destination: bin
+      - persist_to_workspace:
+          root: bin
+          paths:
+            - binaries
   deploy:
     machine:
         enabled: true
-    working_directory: /go/src/github.com/mobingilabs/go-modaemon
+    working_directory: /tmp/workspace
     steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
           name: build release infomation
           command: ./.circleci/release_info.sh
