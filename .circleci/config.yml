@@ -41,6 +41,7 @@ jobs:
       - restore_cache:
           keys:
             - binaries-{{ checksum ".circle-sha" }}
+          at: /tmp/workspace/bin
       - run:
           name: build release infomation
           command: ./.circleci/release_info.sh
