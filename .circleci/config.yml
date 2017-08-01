@@ -32,7 +32,6 @@ jobs:
         enabled: true
     working_directory: /tmp/workspace
     steps:
-      - checkout
       - attach_workspace:
           at: /tmp/workspace
       - run:
