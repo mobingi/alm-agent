@@ -26,7 +26,7 @@ jobs:
           path: bin/
           destination: bin
       - save_cache:
-          key: binaries-{{ checksum "~/.circle-sha" }}
+          key: binaries-{{ checksum ".circle-sha" }}
           paths:
             - ~/bin
   deploy:
@@ -40,7 +40,7 @@ jobs:
           command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           keys:
-            - binaries-{{ checksum "~/.circle-sha" }}
+            - binaries-{{ checksum ".circle-sha" }}
       - run:
           name: build release infomation
           command: ./.circleci/release_info.sh
