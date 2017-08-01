@@ -26,6 +26,7 @@ jobs:
           root: ./
           paths:
             - bin
+            - .circleci
   deploy:
     machine:
         enabled: true
