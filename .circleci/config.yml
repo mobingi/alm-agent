@@ -35,7 +35,7 @@ jobs:
     steps:
       - run:
           name: install deps
-          command:  |
+          command: |
             apk add --update groff less python bash curl jq tar
             wget "s3.amazonaws.com/aws-cli/awscli-bundle.zip" -O "awscli-bundle.zip"
             unzip awscli-bundle.zip
@@ -47,10 +47,15 @@ jobs:
           command: tar cvzf bin/go-modaemon.tgz bin/*
       - run:
           name: put release infomation
-          command: ${CIRCLE_WORKING_DIRECTORY}/bin/go-modaemon -v > ${CIRCLE_BRANCH}.json
-      - run:
-          name: upload
-          command: ${CIRCLE_WORKING_DIRECTORY}/.circleci/upload_to_s3.sh
+          command: |
+            pwd
+            find `pwd`
+    #   - run:
+    #       name: put release infomation
+    #       command: ${CIRCLE_WORKING_DIRECTORY}/bin/go-modaemon -v > ${CIRCLE_BRANCH}.json
+    #   - run:
+    #       name: upload
+    #       command: ${CIRCLE_WORKING_DIRECTORY}/.circleci/upload_to_s3.sh
 
 workflows:
   version: 2
