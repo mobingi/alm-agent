@@ -45,6 +45,7 @@ jobs:
           at: /tmp/workspace/assets
       - run:
           name: deploy to S3
+          shell: /bin/bash
           command: |
             cd assets
             tar cvzf bin/go-modaemon.tgz bin/*
