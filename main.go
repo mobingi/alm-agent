@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"sort"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 
@@ -24,10 +27,39 @@ func globalOptions(c *cli.Context) error {
 	return nil
 }
 
+// could be overwritten by LDFLAGS e.g) 'main.version=$(VERSION)'
+type golatest struct {
+	Version string `json:"version"`
+	Message string `json:"message"`
+	URL     string `json:"url"`
+}
+
+var (
+	version  = "0.1.1-dev"
+	revision = "local-build"
+	urlBase  = "https://download.labs.mobingi.com/go-modaemon/"
+	branch   = "develop"
+	binVer   = "current"
+)
+
+// ReleaseJSONURL builds URL of go-latest json
+func ReleaseJSONURL() string {
+	return strings.Join([]string{urlBase, branch, ".json"}, "")
+}
+
 func main() {
+	cli.VersionPrinter = func(c *cli.Context) {
+		golatest := &golatest{}
+		golatest.Version = version
+		golatest.Message = revision
+		golatest.URL = ReleaseJSONURL()
+		b, _ := json.MarshalIndent(golatest, "", "  ")
+		fmt.Println(string(b))
+	}
+
 	app := cli.NewApp()
 	app.Name = "go-modaemon"
-	app.Version = "0.1.1-dev"
+	app.Version = version
 	app.Usage = ""
 
 	// Gloabl Flags

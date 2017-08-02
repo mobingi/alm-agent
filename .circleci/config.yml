@@ -15,10 +15,48 @@ jobs:
       - run:
           name: build addons
           command: make addon
+      - run:
+          name: put version_info
+          command: ./bin/go-modaemon -v > ./bin/version_info.json
       - save_cache:
           key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
           paths:
-            - "/go/src"
+            - "/go/src/golang.org"
+            - "/go/src/github.com/golang"
       - store_artifacts:
           path: bin/
           destination: bin
+      - persist_to_workspace:
+          root: .
+          paths:
+            - bin
+            - .circleci
+
+  deploy:
+    docker:
+      - image: alpine:3.6
+    working_directory: /tmp/workspace
+    steps:
+      - run:
+          name: install deps
+          command: |
+            apk add --update groff less python bash curl jq tar
+            wget "s3.amazonaws.com/aws-cli/awscli-bundle.zip" -O "awscli-bundle.zip"
+            unzip awscli-bundle.zip
+            ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: deploy to S3
+          shell: /bin/bash
+          command: |
+            ./.circleci/upload_to_s3.sh
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build

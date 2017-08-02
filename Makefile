@@ -1,12 +1,16 @@
 NAME := go-modaemon
 VERSION := $(shell git describe --tags --abbrev=0)
-REVISION := $(shell git rev-parse --short HEAD)
-LDFLAGS := -X 'main.version=$(VERSION)' -X 'main.revision=$(REVISION)'
+MINOR_VERSION := $(shell date +%s)
+CIRCLE_SHA1 ?= $(shell git rev-parse HEAD)
+CIRCLE_BRANCH ?= develop
+LDFLAGS := -X 'main.version=$(VERSION).$(MINOR_VERSION)'
+LDFLAGS += -X 'main.revision=$(CIRCLE_SHA1)'
+LDFLAGS += -X 'main.branch=$(CIRCLE_BRANCH)'
 PACKAGES_ALL = $(shell go list ./... | grep -v '/vendor/')
 PACKAGES_MAIN = $(shell go list ./... | grep -v '/vendor/' | grep -v '/addons/')
 
 setup:
-	go get github.com/golang/dep/...
+	go get -u github.com/golang/dep/cmd/dep
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 
@@ -39,3 +43,6 @@ clean:
 
 addon:
 	cd addons/aws/; go build -ldflags "$(LDFLAGS)" -o ../../bin/$(NAME)-addon-aws
+
+list:
+	@ls -1 bin
