@@ -7,9 +7,6 @@ jobs:
       - image: golang:1.8.1
     steps:
       - checkout
-      - run:
-          name: save SHA to a file
-          command: echo $CIRCLE_SHA1 > .circle-sha
       - restore_cache:
           key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
       - run:
@@ -25,23 +22,19 @@ jobs:
       - store_artifacts:
           path: bin/
           destination: bin
-      - save_cache:
-          key: binaries-{{ checksum ".circle-sha" }}
+      - persist_to_workspace:
+          root: .
           paths:
             - bin
+            - .circleci
+
   deploy:
-    machine:
-        enabled: true
+    docker:
+      - image: alpine:3.6
     working_directory: /tmp/workspace
     steps:
-      - checkout
-      - run:
-          name: save SHA to a file
-          command: echo $CIRCLE_SHA1 > .circle-sha
-      - restore_cache:
-          keys:
-            - binaries-{{ checksum ".circle-sha" }}
-          at: /tmp/workspace/bin
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
           name: create archive
           command: tar cvzf bin/go-modaemon.tgz bin/*
