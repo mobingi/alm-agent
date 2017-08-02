@@ -1,20 +1,24 @@
 
-[[dependencies]]
+[[constraint]]
+  name = "github.com/urfave/cli"
+  branch = "v1"
+
+[[constraint]]
   name = "github.com/koron/go-dproxy"
   version = "v1.1"
 
-[[dependencies]]
+[[constraint]]
   name = "github.com/BurntSushi/toml"
   version = "v0.3.0"
 
-[[dependencies]]
+[[constraint]]
   branch = "master"
   name = "github.com/aws/aws-sdk-go/aws/..."
 
-[[dependencies]]
-  version = "v17.04.0-ce"
+[[constraint]]
+  branch = "17.05.x"
   name = "github.com/docker/docker/..."
 
-[[dependencies]]
+[[constraint]]
   branch = "master"
   name = "github.com/tcnksm/go-latest"
