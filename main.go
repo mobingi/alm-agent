@@ -44,7 +44,7 @@ var (
 
 // ReleaseJSONURL builds URL of go-latest json
 func ReleaseJSONURL() string {
-	return strings.Join([]string{urlBase, branch, ".json"}, "")
+	return strings.Join([]string{urlBase, branch, "/current/version_info.json"}, "")
 }
 
 func main() {
