@@ -15,8 +15,8 @@ version=`cat ${INFO_PATH} | jq -r .version`
 mv bin ${version}
 tar cvzf ${version}/go-modaemon.tgz ${version}/*
 
-# upload for use guess per file
-for x in go-modaemon.tgz $INFO_FILE ; do
-  $AWSCLI s3 cp ${version}/${x} s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/${version}/${x}
-  $AWSCLI s3 cp ${version}/${x} s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/current/${x}
-done
+$AWSCLI s3 cp ${version}/go-modaemon.tgz s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/${version}/
+$AWSCLI s3 cp ${version}/go-modaemon.tgz s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/current/
+
+$AWSCLI s3 cp --content-type application/json ${version}/${INFO_FILE} s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/${version}/
+$AWSCLI s3 cp --content-type application/json ${version}/${INFO_FILE} s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/current/
