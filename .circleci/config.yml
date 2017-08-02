@@ -42,10 +42,11 @@ jobs:
             unzip awscli-bundle.zip
             ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
       - attach_workspace:
-          at: /tmp/workspace
+          at: /tmp/workspace/assets
       - run:
           name: deploy to S3
           command: |
+            cd assets
             tar cvzf bin/go-modaemon.tgz bin/*
             ls -l bin
             ./bin/go-modaemon -v > ${CIRCLE_BRANCH}.json
