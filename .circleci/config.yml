@@ -44,16 +44,13 @@ jobs:
           at: /tmp/workspace
       - run:
           name: create archive
-          command: find ./
-    #   - run:
-    #       name: create archive
-    #       command: tar cvzf bin/go-modaemon.tgz bin/*
-    #   - run:
-    #       name: put release infomation
-    #       command: ./bin/go-modaemon -v > ${CIRCLE_BRANCH}.json
-    #   - run:
-    #       name: upload
-    #       command: ./.circleci/upload_to_s3.sh
+          command: tar cvzf bin/go-modaemon.tgz bin/*
+      - run:
+          name: put release infomation
+          command: ${CIRCLE_WORKING_DIRECTORY}/bin/go-modaemon -v > ${CIRCLE_BRANCH}.json
+      - run:
+          name: upload
+          command: ${CIRCLE_WORKING_DIRECTORY}/.circleci/upload_to_s3.sh
 
 workflows:
   version: 2
