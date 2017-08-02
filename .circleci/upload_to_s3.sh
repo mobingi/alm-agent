@@ -18,5 +18,5 @@ tar cvzf ${version}/go-modaemon.tgz ${version}/*
 $AWSCLI s3 cp ${version}/go-modaemon.tgz s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/${version}/
 $AWSCLI s3 cp ${version}/go-modaemon.tgz s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/current/
 
-$AWSCLI s3 cp --content-type application/json ${version}/${INFO_FILE} s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/${version}/
-$AWSCLI s3 cp --content-type application/json ${version}/${INFO_FILE} s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/current/
+$AWSCLI s3 cp --content-type text/json ${version}/${INFO_FILE} s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/${version}/
+$AWSCLI s3 cp --content-type text/json ${version}/${INFO_FILE} s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/current/
