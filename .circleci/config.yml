@@ -46,6 +46,7 @@ jobs:
           name: deploy to S3
           command: |
             tar cvzf bin/go-modaemon.tgz bin/*
+            ls -l bin
             ./bin/go-modaemon -v > ${CIRCLE_BRANCH}.json
             ./.circleci/upload_to_s3.sh
 
