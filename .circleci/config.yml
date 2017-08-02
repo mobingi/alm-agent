@@ -15,6 +15,9 @@ jobs:
       - run:
           name: build addons
           command: make addon
+      - run:
+          name: put version_info
+          command: ./bin/go-modaemon -v > ./bin/version_info.json
       - save_cache:
           key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
           paths:
@@ -42,19 +45,13 @@ jobs:
             unzip awscli-bundle.zip
             ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
       - attach_workspace:
-          at: /tmp/workspace/assets
-      - store_artifacts:
-          path: assets/
-          destination: assets
+          at: /tmp/workspace
       - run:
           name: deploy to S3
           shell: /bin/bash
           command: |
-            cd assets
             tar cvzf bin/go-modaemon.tgz bin/*
-            ls -l bin
-            `pwd`/bin/go-modaemon -v > ${CIRCLE_BRANCH}.json
-            `pwd`/.circleci/upload_to_s3.sh
+            ./.circleci/upload_to_s3.sh
 
 workflows:
   version: 2

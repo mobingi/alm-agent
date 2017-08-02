@@ -1,9 +1,15 @@
 #!/bin/bash
 
+INFO_FILE="./bin/version_info.json"
+
+if ! [ -f ${INFO_FILE} ] ; then
+  echo 'JSONfile not found.'
+  exit 1
+fi
+
 AWSCLI="/usr/local/bin/aws"
 bucket="download.labs.mobingi.com"
-version=`cat ${CIRCLE_BRANCH}.json | jq -r .version`
+version=`cat ${INFO_FILE} | jq -r .version`
 
-$AWSCLI s3 cp ${CIRCLE_BRANCH}.json s3://${bucket}/go-modaemon/
-$AWSCLI s3 cp bin/* s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/${version}/
-$AWSCLI s3 cp bin/* s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/current/
+$AWSCLI s3 cp --recursive bin/ s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/${version}/
+$AWSCLI s3 cp --recursive bin/ s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/current/
