@@ -11,5 +11,7 @@ AWSCLI="/usr/local/bin/aws"
 bucket="download.labs.mobingi.com"
 version=`cat ${INFO_FILE} | jq -r .version`
 
-$AWSCLI s3 cp --recursive bin/ s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/${version}/
-$AWSCLI s3 cp --recursive bin/ s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/current/
+mv bin ${version}
+tar cvzf ${version}/go-modaemon.tgz ${version}/*
+$AWSCLI s3 cp --recursive ${version}/ s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/${version}/
+$AWSCLI s3 cp --recursive ${version}/ s3://${bucket}/go-modaemon/${CIRCLE_BRANCH}/current/
