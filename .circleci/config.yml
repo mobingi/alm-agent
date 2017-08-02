@@ -9,7 +9,6 @@ jobs:
       - checkout
       - restore_cache:
           key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
-      - checkout
       - run:
           name: test and build maincli
           command: make cibuild
@@ -19,7 +18,8 @@ jobs:
       - save_cache:
           key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
           paths:
-            - "/go/src"
+            - "/go/src/golang.org"
+            - "/go/src/github.com/golang"
       - store_artifacts:
           path: bin/
           destination: bin
