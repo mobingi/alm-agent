@@ -50,7 +50,6 @@ jobs:
           name: deploy to S3
           shell: /bin/bash
           command: |
-            tar cvzf bin/go-modaemon.tgz bin/*
             ./.circleci/upload_to_s3.sh
 
 workflows:
