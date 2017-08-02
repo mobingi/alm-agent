@@ -43,6 +43,9 @@ jobs:
             ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
       - attach_workspace:
           at: /tmp/workspace/assets
+      - store_artifacts:
+          path: assets/
+          destination: assets
       - run:
           name: deploy to S3
           shell: /bin/bash
@@ -50,8 +53,8 @@ jobs:
             cd assets
             tar cvzf bin/go-modaemon.tgz bin/*
             ls -l bin
-            ./bin/go-modaemon -v > ${CIRCLE_BRANCH}.json
-            ./.circleci/upload_to_s3.sh
+            `pwd`/bin/go-modaemon -v > ${CIRCLE_BRANCH}.json
+            `pwd`/.circleci/upload_to_s3.sh
 
 workflows:
   version: 2
