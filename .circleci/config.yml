@@ -43,19 +43,11 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run:
-          name: create archive
-          command: tar cvzf bin/go-modaemon.tgz bin/*
-      - run:
-          name: put release infomation
+          name: deploy to S3
           command: |
-            pwd
-            find `pwd`
-    #   - run:
-    #       name: put release infomation
-    #       command: ${CIRCLE_WORKING_DIRECTORY}/bin/go-modaemon -v > ${CIRCLE_BRANCH}.json
-    #   - run:
-    #       name: upload
-    #       command: ${CIRCLE_WORKING_DIRECTORY}/.circleci/upload_to_s3.sh
+            tar cvzf bin/go-modaemon.tgz bin/*
+            ./bin/go-modaemon -v > ${CIRCLE_BRANCH}.json
+            ./.circleci/upload_to_s3.sh
 
 workflows:
   version: 2
