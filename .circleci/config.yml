@@ -6,6 +6,7 @@ jobs:
     docker:
       - image: golang:1.8.1
     steps:
+      - checkout
       - restore_cache:
           key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
       - checkout
