@@ -11,6 +11,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/mobingilabs/go-modaemon/cmd"
+	"github.com/mobingilabs/go-modaemon/versions"
 	"github.com/urfave/cli"
 )
 
@@ -27,39 +28,36 @@ func globalOptions(c *cli.Context) error {
 	return nil
 }
 
-// could be overwritten by LDFLAGS e.g) 'main.version=$(VERSION)'
-type golatest struct {
-	Version string `json:"version"`
-	Message string `json:"message"`
-	URL     string `json:"url"`
+func beforeActions(c *cli.Context) error {
+	globalOptions(c)
+	if c.GlobalBool("autoupdate") {
+		versions.AutoUpdate(golatest())
+	}
+	return nil
 }
-
-var (
-	version  = "0.1.1-dev"
-	revision = "local-build"
-	urlBase  = "https://download.labs.mobingi.com/go-modaemon/"
-	branch   = "develop"
-	binVer   = "current"
-)
 
 // ReleaseJSONURL builds URL of go-latest json
 func ReleaseJSONURL() string {
-	return strings.Join([]string{urlBase, branch, "/current/version_info.json"}, "")
+	return strings.Join([]string{versions.URLBase, versions.Branch, "/current/version_info.json"}, "")
+}
+
+func golatest() *versions.GoLatest {
+	v := &versions.GoLatest{}
+	v.Version = versions.Version
+	v.Message = versions.Revision
+	v.URL = ReleaseJSONURL()
+	return v
 }
 
 func main() {
 	cli.VersionPrinter = func(c *cli.Context) {
-		golatest := &golatest{}
-		golatest.Version = version
-		golatest.Message = revision
-		golatest.URL = ReleaseJSONURL()
-		b, _ := json.MarshalIndent(golatest, "", "  ")
+		b, _ := json.MarshalIndent(golatest(), "", "  ")
 		fmt.Println(string(b))
 	}
 
 	app := cli.NewApp()
 	app.Name = "go-modaemon"
-	app.Version = version
+	app.Version = versions.Version
 	app.Usage = ""
 
 	// Gloabl Flags
@@ -67,6 +65,10 @@ func main() {
 		cli.BoolFlag{
 			Name:  "verbose, V",
 			Usage: "show debug logs",
+		},
+		cli.BoolFlag{
+			Name:  "autoupdate, U",
+			Usage: "auto update before run",
 		},
 	}
 
@@ -89,7 +91,7 @@ func main() {
 			Usage:  "start active container",
 			Action: cmd.Start,
 			Flags:  flags,
-			Before: globalOptions,
+			Before: beforeActions,
 		},
 		{
 			Name:   "stop",
@@ -103,7 +105,14 @@ func main() {
 			Usage:  "update code and image, then switch container",
 			Action: cmd.Update,
 			Flags:  flags,
-			Before: globalOptions,
+			Before: beforeActions,
+		},
+		{
+			Name:   "noop",
+			Usage:  "run without container actions.",
+			Action: func(c *cli.Context) error { return nil },
+			Flags:  flags,
+			Before: beforeActions,
 		},
 	}
 
@@ -112,6 +121,7 @@ func main() {
 	app.Run(os.Args)
 }
 
+// FatalWriter just initiaizes cliErrWriter
 type FatalWriter struct {
 	cliErrWriter io.Writer
 }
