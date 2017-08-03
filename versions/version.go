@@ -13,8 +13,6 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-
-	"github.com/tcnksm/go-latest"
 )
 
 // GoLatest uses check latest version
@@ -57,6 +55,8 @@ func AutoUpdate(v *GoLatest) {
 	if res.Outdated {
 		log.Infof("%s is not latest, %s, upgrade to %s", v.Version, res.Meta.Message, res.Current)
 		ensure(v, res.Current)
+	} else {
+		log.Debug("AutoUpdate: Using newest.")
 	}
 	return
 }
