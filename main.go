@@ -20,7 +20,7 @@ func init() {
 }
 
 func globalOptions(c *cli.Context) error {
-	if c.GlobalBool("noupdate") {
+	if c.GlobalBool("verbose") {
 		log.SetLevel(log.DebugLevel)
 		log.Debug("Loglevel is set to DebugLevel.")
 	}
@@ -36,23 +36,15 @@ func beforeActions(c *cli.Context) error {
 	return nil
 }
 
-var (
-	version  = "0.1.1-dev"
-	revision = "local-build"
-	urlBase  = "https://download.labs.mobingi.com/go-modaemon/"
-	branch   = "develop"
-	binVer   = "current"
-)
-
 // ReleaseJSONURL builds URL of go-latest json
 func ReleaseJSONURL() string {
-	return strings.Join([]string{urlBase, branch, "/current/version_info.json"}, "")
+	return strings.Join([]string{versions.URLBase, versions.Branch, "/current/version_info.json"}, "")
 }
 
 func golatest() *versions.GoLatest {
 	v := &versions.GoLatest{}
-	v.Version = version
-	v.Message = revision
+	v.Version = versions.Version
+	v.Message = versions.Revision
 	v.URL = ReleaseJSONURL()
 	return v
 }
@@ -65,7 +57,7 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "go-modaemon"
-	app.Version = version
+	app.Version = versions.Version
 	app.Usage = ""
 
 	// Gloabl Flags
@@ -129,6 +121,7 @@ func main() {
 	app.Run(os.Args)
 }
 
+// FatalWriter just initiaizes cliErrWriter
 type FatalWriter struct {
 	cliErrWriter io.Writer
 }
