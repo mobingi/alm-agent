@@ -13,6 +13,8 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	
+	"github.com/tcnksm/go-latest"
 )
 
 // GoLatest uses check latest version
