@@ -10,11 +10,12 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	
-	"github.com/tcnksm/go-latest"
+	"github.com/hashicorp/go-version"
+	latest "github.com/tcnksm/go-latest"
 )
 
 // GoLatest uses check latest version
@@ -40,6 +41,7 @@ var (
 
 var (
 	basedir = "/opt/mobingi/go-modaemon"
+	keepNum = 5
 )
 
 // AutoUpdate checks latest version and replace to latest.
@@ -57,9 +59,11 @@ func AutoUpdate(v *GoLatest) {
 	if res.Outdated {
 		log.Infof("%s is not latest, %s, upgrade to %s", v.Version, res.Meta.Message, res.Current)
 		ensure(v, res.Current)
+		removeOlders()
 	} else {
 		log.Debug("AutoUpdate: Using newest.")
 	}
+
 	return
 }
 
@@ -68,7 +72,7 @@ func ensure(v *GoLatest, newVer string) {
 
 	os.MkdirAll(filepath.Join(basedir, "v"+newVer), 0700)
 	tmpdir, _ := ioutil.TempDir("", "modaemon")
-	// defer os.RemoveAll(tmpdir)
+	defer os.RemoveAll(tmpdir)
 
 	tmpPath := filepath.Join(tmpdir, "go-modaemon.tgz")
 	downloadLatest(tmpPath, newVer)
@@ -127,5 +131,31 @@ func downloadLatest(tmpPath string, newVer string) {
 
 	file, _ := os.Create(tmpPath)
 	io.Copy(file, res.Body)
+	return
+}
+
+func removeOlders() {
+	versionDirs, err := filepath.Glob(filepath.Join(basedir, "v*"))
+	if err != nil {
+		return
+	}
+
+	versionList := make([]*version.Version, len(versionDirs))
+	for i, raw := range versionDirs {
+		raws := strings.Split(raw, "/")
+		v, _ := version.NewVersion(raws[len(raws)-1])
+		versionList[i] = v
+	}
+
+	sort.Sort(version.Collection(versionList))
+	if len(versionList) >= keepNum {
+		log.Info("AutoUpdate: Cleans up olders.")
+		for _, d := range versionList[:len(versionList)-keepNum] {
+			dv := filepath.Join(basedir, "v"+d.String())
+			log.Infof("AutoUpdate: Removing %s .", dv)
+			os.RemoveAll(dv)
+		}
+	}
+
 	return
 }
