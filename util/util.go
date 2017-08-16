@@ -13,6 +13,7 @@ import (
 
 var (
 	ec2METAENDPOINT       = "http://169.254.169.254/"
+	ecsMETAENDPOINT       = "http://100.100.100.200/"
 	containerLogsLocation = "/var/modaemon/containerlogs"
 )
 
@@ -45,7 +46,9 @@ func GetServerID(s ...string) (string, error) {
 
 	switch s[0] {
 	case "aws":
-		sid = getServerIDforEC2()
+		sid = getServerID("aws")
+	case "alicloud":
+		sid = getServerID("alicloud")
 	default:
 		return sid, errors.New("Provider `" + s[0] + "` is not supported.")
 	}
@@ -53,13 +56,21 @@ func GetServerID(s ...string) (string, error) {
 	return sid, nil
 }
 
-func getServerIDforEC2() string {
+func getServerID(provider string) string {
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
 
-	resp, err := client.Get(ec2METAENDPOINT + "/latest/meta-data/instance-id")
+	var endpoint string
+	switch provider {
+	case "aws":
+		endpoint = ec2METAENDPOINT + "/latest/meta-data/instance-id"
+	case "alicloud":
+		endpoint = ecsMETAENDPOINT + "/latest/meta-data/instance-id"
+	}
+
+	resp, err := client.Get(endpoint)
 	if err != nil {
 		log.Warnf("%#v", err)
 		return ""

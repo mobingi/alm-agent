@@ -70,6 +70,10 @@ func main() {
 			Name:  "autoupdate, U",
 			Usage: "auto update before run",
 		},
+		cli.StringFlag{
+			Name:  "provider, P",
+			Usage: "set cloud provider",
+		},
 	}
 
 	// Common Flags for commands
