@@ -17,7 +17,7 @@ import (
 )
 
 func Update(c *cli.Context) error {
-	serverid, err := util.GetServerID(c.String("provider"))
+	serverid, err := util.GetServerID(c.GlobalString("provider"))
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {
 		return err

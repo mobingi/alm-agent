@@ -33,6 +33,7 @@ func beforeActions(c *cli.Context) error {
 	if c.GlobalBool("autoupdate") {
 		versions.AutoUpdate(golatest())
 	}
+	log.Debugf("Set provider to %#v", c.GlobalString("provider"))
 	return nil
 }
 
