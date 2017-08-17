@@ -37,20 +37,16 @@ func FetchContainerState() string {
 	return strings.TrimSpace(string(dat))
 }
 
-func GetServerID(s ...string) (string, error) {
+func GetServerID(s string) (string, error) {
 	var sid string
 
-	if len(s) == 0 {
-		s = append(s, "aws")
-	}
-
-	switch s[0] {
+	switch s {
 	case "aws":
 		sid = getServerID("aws")
 	case "alicloud":
 		sid = getServerID("alicloud")
 	default:
-		return sid, errors.New("Provider `" + s[0] + "` is not supported.")
+		return sid, errors.New("Provider `" + s + "` is not supported.")
 	}
 
 	return sid, nil
