@@ -73,7 +73,8 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:  "provider, P",
-			Usage: "set cloud provider",
+			Value: "aws",
+			Usage: "set `Provider`",
 		},
 	}
 
