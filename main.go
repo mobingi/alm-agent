@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"sort"
 	"strings"
 
@@ -124,7 +123,7 @@ func main() {
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 
-	app.Run(os.Args)
+	app.RunAndExitOnError()
 }
 
 // FatalWriter just initiaizes cliErrWriter
