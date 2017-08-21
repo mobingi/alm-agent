@@ -65,7 +65,7 @@ func getServerID(provider string) (string, error) {
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		log.Warnf("%#v", err)
-		return "", errors.New("Faild to get ServerID")
+		return "", errors.New("Failed to get ServerID")
 	}
 
 	defer resp.Body.Close()
@@ -73,7 +73,7 @@ func getServerID(provider string) (string, error) {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Warnf("%#v", err)
-		return "", errors.New("Faild to get ServerID")
+		return "", errors.New("Failed to get ServerID")
 	}
 
 	return string(body), nil
