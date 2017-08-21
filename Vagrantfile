@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
       aws.security_groups = ENV['AWS_SGS'].split(",")
       aws.block_device_mapping = [{ 'DeviceName' => '/dev/xvda', 'Ebs.VolumeSize' => 20 }]
       aws.tags = {
-        'Name' => "go-modaemon-dev (Developping by #{ENV['USER']})"
+        'Name' => "alm-agent-dev (Developping by #{ENV['USER']})"
       }
     end
 

@@ -1,4 +1,4 @@
-NAME := go-modaemon
+NAME := alm-agent
 VERSION := $(shell git describe --tags --abbrev=0)
 MINOR_VERSION := $(shell date +%s)
 CIRCLE_SHA1 ?= $(shell git rev-parse HEAD)

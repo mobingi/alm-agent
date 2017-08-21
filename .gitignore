@@ -3,4 +3,4 @@ vendor/
 vendor.orig/
 .vagrant
 
-/go-modaemon
+/alm-agent

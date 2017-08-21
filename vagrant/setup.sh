@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir -p /opt/mobingi/go-modaemon
-wget https://download.labs.mobingi.com/go-modaemon/develop/current/go-modaemon.tgz
-tar xvzf go-modaemon.tgz -C /opt/mobingi/go-modaemon
-ln -s /opt/mobingi/go-modaemon/v* /opt/mobingi/go-modaemon/current
+mkdir -p /opt/mobingi/alm-agent
+wget https://download.labs.mobingi.com/alm-agent/develop/current/alm-agent.tgz
+tar xvzf alm-agent.tgz -C /opt/mobingi/alm-agent
+ln -s /opt/mobingi/alm-agent/v* /opt/mobingi/alm-agent/current

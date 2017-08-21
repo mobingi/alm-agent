@@ -56,7 +56,7 @@ func main() {
 	}
 
 	app := cli.NewApp()
-	app.Name = "go-modaemon"
+	app.Name = "alm-agent"
 	app.Version = versions.Version
 	app.Usage = ""
 
