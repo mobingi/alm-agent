@@ -302,7 +302,7 @@ func (d *Docker) containerCreate(name string, dir string, isApp bool) (*Containe
 
 // to keep compatibility with older modaemon
 func (d *Docker) prepareLogsDir() error {
-	if util.FileExists(containerLogsLocation) {
+	if util.FileExists(containerLogsLocation + "log") {
 		return nil
 	}
 

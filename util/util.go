@@ -13,6 +13,7 @@ import (
 
 var (
 	ec2METAENDPOINT       = "http://169.254.169.254/"
+	ecsMETAENDPOINT       = "http://100.100.100.200/"
 	containerLogsLocation = "/var/modaemon/containerlogs"
 )
 
@@ -36,33 +37,35 @@ func FetchContainerState() string {
 	return strings.TrimSpace(string(dat))
 }
 
-func GetServerID(s ...string) (string, error) {
-	var sid string
-
-	if len(s) == 0 {
-		s = append(s, "aws")
-	}
-
-	switch s[0] {
-	case "aws":
-		sid = getServerIDforEC2()
-	default:
-		return sid, errors.New("Provider `" + s[0] + "` is not supported.")
+func GetServerID(s string) (string, error) {
+	sid, err := getServerID(s)
+	if err != nil {
+		return "", err
 	}
 
 	return sid, nil
 }
 
-func getServerIDforEC2() string {
+func getServerID(provider string) (string, error) {
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
 
-	resp, err := client.Get(ec2METAENDPOINT + "/latest/meta-data/instance-id")
+	var endpoint string
+	switch provider {
+	case "aws":
+		endpoint = ec2METAENDPOINT + "/latest/meta-data/instance-id"
+	case "alicloud":
+		endpoint = ecsMETAENDPOINT + "/latest/meta-data/instance-id"
+	default:
+		return "", errors.New("Provider `" + provider + "` is not supported.")
+	}
+
+	resp, err := client.Get(endpoint)
 	if err != nil {
 		log.Warnf("%#v", err)
-		return ""
+		return "", errors.New("Failed to get ServerID")
 	}
 
 	defer resp.Body.Close()
@@ -70,8 +73,8 @@ func getServerIDforEC2() string {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Warnf("%#v", err)
-		return ""
+		return "", errors.New("Failed to get ServerID")
 	}
 
-	return string(body)
+	return string(body), nil
 }
