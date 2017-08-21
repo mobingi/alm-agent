@@ -28,11 +28,11 @@ type GoLatest struct {
 
 var (
 	// Version : majour.minor.epochtime
-	Version = "0.1.1-dev"
+	Version = "0.2.0-dev"
 	// Revision : Commit SHA1.
 	Revision = "local-build"
 	// URLBase : host version_info and binaries.
-	URLBase = "https://download.labs.mobingi.com/go-modaemon/"
+	URLBase = "https://download.labs.mobingi.com/alm-agent/"
 	// Branch : current branch of build environment.
 	Branch = "develop"
 	// BinVer : path to latest symlink
@@ -40,7 +40,7 @@ var (
 )
 
 var (
-	basedir = "/opt/mobingi/go-modaemon"
+	basedir = "/opt/mobingi/alm-agent"
 	keepNum = 5
 )
 
@@ -74,7 +74,7 @@ func ensure(v *GoLatest, newVer string) {
 	tmpdir, _ := ioutil.TempDir("", "modaemon")
 	defer os.RemoveAll(tmpdir)
 
-	tmpPath := filepath.Join(tmpdir, "go-modaemon.tgz")
+	tmpPath := filepath.Join(tmpdir, "alm-agent.tgz")
 	downloadLatest(tmpPath, newVer)
 
 	file, _ := os.Open(tmpPath)
@@ -119,7 +119,7 @@ func ensure(v *GoLatest, newVer string) {
 }
 
 func downloadLatest(tmpPath string, newVer string) {
-	urlPath := strings.Join([]string{URLBase, Branch, "/v" + newVer + "/go-modaemon.tgz"}, "")
+	urlPath := strings.Join([]string{URLBase, Branch, "/v" + newVer + "/alm-agent.tgz"}, "")
 	u, _ := url.Parse(urlPath)
 	log.Infof("AutoUpdate: Trying to GET %s", u.String())
 	req, _ := http.NewRequest("GET", u.String(), nil)

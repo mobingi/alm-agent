@@ -2,7 +2,7 @@
 version: 2
 jobs:
   build:
-    working_directory: /go/src/github.com/mobingilabs/go-modaemon
+    working_directory: /go/src/github.com/mobingi/alm-agent
     docker:
       - image: golang:1.8.1
     steps:
@@ -17,7 +17,7 @@ jobs:
           command: make addon
       - run:
           name: put version_info
-          command: ./bin/go-modaemon -v > ./bin/version_info.json
+          command: ./bin/alm-agent -v > ./bin/version_info.json
       - save_cache:
           key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
           paths:

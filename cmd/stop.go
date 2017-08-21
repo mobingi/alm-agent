@@ -5,9 +5,9 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"github.com/mobingilabs/go-modaemon/api"
-	"github.com/mobingilabs/go-modaemon/config"
-	"github.com/mobingilabs/go-modaemon/container"
+	"github.com/mobingi/alm-agent/api"
+	"github.com/mobingi/alm-agent/config"
+	"github.com/mobingi/alm-agent/container"
 	"github.com/urfave/cli"
 	"golang.org/x/net/context"
 )

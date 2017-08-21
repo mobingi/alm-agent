@@ -24,7 +24,7 @@ echo Installing pkgconf, git and cmake ...
 apt-get update
 apt-get install -y pkgconf git cmake
 
-mkdir -p ~vagrant/src/github.com/mobingilabs/go-modaemon
+mkdir -p ~vagrant/src/github.com/mobingi/alm-agent
 chown -R vagrant:vagrant ~vagrant/src
 
 apt-get install -y apt-transport-https ca-certificates

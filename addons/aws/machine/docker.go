@@ -4,9 +4,9 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/docker/docker/api/types"
-	"github.com/mobingilabs/go-modaemon/config"
-	"github.com/mobingilabs/go-modaemon/container"
-	"github.com/mobingilabs/go-modaemon/server_config"
+	"github.com/mobingi/alm-agent/config"
+	"github.com/mobingi/alm-agent/container"
+	"github.com/mobingi/alm-agent/server_config"
 )
 
 // ExecShutdownTaskOnAppContainers runs final tasks before shutdown instance.
