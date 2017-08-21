@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -15,6 +16,8 @@ type Git struct {
 	path string
 	ref  string
 }
+
+var isTag = regexp.MustCompile("^refs/tags/")
 
 func (g *Git) checkUpdate() (bool, error) {
 	out, err := execPipeline(
@@ -40,7 +43,11 @@ func (g *Git) checkUpdate() (bool, error) {
 		return false, err
 	}
 
-	cmd = exec.Command("git", "diff", fmt.Sprintf("origin/%s", g.ref))
+	if isTag.MatchString(g.ref) {
+		cmd = exec.Command("git", "diff", g.ref)
+	} else {
+		cmd = exec.Command("git", "diff", fmt.Sprintf("origin/%s", g.ref))
+	}
 	cmd.Dir = g.path
 
 	out, err = cmd.Output()
@@ -57,12 +64,29 @@ func (g *Git) checkUpdate() (bool, error) {
 }
 
 func (g *Git) get() error {
-	log.Infof("Executing git clone -b %s %s %s", g.ref, g.url, g.path)
-	out, err := exec.Command("git", "clone", "-b", g.ref, g.url, g.path).CombinedOutput()
-	if err != nil {
-		log.Error(string(out))
+	if isTag.MatchString(g.ref) {
+		log.Infof("Executing git clone %s %s", g.url, g.path)
+		out, err := exec.Command("git", "clone", g.url, g.path).CombinedOutput()
+		if err != nil {
+			log.Error(string(out))
+		}
+
+		log.Infof("Executing git checkout %s ", g.ref)
+		cmd := exec.Command("git", "checkout", g.ref)
+		cmd.Dir = g.path
+		err = cmd.Run()
+		if err != nil {
+			return err
+		}
+		return err
+	} else {
+		log.Infof("Executing git clone -b %s %s %s", g.ref, g.url, g.path)
+		out, err := exec.Command("git", "clone", "-b", g.ref, g.url, g.path).CombinedOutput()
+		if err != nil {
+			log.Error(string(out))
+		}
+		return err
 	}
-	return err
 }
 
 func execPipeline(dir string, commands ...[]string) ([]byte, error) {
