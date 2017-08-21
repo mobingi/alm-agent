@@ -20,7 +20,10 @@ import (
 func Start(c *cli.Context) error {
 	log.Debug("Step: config.LoadFromFile")
 
-	serverid, err := util.GetServerID()
+	serverid, err := util.GetServerID(c.GlobalString("provider"))
+	if err != nil {
+		return err
+	}
 
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {

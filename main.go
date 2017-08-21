@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"sort"
 	"strings"
 
@@ -33,6 +32,7 @@ func beforeActions(c *cli.Context) error {
 	if c.GlobalBool("autoupdate") {
 		versions.AutoUpdate(golatest())
 	}
+	log.Debugf("Set provider to %#v", c.GlobalString("provider"))
 	return nil
 }
 
@@ -69,6 +69,11 @@ func main() {
 		cli.BoolFlag{
 			Name:  "autoupdate, U",
 			Usage: "auto update before run",
+		},
+		cli.StringFlag{
+			Name:  "provider, P",
+			Value: "aws",
+			Usage: "set `Provider`",
 		},
 	}
 
@@ -118,7 +123,7 @@ func main() {
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 
-	app.Run(os.Args)
+	app.RunAndExitOnError()
 }
 
 // FatalWriter just initiaizes cliErrWriter
