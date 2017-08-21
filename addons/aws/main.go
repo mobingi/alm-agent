@@ -9,10 +9,10 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/mobingilabs/go-modaemon/addons/aws/machine"
-	"github.com/mobingilabs/go-modaemon/api"
-	"github.com/mobingilabs/go-modaemon/config"
-	"github.com/mobingilabs/go-modaemon/server_config"
+	"github.com/mobingi/alm-agent/addons/aws/machine"
+	"github.com/mobingi/alm-agent/api"
+	"github.com/mobingi/alm-agent/config"
+	"github.com/mobingi/alm-agent/server_config"
 )
 
 var wg sync.WaitGroup

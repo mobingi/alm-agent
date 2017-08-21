@@ -11,9 +11,9 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/mobingilabs/go-modaemon/config"
-	"github.com/mobingilabs/go-modaemon/server_config"
-	"github.com/mobingilabs/go-modaemon/util"
+	"github.com/mobingi/alm-agent/config"
+	"github.com/mobingi/alm-agent/server_config"
+	"github.com/mobingi/alm-agent/util"
 )
 
 var logregion = "ap-northeast-1"

@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/autoscaling"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/elb"
-	"github.com/mobingilabs/go-modaemon/config"
+	"github.com/mobingi/alm-agent/config"
 )
 
 // GetCurrentStateOfAS returns Instance State on AutoScalling

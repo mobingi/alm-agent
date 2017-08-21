@@ -9,8 +9,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
-	"github.com/mobingilabs/go-modaemon/cmd"
-	"github.com/mobingilabs/go-modaemon/versions"
+	"github.com/mobingi/alm-agent/cmd"
+	"github.com/mobingi/alm-agent/versions"
 	"github.com/urfave/cli"
 )
 

@@ -13,8 +13,8 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/mobingilabs/go-modaemon/server_config"
-	"github.com/mobingilabs/go-modaemon/util"
+	"github.com/mobingi/alm-agent/server_config"
+	"github.com/mobingi/alm-agent/util"
 )
 
 type Code struct {

@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "default" do |c|
     c.vm.box = 'ubuntu/trusty64'
     c.vm.provision :shell, path: File.expand_path('../vagrant/prov/ub14.sh', __FILE__)
-    c.vm.synced_folder '.', '/home/vagrant/src/github.com/mobingilabs/go-modaemon'
+    c.vm.synced_folder '.', '/home/vagrant/src/github.com/mobingi/alm-agent'
   end
 
   # for plugin development
@@ -36,6 +36,6 @@ Vagrant.configure("2") do |config|
     end
 
     c.vm.provision :shell, path: File.expand_path('../vagrant/prov/amzn.sh', __FILE__)
-    c.vm.synced_folder '.', '/home/ec2-user/src/github.com/mobingilabs/go-modaemon'
+    c.vm.synced_folder '.', '/home/ec2-user/src/github.com/mobingi/alm-agent'
   end
 end

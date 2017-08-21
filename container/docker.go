@@ -13,9 +13,9 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/mobingilabs/go-modaemon/config"
-	"github.com/mobingilabs/go-modaemon/server_config"
-	"github.com/mobingilabs/go-modaemon/util"
+	"github.com/mobingi/alm-agent/config"
+	"github.com/mobingi/alm-agent/server_config"
+	"github.com/mobingi/alm-agent/util"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"

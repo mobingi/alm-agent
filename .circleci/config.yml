@@ -2,7 +2,7 @@
 version: 2
 jobs:
   build:
-    working_directory: /go/src/github.com/mobingilabs/go-modaemon
+    working_directory: /go/src/github.com/mobingi/alm-agent
     docker:
       - image: golang:1.8.1
     steps:

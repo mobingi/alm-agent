@@ -3,9 +3,9 @@ VERSION := $(shell git describe --tags --abbrev=0)
 MINOR_VERSION := $(shell date +%s)
 CIRCLE_SHA1 ?= $(shell git rev-parse HEAD)
 CIRCLE_BRANCH ?= develop
-LDFLAGS := -X 'github.com/mobingilabs/go-modaemon/versions.Version=$(VERSION).$(MINOR_VERSION)'
-LDFLAGS += -X 'github.com/mobingilabs/go-modaemon/versions.Revision=$(CIRCLE_SHA1)'
-LDFLAGS += -X 'github.com/mobingilabs/go-modaemon/versions.Branch=$(CIRCLE_BRANCH)'
+LDFLAGS := -X 'github.com/mobingi/alm-agent/versions.Version=$(VERSION).$(MINOR_VERSION)'
+LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Revision=$(CIRCLE_SHA1)'
+LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Branch=$(CIRCLE_BRANCH)'
 PACKAGES_ALL = $(shell go list ./... | grep -v '/vendor/')
 PACKAGES_MAIN = $(shell go list ./... | grep -v '/vendor/' | grep -v '/addons/')
 

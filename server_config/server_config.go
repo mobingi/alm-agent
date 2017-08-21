@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/mobingilabs/go-modaemon/util"
+	"github.com/mobingi/alm-agent/util"
 )
 
 type PubKey struct {

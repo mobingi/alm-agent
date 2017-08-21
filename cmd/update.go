@@ -5,14 +5,14 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/mobingilabs/go-modaemon/api"
-	"github.com/mobingilabs/go-modaemon/code"
-	"github.com/mobingilabs/go-modaemon/config"
-	"github.com/mobingilabs/go-modaemon/container"
-	molog "github.com/mobingilabs/go-modaemon/log"
-	"github.com/mobingilabs/go-modaemon/login"
-	"github.com/mobingilabs/go-modaemon/server_config"
-	"github.com/mobingilabs/go-modaemon/util"
+	"github.com/mobingi/alm-agent/api"
+	"github.com/mobingi/alm-agent/code"
+	"github.com/mobingi/alm-agent/config"
+	"github.com/mobingi/alm-agent/container"
+	molog "github.com/mobingi/alm-agent/log"
+	"github.com/mobingi/alm-agent/login"
+	"github.com/mobingi/alm-agent/server_config"
+	"github.com/mobingi/alm-agent/util"
 	"github.com/urfave/cli"
 )
 

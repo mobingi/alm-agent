@@ -1,8 +1,8 @@
 package log
 
 import (
-	"github.com/mobingilabs/go-modaemon/config"
-	"github.com/mobingilabs/go-modaemon/container"
+	"github.com/mobingi/alm-agent/config"
+	"github.com/mobingi/alm-agent/container"
 
 	"github.com/docker/docker/client"
 )
