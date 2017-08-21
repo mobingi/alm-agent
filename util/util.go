@@ -38,21 +38,15 @@ func FetchContainerState() string {
 }
 
 func GetServerID(s string) (string, error) {
-	var sid string
-
-	switch s {
-	case "aws":
-		sid = getServerID("aws")
-	case "alicloud":
-		sid = getServerID("alicloud")
-	default:
-		return sid, errors.New("Provider `" + s + "` is not supported.")
+	sid, err := getServerID(s)
+	if err != nil {
+		return "", err
 	}
 
 	return sid, nil
 }
 
-func getServerID(provider string) string {
+func getServerID(provider string) (string, error) {
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
@@ -64,12 +58,14 @@ func getServerID(provider string) string {
 		endpoint = ec2METAENDPOINT + "/latest/meta-data/instance-id"
 	case "alicloud":
 		endpoint = ecsMETAENDPOINT + "/latest/meta-data/instance-id"
+	default:
+		return "", errors.New("Provider `" + provider + "` is not supported.")
 	}
 
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		log.Warnf("%#v", err)
-		return ""
+		return "", errors.New("Faild to get ServerID")
 	}
 
 	defer resp.Body.Close()
@@ -77,8 +73,8 @@ func getServerID(provider string) string {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Warnf("%#v", err)
-		return ""
+		return "", errors.New("Faild to get ServerID")
 	}
 
-	return string(body)
+	return string(body), nil
 }
