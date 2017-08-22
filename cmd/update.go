@@ -155,7 +155,9 @@ func Update(c *cli.Context) error {
 				log.Error("Container update processing timed out.")
 				return
 			case s := <-state:
-				apiClient.SendInstanceStatus(serverid, s)
+				if s != "" {
+					apiClient.SendInstanceStatus(serverid, s)
+				}
 				if s == "complete" {
 					done <- true
 					return

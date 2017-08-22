@@ -17,11 +17,13 @@ var (
 	containerLogsLocation = "/var/modaemon/containerlogs"
 )
 
+// FileExists is simple wrapper for check file existance.
 func FileExists(filename string) bool {
 	_, err := os.Stat(filename)
 	return err == nil
 }
 
+// FetchContainerState fetches state of application in running container.
 func FetchContainerState() string {
 	containerStatus := containerLogsLocation + "/log/container_status"
 	if !FileExists(containerStatus) {
@@ -37,6 +39,7 @@ func FetchContainerState() string {
 	return strings.TrimSpace(string(dat))
 }
 
+// GetServerID returns string that identify VM on running provider. (e.g. instance ID)
 func GetServerID(s string) (string, error) {
 	sid, err := getServerID(s)
 	if err != nil {

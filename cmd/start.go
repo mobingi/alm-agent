@@ -135,7 +135,9 @@ func Start(c *cli.Context) error {
 				log.Error("Container start processing timed out.")
 				return
 			case s := <-state:
-				apiClient.SendInstanceStatus(serverid, s)
+				if s != "" {
+					apiClient.SendInstanceStatus(serverid, s)
+				}
 				if s == "complete" {
 					done <- true
 					return
