@@ -1,5 +1,5 @@
 NAME := alm-agent
-VERSION := $(shell git describe --tags --abbrev=0)
+VERSION := $(shell cat versions/version_base)
 MINOR_VERSION := $(shell date +%s)
 CIRCLE_SHA1 ?= $(shell git rev-parse HEAD)
 CIRCLE_BRANCH ?= develop
@@ -46,3 +46,6 @@ addon:
 
 list:
 	@ls -1 bin
+
+version:
+	@echo ${VERSION}.${MINOR_VERSION}
