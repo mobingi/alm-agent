@@ -61,6 +61,8 @@ func getServerID(provider string) (string, error) {
 		endpoint = ec2METAENDPOINT + "/latest/meta-data/instance-id"
 	case "alicloud":
 		endpoint = ecsMETAENDPOINT + "/latest/meta-data/instance-id"
+	case "localtest":
+		return "", nil
 	default:
 		return "", errors.New("Provider `" + provider + "` is not supported.")
 	}
