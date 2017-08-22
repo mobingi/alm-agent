@@ -27,19 +27,19 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
-	apiClient, err := api.NewClient(conf)
+	err = api.GetAccessToken()
 	if err != nil {
 		return err
 	}
 
-	stsToken, err := apiClient.GetStsToken()
+	stsToken, err := api.GetStsToken()
 	if err != nil {
 		return err
 	}
 
-	apiClient.WriteTempToken(stsToken)
+	api.WriteTempToken(stsToken)
 
-	s, err := apiClient.GetServerConfig(c.String("serverconfig"))
+	s, err := api.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func Update(c *cli.Context) error {
 		}
 	}
 
-	apiClient.SendInstanceStatus(serverid, "updating")
+	api.SendInstanceStatus(serverid, "updating")
 	d.MapPort(oldContainer) // For regenerating port map information
 
 	newContainer, err := d.StartContainer("standby", codeDir, true)
@@ -156,7 +156,7 @@ func Update(c *cli.Context) error {
 				return
 			case s := <-state:
 				if s != "" {
-					apiClient.SendInstanceStatus(serverid, s)
+					api.SendInstanceStatus(serverid, s)
 				}
 				if s == "complete" {
 					done <- true

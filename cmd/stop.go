@@ -18,12 +18,16 @@ func Stop(c *cli.Context) error {
 		return err
 	}
 
-	apiClient, err := api.NewClient(conf)
 	if err != nil {
 		return err
 	}
 
-	s, err := apiClient.GetServerConfig(c.String("serverconfig"))
+	err = api.GetAccessToken()
+	if err != nil {
+		return err
+	}
+
+	s, err := api.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
 		return err
 	}
