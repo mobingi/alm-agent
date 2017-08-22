@@ -18,6 +18,7 @@ var logregion = "ap-northeast-1"
 type clientInterface interface {
 	buildURI(string) string
 	getHTTPClient() *http.Client
+	setConfig(*config.Config) error
 	getConfig() *config.Config
 }
 
@@ -39,7 +40,7 @@ type StsToken struct {
 var stsToken StsToken
 
 type client struct {
-	config config.Config
+	config *config.Config
 }
 
 func (c *client) getHTTPClient() *http.Client {
@@ -50,8 +51,18 @@ func (c *client) buildURI(path string) string {
 	return c.getConfig().APIHost + path
 }
 
+func SetConfig(conf *config.Config) error {
+	c.setConfig(conf)
+	return nil
+}
+
+func (c *client) setConfig(conf *config.Config) error {
+	c.config = conf
+	return nil
+}
+
 func (c *client) getConfig() *config.Config {
-	return &c.config
+	return c.config
 }
 
 func init() {
@@ -60,6 +71,7 @@ func init() {
 }
 
 var Get = func(path string, values url.Values, target interface{}) error {
+	log.Debug(c.getConfig())
 	req, err := http.NewRequest("GET", c.buildURI(path), nil)
 
 	if apitoken.token != "" && apitoken.tokenType != "" {
@@ -89,6 +101,7 @@ var Get = func(path string, values url.Values, target interface{}) error {
 }
 
 var Post = func(path string, values url.Values, target interface{}) error {
+	log.Debug(c.getConfig())
 	req, err := http.NewRequest("POST", c.buildURI(path), strings.NewReader(values.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	if apitoken.token != "" && apitoken.tokenType != "" {

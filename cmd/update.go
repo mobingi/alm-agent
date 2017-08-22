@@ -27,6 +27,7 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
+	api.SetConfig(conf)
 	err = api.GetAccessToken()
 	if err != nil {
 		return err

@@ -17,10 +17,7 @@ func Stop(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-
-	if err != nil {
-		return err
-	}
+	api.SetConfig(conf)
 
 	err = api.GetAccessToken()
 	if err != nil {

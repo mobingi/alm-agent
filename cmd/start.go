@@ -30,7 +30,7 @@ func Start(c *cli.Context) error {
 		return err
 	}
 	log.Debugf("%#v", conf)
-
+	api.SetConfig(conf)
 	err = api.GetAccessToken()
 	if err != nil {
 		return err
