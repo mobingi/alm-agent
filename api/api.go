@@ -25,8 +25,8 @@ type clientInterface interface {
 var c clientInterface
 
 type apiToken struct {
-	tokenType string
-	token     string
+	TokenType string `json:"token_type"`
+	Token     string `json:"access_token"`
 }
 
 var apitoken apiToken
@@ -71,12 +71,14 @@ func init() {
 }
 
 var Get = func(path string, values url.Values, target interface{}) error {
-	log.Debug(c.getConfig())
+	log.Debugf("%#v", c.getConfig())
+	log.Debugf("%#v", apitoken)
 	req, err := http.NewRequest("GET", c.buildURI(path), nil)
 
-	if apitoken.token != "" && apitoken.tokenType != "" {
-		req.Header.Add("Authorization", fmt.Sprintf("%s %s", apitoken.tokenType, apitoken.token))
+	if apitoken.Token != "" && apitoken.TokenType != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("%s %s", apitoken.TokenType, apitoken.Token))
 	}
+	log.Debugf("%#v", req)
 
 	req.URL.RawQuery = values.Encode()
 	httpClient := c.getHTTPClient()
@@ -92,6 +94,7 @@ var Get = func(path string, values url.Values, target interface{}) error {
 		return errors.New(resp.Status)
 	}
 
+	log.Debugf("%#v", string(res))
 	err = json.Unmarshal(res, &target)
 	if err != nil {
 		return err
@@ -101,12 +104,13 @@ var Get = func(path string, values url.Values, target interface{}) error {
 }
 
 var Post = func(path string, values url.Values, target interface{}) error {
-	log.Debug(c.getConfig())
+	log.Debugf("%#v", c.getConfig())
 	req, err := http.NewRequest("POST", c.buildURI(path), strings.NewReader(values.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	if apitoken.token != "" && apitoken.tokenType != "" {
-		req.Header.Add("Authorization", fmt.Sprintf("%s %s", apitoken.tokenType, apitoken.token))
+	if apitoken.Token != "" && apitoken.TokenType != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("%s %s", apitoken.TokenType, apitoken.Token))
 	}
+	log.Debugf("%#v", req)
 
 	httpClient := c.getHTTPClient()
 	resp, err := httpClient.Do(req)
@@ -121,6 +125,7 @@ var Post = func(path string, values url.Values, target interface{}) error {
 		return errors.New(resp.Status)
 	}
 
+	log.Debugf("%#v", string(res))
 	err = json.Unmarshal(res, &target)
 	if err != nil {
 		return err
