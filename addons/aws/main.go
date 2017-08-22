@@ -44,14 +44,7 @@ func main() {
 	}
 	log.Debugf("%#v", moConfig)
 
-	log.Debug("Step: api.NewClient")
-	apiClient, err := api.NewClient(moConfig)
-	if err != nil {
-		log.Fatal("Failed load Config. exit.")
-		os.Exit(1)
-	}
-
-	svConfig, err := apiClient.GetServerConfig(moConfig.APIHost)
+	svConfig, err := api.GetServerConfig(moConfig.APIHost)
 	if err != nil {
 		os.Exit(1)
 	}
@@ -105,7 +98,7 @@ func main() {
 		// Run first check
 		if instance.DetectSpotTerminationState() {
 			finalizeSpotInstance(sess, instance, moConfig, svConfig)
-			apiClient.SendSpotShutdownEvent(instance.InstanceID)
+			api.SendSpotShutdownEvent(instance.InstanceID)
 			return
 		}
 		t := time.NewTicker(15 * time.Second)
@@ -116,7 +109,7 @@ func main() {
 				log.Debugf("Start checking spot termination event.")
 				if instance.DetectSpotTerminationState() {
 					finalizeSpotInstance(sess, instance, moConfig, svConfig)
-					apiClient.SendSpotShutdownEvent(instance.InstanceID)
+					api.SendSpotShutdownEvent(instance.InstanceID)
 					return
 				}
 			}
