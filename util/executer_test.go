@@ -31,11 +31,23 @@ func TestMockExec(t *testing.T) {
 	}
 }
 
-func ExampleExecuter() {
+func TestMockedExecuter(t *testing.T) {
 	Executer = &MockExecuter{}
 	Executer.Exec("echo", "-n", "Mocked")
 	Executer.Exec("/bin/true", "but", "Mocked")
-	// Output:
-	// echo -n Mocked
-	// /bin/true but Mocked
+
+	buf := GetMockBufferr()
+	t.Log(buf)
+
+	expected := "echo -n Mocked"
+	actual := buf[0]
+	if actual != expected {
+		t.Fatalf("Expected: %s\n But: %s", expected, actual)
+	}
+
+	expected = "/bin/true but Mocked"
+	actual = buf[1]
+	if actual != expected {
+		t.Fatalf("Expected: %s\n But: %s", expected, actual)
+	}
 }
