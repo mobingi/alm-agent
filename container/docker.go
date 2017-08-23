@@ -40,7 +40,7 @@ type Docker struct {
 }
 
 var (
-	containerLogsLocation = "/var/log/alm-agent/containerlogs"
+	containerLogsLocation = "/var/log/alm-agent/container"
 )
 
 // NewDocker is construcor for DockerClient
@@ -296,7 +296,7 @@ func (d *Docker) containerCreate(name string, dir string, isApp bool) (*Containe
 			hostConfig.Binds,
 			"/root/.aws/awslogs_creds.conf:/etc/awslogs/awscli.conf",
 			"/var/log:/var/log",
-			containerLogsLocation+":/var/containerlogs",
+			containerLogsLocation+":/var/container",
 			"/opt/awslogs:/var/lib/awslogs",
 		)
 	}
