@@ -1,11 +1,14 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
+	log "github.com/Sirupsen/logrus"
+	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
 )
 
@@ -44,6 +47,22 @@ region=%s
 	}
 
 	err = ioutil.WriteFile(filepath.Join(awsConfDir, "awslogs_creds.conf"), []byte(logscreadsContent), 0600)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func getServerConfigFromFile(path string, sc *serverConfig.Config) error {
+	log.Debugf("Step: serverConfig.getFromFile %s", path)
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	log.Debugf("SCFfromfile: %s", b)
+	err = json.Unmarshal(b, sc)
+
 	if err != nil {
 		return err
 	}

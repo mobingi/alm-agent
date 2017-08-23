@@ -1,8 +1,6 @@
 package api
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/url"
 
 	log "github.com/Sirupsen/logrus"
@@ -34,32 +32,33 @@ func GetServerConfig(sclocation string) (*serverConfig.Config, error) {
 	conf := &serverConfig.Config{}
 	switch u.Scheme {
 	case "file":
-		log.Debug("Step: serverConfig.getFromFile")
-		b, err := ioutil.ReadFile(u.Path)
-		if err != nil {
-			return nil, err
-		}
-
-		log.Debugf("SCFfromfile: %s", b)
-
-		err = json.Unmarshal(b, conf)
+		err = getServerConfigFromFile(u.Path, conf)
 		if err != nil {
 			return nil, err
 		}
 	default:
-		log.Debug("Step: serverConfig.getFromHTTP")
-
-		values := url.Values{}
-		values.Set("stack_id", c.getConfig().StackID)
-
-		log.Debug("Step: api: /v2/alm/serverconfig")
-		err := Get("/v2/alm/serverconfig", values, &conf)
+		err = getServerConfigFromAPI(conf)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	return conf, nil
+}
+
+func getServerConfigFromAPI(sc *serverConfig.Config) error {
+	log.Debug("Step: serverConfig.getFromAPI")
+
+	values := url.Values{}
+	values.Set("stack_id", c.getConfig().StackID)
+
+	log.Debug("Step: api: /v2/alm/serverconfig")
+	err := Get("/v2/alm/serverconfig", values, sc)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // GetStsToken to STS token for CWLogs

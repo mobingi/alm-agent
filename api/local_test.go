@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"testing"
+
+	"github.com/mobingi/alm-agent/server_config"
 )
 
 func TestWriteTempToken(t *testing.T) {
@@ -39,5 +41,17 @@ func TestWriteTempToken(t *testing.T) {
 	t.Log(string(buf))
 	if !re.MatchString(string(buf)) {
 		t.Fatal("credentials does not contain Key")
+	}
+}
+
+func TestFetServerConfigFromFile(t *testing.T) {
+	sc := &serverConfig.Config{}
+	getServerConfigFromFile("../test/fixtures/serverconfig.v1.json", sc)
+	t.Log(sc)
+
+	expected := "mobingi/ubuntu-apache2-php7:7.1"
+	actual := sc.Image
+	if actual != expected {
+		t.Fatalf("Expected: %s\n But: %s", expected, actual)
 	}
 }

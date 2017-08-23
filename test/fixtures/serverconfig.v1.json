@@ -1,0 +1,16 @@
+{
+  "image": "mobingi/ubuntu-apache2-php7:7.1",
+  "code": "git://github.com/mobingilabs/default-site-php",
+  "codeDir": "/srv/code/",
+  "ports": [
+    80,
+    443
+  ],
+  "updated": 1495677005,
+  "version": "2017-02-01",
+  "users": {
+    "mobingi": {
+      "publicKey": "ssh-rsa AAAAB3Nza"
+    }
+  }
+}
