@@ -2,15 +2,26 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/url"
-	"os"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mobingi/alm-agent/server_config"
-	"github.com/mobingi/alm-agent/util"
 )
+
+// GetAccessToken requests token of user for auth by API.
+func GetAccessToken() error {
+	values := url.Values{}
+	values.Set("grant_type", "client_credentials")
+	values.Set("client_id", c.getConfig().StackID)
+	values.Set("client_secret", c.getConfig().AuthorizationToken)
+
+	err := Post("/v2/access_token", values, &apitoken)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 // GetServerConfig retrives serverconfig from file or API.
 func GetServerConfig(sclocation string) (*serverConfig.Config, error) {
@@ -42,8 +53,10 @@ func GetServerConfig(sclocation string) (*serverConfig.Config, error) {
 		values.Set("stack_id", c.getConfig().StackID)
 
 		log.Debug("Step: api: /v2/alm/serverconfig")
-		res := Get("/v2/alm/serverconfig", values, &conf)
-		log.Debugf("Response: %s", res)
+		err := Get("/v2/alm/serverconfig", values, &conf)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return conf, nil
@@ -63,43 +76,6 @@ func GetStsToken() (*StsToken, error) {
 	return &stsToken, nil
 }
 
-// WriteTempToken to save STS token for CWLogs container
-func WriteTempToken(token *StsToken) error {
-	region := logregion
-
-	creadsTemplate := `[tempcreds]
-aws_access_key_id=%s
-aws_secret_access_key=%s
-aws_session_token=%s
-region=%s
-`
-
-	creadsForlogs := `[plugins]
-cwlogs = cwlogs
-[default]
-aws_access_key_id=%s
-aws_secret_access_key=%s
-aws_session_token=%s
-region=%s
-`
-
-	if !util.FileExists("/root/.aws") {
-		os.Mkdir("/root/.aws", 0700)
-	}
-
-	tempcreadsContent := fmt.Sprintf(creadsTemplate, token.AccessKeyID, token.SecretAccessKey, token.SessionToken, region)
-	logscreadsContent := fmt.Sprintf(creadsForlogs, token.AccessKeyID, token.SecretAccessKey, token.SessionToken, region)
-	err := ioutil.WriteFile("/root/.aws/credentials", []byte(tempcreadsContent), 0600)
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile("/root/.aws/awslogs_creds.conf", []byte(logscreadsContent), 0600)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 // SendInstanceStatus send container app status to API
 func SendInstanceStatus(serverID, status string) error {
 	values := url.Values{}
@@ -114,7 +90,10 @@ func SendInstanceStatus(serverID, status string) error {
 	}
 
 	err := Post("/v2/alm/instance/status", values, nil)
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // SendSpotShutdownEvent nortifies that instance detects shutdown event.
@@ -126,18 +105,4 @@ func SendSpotShutdownEvent(serverID string) error {
 
 	err := Post("/v2/event/spot/shutdown", values, nil)
 	return err
-}
-
-// GetAccessToken requests token of user for auth by API.
-func GetAccessToken() error {
-	values := url.Values{}
-	values.Set("grant_type", "client_credentials")
-	values.Set("client_id", c.getConfig().StackID)
-	values.Set("client_secret", c.getConfig().AuthorizationToken)
-
-	err := Post("/v2/access_token", values, &apitoken)
-	if err != nil {
-		return err
-	}
-	return nil
 }

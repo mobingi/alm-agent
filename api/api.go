@@ -74,6 +74,7 @@ func init() {
 
 // Get wraps HTTP GET Request
 var Get = func(path string, values url.Values, target interface{}) error {
+	log.Debugf("Get: %s", path)
 	log.Debugf("%#v", c.getConfig())
 	log.Debugf("%#v", apitoken)
 	req, err := http.NewRequest("GET", c.buildURI(path), nil)
@@ -108,6 +109,7 @@ var Get = func(path string, values url.Values, target interface{}) error {
 
 // Post wraps HTTP Post Request
 var Post = func(path string, values url.Values, target interface{}) error {
+	log.Debugf("Post: %s", path)
 	log.Debugf("%#v", c.getConfig())
 	req, err := http.NewRequest("POST", c.buildURI(path), strings.NewReader(values.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
