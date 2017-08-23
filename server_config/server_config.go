@@ -29,7 +29,7 @@ type Config struct {
 	EnvironmentVariables map[string]string
 }
 
-var versionPath = "/opt/mobingi/etc/lastUpdated"
+var versionPath = "/opt/mobingi/etc/configVersion"
 
 // NeedsUpdate checks latest serverconfig
 func NeedsUpdate(c *Config) (bool, error) {
