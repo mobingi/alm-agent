@@ -9,10 +9,12 @@ import (
 	"github.com/mobingi/alm-agent/util"
 )
 
+// PubKey for SSH
 type PubKey struct {
 	PublicKey string
 }
 
+// Config means application stack
 type Config struct {
 	Image                string
 	DockerHubUserName    string
@@ -27,8 +29,9 @@ type Config struct {
 	EnvironmentVariables map[string]string
 }
 
-var path = "/var/modaemon/updated"
+var path = "/opt/mobingi/etc/updated"
 
+// NeedsUpdate checks latest serverconfig
 func NeedsUpdate(c *Config) (bool, error) {
 	if !util.FileExists(path) {
 		return true, nil
@@ -53,6 +56,7 @@ func NeedsUpdate(c *Config) (bool, error) {
 	return false, nil
 }
 
+// WriteUpdated stores current
 func WriteUpdated(c *Config) error {
 	v := fmt.Sprintf("%d", c.Updated)
 	log.Debugf("Write %s to %s", v, path)

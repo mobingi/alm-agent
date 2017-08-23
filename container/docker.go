@@ -27,6 +27,7 @@ import (
 	"golang.org/x/net/context"
 )
 
+// Docker is manager of docker
 type Docker struct {
 	Client   *client.Client
 	Image    string
@@ -39,9 +40,10 @@ type Docker struct {
 }
 
 var (
-	containerLogsLocation = "/var/modaemon/containerlogs"
+	containerLogsLocation = "/var/log/alm-agent/containerlogs"
 )
 
+// NewDocker is construcor for DockerClient
 func NewDocker(c *config.Config, s *serverConfig.Config) (*Docker, error) {
 	docker := &Docker{
 		Image:    strings.TrimPrefix(s.Image, "http://"),
@@ -71,6 +73,7 @@ func NewDocker(c *config.Config, s *serverConfig.Config) (*Docker, error) {
 	return docker, err
 }
 
+// CheckImageUpdated pulls latest image if exsist.
 func (d *Docker) CheckImageUpdated() (bool, error) {
 	res, err := d.imagePull()
 	if err != nil {
@@ -84,6 +87,7 @@ func (d *Docker) CheckImageUpdated() (bool, error) {
 	return true, nil
 }
 
+// GetContainer returns container by name
 func (d *Docker) GetContainer(name string) (*Container, error) {
 	filter := opts.NewFilterOpt()
 	filter.Set(fmt.Sprintf("name=%s", name))
@@ -109,6 +113,7 @@ func (d *Docker) GetContainer(name string) (*Container, error) {
 	return c, err
 }
 
+// GetContainerIDbyImage returns container by Image
 func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 	filter := opts.NewFilterOpt()
 	filter.Set(fmt.Sprintf("ancestor=%s", ancestor))
@@ -127,6 +132,7 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 	return res[0].ID, nil
 }
 
+// StartContainer starts docker container
 func (d *Docker) StartContainer(name string, dir string, isApp bool) (*Container, error) {
 
 	_, err := d.imagePull()
@@ -162,6 +168,7 @@ func (d *Docker) StartContainer(name string, dir string, isApp bool) (*Container
 	return c, nil
 }
 
+// MapPort allocates listner
 func (d *Docker) MapPort(c *Container) error {
 	for _, port := range d.Ports {
 		dest := &net.TCPAddr{IP: c.IP, Port: port}
@@ -173,6 +180,7 @@ func (d *Docker) MapPort(c *Container) error {
 	return nil
 }
 
+// UnmapPort disallocates listner
 func (d *Docker) UnmapPort() error {
 	for _, port := range d.Ports {
 		key := &net.TCPAddr{IP: net.IPv4(0, 0, 0, 0), Port: port}
@@ -184,6 +192,7 @@ func (d *Docker) UnmapPort() error {
 	return nil
 }
 
+// RenameContainer renames after lounch
 func (d *Docker) RenameContainer(c *Container, name string) error {
 	err := d.Client.ContainerRename(context.Background(), c.ID, name)
 	if err != nil {
@@ -287,7 +296,7 @@ func (d *Docker) containerCreate(name string, dir string, isApp bool) (*Containe
 			hostConfig.Binds,
 			"/root/.aws/awslogs_creds.conf:/etc/awslogs/awscli.conf",
 			"/var/log:/var/log",
-			"/var/modaemon/containerlogs:/var/containerlogs",
+			containerLogsLocation+":/var/containerlogs",
 			"/opt/awslogs:/var/lib/awslogs",
 		)
 	}
@@ -360,16 +369,19 @@ func (d *Docker) inspectContainer(c *Container) (types.ContainerJSON, error) {
 	return d.Client.ContainerInspect(context.Background(), c.ID)
 }
 
+// StopContainer stops contaner
 func (d *Docker) StopContainer(c *Container) error {
 	timeout := 3 * time.Second
 	return d.Client.ContainerStop(context.Background(), c.ID, &timeout)
 }
 
+// RemoveContainer Removes stopped contaner
 func (d *Docker) RemoveContainer(c *Container) error {
 	options := types.ContainerRemoveOptions{}
 	return d.Client.ContainerRemove(context.Background(), c.ID, options)
 }
 
+// CreateContainerExec prepaces exec on running container
 func (d *Docker) CreateContainerExec(id string, cmd []string) (types.IDResponse, error) {
 	exc := types.ExecConfig{
 		Cmd: cmd,
@@ -377,6 +389,7 @@ func (d *Docker) CreateContainerExec(id string, cmd []string) (types.IDResponse,
 	return d.Client.ContainerExecCreate(context.Background(), id, exc)
 }
 
+// StartContainerExec do exec on running container
 func (d *Docker) StartContainerExec(id string, esc types.ExecStartCheck) error {
 	return d.Client.ContainerExecStart(context.Background(), id, esc)
 }
