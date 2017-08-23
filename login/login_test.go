@@ -10,12 +10,13 @@ import (
 
 func TestEnsureUser(t *testing.T) {
 	util.ClearMockBuffer()
-
 	tmpHomeDir, _ := ioutil.TempDir("", "home")
+
 	defer os.RemoveAll(tmpHomeDir)
 	userHomeDir = tmpHomeDir
 
 	util.Executer = &util.MockExecuter{}
+	orig_setLogin := setLogin
 	setLogin = func(username string, sshkey string) {
 		return
 	}
@@ -39,6 +40,10 @@ func TestEnsureUser(t *testing.T) {
 	if actual != expected {
 		t.Fatalf("Expected: %s\n But: %s", expected, actual)
 	}
+
+	// TearDown
+	userHomeDir = "/home"
+	setLogin = orig_setLogin
 	util.ClearMockBuffer()
 }
 
