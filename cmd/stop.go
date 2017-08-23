@@ -17,13 +17,14 @@ func Stop(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	api.SetConfig(conf)
 
-	apiClient, err := api.NewClient(conf)
+	err = api.GetAccessToken()
 	if err != nil {
 		return err
 	}
 
-	s, err := apiClient.GetServerConfig(c.String("serverconfig"))
+	s, err := api.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
 		return err
 	}

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -16,12 +15,6 @@ var (
 	ecsMETAENDPOINT       = "http://100.100.100.200/"
 	containerLogsLocation = "/var/modaemon/containerlogs"
 )
-
-// FileExists is simple wrapper for check file existance.
-func FileExists(filename string) bool {
-	_, err := os.Stat(filename)
-	return err == nil
-}
 
 // FetchContainerState fetches state of application in running container.
 func FetchContainerState() string {
@@ -61,6 +54,8 @@ func getServerID(provider string) (string, error) {
 		endpoint = ec2METAENDPOINT + "/latest/meta-data/instance-id"
 	case "alicloud":
 		endpoint = ecsMETAENDPOINT + "/latest/meta-data/instance-id"
+	case "localtest":
+		return "", nil
 	default:
 		return "", errors.New("Provider `" + provider + "` is not supported.")
 	}
