@@ -39,7 +39,13 @@ func (m *MockExecuter) Exec(command string, args ...string) ([]byte, error) {
 	return out, nil
 }
 
-// GetMockBufferr returns buffered commands
-func GetMockBufferr() []string {
+// GetMockBuffer returns buffered commands
+func GetMockBuffer() []string {
 	return MockBuffer
+}
+
+// ClearMockBuffer discards buffer
+func ClearMockBuffer() {
+	MockBuffer = nil
+	return
 }

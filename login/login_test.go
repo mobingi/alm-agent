@@ -9,6 +9,8 @@ import (
 )
 
 func TestEnsureUser(t *testing.T) {
+	util.ClearMockBuffer()
+
 	tmpHomeDir, _ := ioutil.TempDir("", "home")
 	defer os.RemoveAll(tmpHomeDir)
 	userHomeDir = tmpHomeDir
@@ -18,7 +20,7 @@ func TestEnsureUser(t *testing.T) {
 		return
 	}
 	EnsureUser("mobingi", "ssh-rsa PubKey")
-	buf := util.GetMockBufferr()
+	buf := util.GetMockBuffer()
 	t.Log(buf)
 	expected := "useradd -m mobingi"
 	actual := buf[0]
@@ -37,6 +39,7 @@ func TestEnsureUser(t *testing.T) {
 	if actual != expected {
 		t.Fatalf("Expected: %s\n But: %s", expected, actual)
 	}
+	util.ClearMockBuffer()
 }
 
 func TestSshDirpath(t *testing.T) {
