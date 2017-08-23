@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -17,11 +16,7 @@ var (
 	containerLogsLocation = "/var/modaemon/containerlogs"
 )
 
-func FileExists(filename string) bool {
-	_, err := os.Stat(filename)
-	return err == nil
-}
-
+// FetchContainerState fetches state of application in running container.
 func FetchContainerState() string {
 	containerStatus := containerLogsLocation + "/log/container_status"
 	if !FileExists(containerStatus) {
@@ -37,6 +32,7 @@ func FetchContainerState() string {
 	return strings.TrimSpace(string(dat))
 }
 
+// GetServerID returns string that identify VM on running provider. (e.g. instance ID)
 func GetServerID(s string) (string, error) {
 	sid, err := getServerID(s)
 	if err != nil {
@@ -58,6 +54,8 @@ func getServerID(provider string) (string, error) {
 		endpoint = ec2METAENDPOINT + "/latest/meta-data/instance-id"
 	case "alicloud":
 		endpoint = ecsMETAENDPOINT + "/latest/meta-data/instance-id"
+	case "localtest":
+		return "", nil
 	default:
 		return "", errors.New("Provider `" + provider + "` is not supported.")
 	}
