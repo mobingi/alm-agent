@@ -11,7 +11,7 @@ import (
 )
 
 func TestWriteTempToken(t *testing.T) {
-	tmpAWSDir, _ := ioutil.TempDir("", "containerLogs")
+	tmpAWSDir, _ := ioutil.TempDir("", "TestWriteTempToken")
 	awsConfDir = filepath.Join(tmpAWSDir, ".aws")
 	defer os.RemoveAll(tmpAWSDir)
 
