@@ -32,27 +32,29 @@ func init() {
 
 }
 
+var agentConfigPath = "/opt/mobingi/etc/alm-agent.cfg"
+
 func main() {
 	instance := machine.NewMachine()
 
 	log.Debug("Step: config.LoadFromFile")
-	moConfig, err := config.LoadFromFile("/opt/modaemon/modaemon.cfg")
+	agentConfig, err := config.LoadFromFile(agentConfigPath)
 	if err != nil {
 		log.Debugf("%#v", err)
 		log.Fatal("Failed load Config. exit.")
 		os.Exit(1)
 	}
-	log.Debugf("%#v", moConfig)
+	log.Debugf("%#v", agentConfig)
 
-	svConfig, err := api.GetServerConfig(moConfig.APIHost)
+	svConfig, err := api.GetServerConfig(agentConfig.APIHost)
 	if err != nil {
 		os.Exit(1)
 	}
 	log.Debugf("%#v", svConfig)
 
 	creds := credentials.NewStaticCredentials(
-		moConfig.AccessKey,
-		moConfig.SecretKey,
+		agentConfig.AccessKey,
+		agentConfig.SecretKey,
 		"",
 	)
 
@@ -71,7 +73,7 @@ func main() {
 		log.Debugf("Start checking inscale event.")
 		// Run first check
 		if isTerminateWait(sess, instance) {
-			finalizeNormalInstance(sess, instance, moConfig, svConfig)
+			finalizeNormalInstance(sess, instance, agentConfig, svConfig)
 			return
 		}
 		t := time.NewTicker(20 * time.Second)
@@ -81,7 +83,7 @@ func main() {
 			case <-t.C:
 				log.Debugf("Start checking inscale event.")
 				if isTerminateWait(sess, instance) {
-					finalizeNormalInstance(sess, instance, moConfig, svConfig)
+					finalizeNormalInstance(sess, instance, agentConfig, svConfig)
 					return
 				}
 			}
@@ -97,7 +99,7 @@ func main() {
 		log.Debugf("Start checking spot termination event.")
 		// Run first check
 		if instance.DetectSpotTerminationState() {
-			finalizeSpotInstance(sess, instance, moConfig, svConfig)
+			finalizeSpotInstance(sess, instance, agentConfig, svConfig)
 			api.SendSpotShutdownEvent(instance.InstanceID)
 			return
 		}
@@ -108,7 +110,7 @@ func main() {
 			case <-t.C:
 				log.Debugf("Start checking spot termination event.")
 				if instance.DetectSpotTerminationState() {
-					finalizeSpotInstance(sess, instance, moConfig, svConfig)
+					finalizeSpotInstance(sess, instance, agentConfig, svConfig)
 					api.SendSpotShutdownEvent(instance.InstanceID)
 					return
 				}
@@ -133,22 +135,22 @@ func isTerminateWait(sess *session.Session, instance *machine.Machine) bool {
 	return false
 }
 
-func finalizeInstance(sess *session.Session, instance *machine.Machine, moConfig *config.Config, svConfig *serverConfig.Config) {
-	instance.DeregisterInstancesFromELB(sess, moConfig)
+func finalizeInstance(sess *session.Session, instance *machine.Machine, agentConfig *config.Config, svConfig *serverConfig.Config) {
+	instance.DeregisterInstancesFromELB(sess, agentConfig)
 	instance.CleanupCrontabs()
-	instance.ExecShutdownTaskOnAppContainers(moConfig, svConfig)
+	instance.ExecShutdownTaskOnAppContainers(agentConfig, svConfig)
 	return
 }
 
-func finalizeNormalInstance(sess *session.Session, instance *machine.Machine, moConfig *config.Config, svConfig *serverConfig.Config) {
+func finalizeNormalInstance(sess *session.Session, instance *machine.Machine, agentConfig *config.Config, svConfig *serverConfig.Config) {
 	log.Infof("Detected: Terminating:Wait")
-	finalizeInstance(sess, instance, moConfig, svConfig)
-	instance.SendLifeCycleAction(sess, moConfig, "CONTINUE")
+	finalizeInstance(sess, instance, agentConfig, svConfig)
+	instance.SendLifeCycleAction(sess, agentConfig, "CONTINUE")
 	return
 }
 
-func finalizeSpotInstance(sess *session.Session, instance *machine.Machine, moConfig *config.Config, svConfig *serverConfig.Config) {
+func finalizeSpotInstance(sess *session.Session, instance *machine.Machine, agentConfig *config.Config, svConfig *serverConfig.Config) {
 	log.Infof("Detected: Spot Instance Terminating")
-	finalizeInstance(sess, instance, moConfig, svConfig)
+	finalizeInstance(sess, instance, agentConfig, svConfig)
 	return
 }
