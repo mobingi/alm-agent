@@ -33,11 +33,11 @@ func (m *Machine) GetCurrentStateOfAS(sess *session.Session) (string, error) {
 }
 
 // DeregisterInstancesFromELB removes instance from ELB backend servers.
-func (m *Machine) DeregisterInstancesFromELB(sess *session.Session, moConfig *config.Config) {
+func (m *Machine) DeregisterInstancesFromELB(sess *session.Session, agentConfig *config.Config) {
 	cfnClient := cloudformation.New(sess)
 
 	cfnparams := &cloudformation.DescribeStackResourcesInput{
-		StackName: aws.String(moConfig.StackID),
+		StackName: aws.String(agentConfig.StackID),
 	}
 
 	cfnresp, err := cfnClient.DescribeStackResources(cfnparams)
@@ -80,13 +80,13 @@ func (m *Machine) DeregisterInstancesFromELB(sess *session.Session, moConfig *co
 }
 
 // SendLifeCycleAction tell dying to API
-func (m *Machine) SendLifeCycleAction(sess *session.Session, moConfig *config.Config, action string) bool {
+func (m *Machine) SendLifeCycleAction(sess *session.Session, agentConfig *config.Config, action string) bool {
 	asClient := autoscaling.New(sess)
 
 	asparams := &autoscaling.CompleteLifecycleActionInput{
 		AutoScalingGroupName:  aws.String(m.ASName),
 		LifecycleActionResult: aws.String(action),
-		LifecycleHookName:     aws.String(moConfig.StackID + "-lch-ists-tmnt"),
+		LifecycleHookName:     aws.String(agentConfig.StackID + "-lch-ists-tmnt"),
 		InstanceId:            aws.String(m.InstanceID),
 	}
 

@@ -13,7 +13,7 @@ import (
 var (
 	ec2METAENDPOINT       = "http://169.254.169.254/"
 	ecsMETAENDPOINT       = "http://100.100.100.200/"
-	containerLogsLocation = "/var/modaemon/containerlogs"
+	containerLogsLocation = "/var/log/alm-agent/containerlogs"
 )
 
 // FetchContainerState fetches state of application in running container.
