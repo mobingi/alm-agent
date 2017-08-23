@@ -13,7 +13,12 @@ import (
 	"github.com/mobingi/alm-agent/config"
 )
 
-var logregion = "ap-northeast-1"
+var (
+	logregion = "ap-northeast-1"
+	c         clientInterface
+	apitoken  apiToken
+	stsToken  StsToken
+)
 
 type clientInterface interface {
 	buildURI(string) string
@@ -22,14 +27,10 @@ type clientInterface interface {
 	getConfig() *config.Config
 }
 
-var c clientInterface
-
 type apiToken struct {
 	TokenType string `json:"token_type"`
 	Token     string `json:"access_token"`
 }
-
-var apitoken apiToken
 
 // StsToken for CWLogs
 type StsToken struct {
@@ -37,8 +38,6 @@ type StsToken struct {
 	SecretAccessKey string
 	SessionToken    string
 }
-
-var stsToken StsToken
 
 type client struct {
 	config *config.Config

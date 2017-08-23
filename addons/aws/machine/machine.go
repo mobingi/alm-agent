@@ -10,7 +10,10 @@ import (
 
 // METAENDPOINT EC2 Metadata Endpoint
 // we can update machine.METAENDPOINT on build.
-var METAENDPOINT = "http://169.254.169.254/"
+var (
+	METAENDPOINT      = "http://169.254.169.254/"
+	instanceLifecycle = "/opt/mobingi/etc/instance_lifecycle"
+)
 
 var getInstanceID = func(m *Machine) string {
 	resp, err := http.Get(METAENDPOINT + "/latest/meta-data/instance-id")
@@ -61,7 +64,7 @@ func NewMachine() *Machine {
 }
 
 func isSpot() bool {
-	dat, err := ioutil.ReadFile("/opt/modeamon/instance_lifecycle")
+	dat, err := ioutil.ReadFile(instanceLifecycle)
 
 	if err != nil {
 		// for older template

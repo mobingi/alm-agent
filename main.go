@@ -14,6 +14,8 @@ import (
 	"github.com/urfave/cli"
 )
 
+var agentConfigPath = "/opt/mobingi/etc/alm-agent.cfg"
+
 func init() {
 	cli.ErrWriter = &FatalWriter{cli.ErrWriter}
 }
@@ -81,7 +83,7 @@ func main() {
 	flags := []cli.Flag{
 		cli.StringFlag{
 			Name:  "config, c",
-			Value: "/opt/modaemon/modaemon.cfg",
+			Value: agentConfigPath,
 			Usage: "Load configuration from `FILE`",
 		},
 		cli.StringFlag{
