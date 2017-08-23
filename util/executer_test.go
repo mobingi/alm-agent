@@ -16,17 +16,10 @@ func TestRealExec(t *testing.T) {
 	}
 }
 
-type mockExecuter struct{}
-
-func (m *mockExecuter) Exec(command string, args ...string) ([]byte, error) {
-	out := []byte("Mocked")
-	return out, nil
-}
-
 func TestMockExec(t *testing.T) {
-	Executer = &mockExecuter{}
-	expected := "Mocked"
-	out, err := Executer.Exec("echo", "-n", expected)
+	Executer = &MockExecuter{}
+	expected := "echo -n Mocked"
+	out, err := Executer.Exec("echo", "-n", "Mocked")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -36,4 +29,13 @@ func TestMockExec(t *testing.T) {
 	if actual != expected {
 		t.Fatalf("Expected: %s\n But: %s", expected, actual)
 	}
+}
+
+func ExampleExecuter() {
+	Executer = &MockExecuter{}
+	Executer.Exec("echo", "-n", "Mocked")
+	Executer.Exec("/bin/true", "but", "Mocked")
+	// Output:
+	// echo -n Mocked
+	// /bin/true but Mocked
 }

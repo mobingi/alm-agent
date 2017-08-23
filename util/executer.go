@@ -1,6 +1,10 @@
 package util
 
-import "os/exec"
+import (
+	"fmt"
+	"os/exec"
+	"strings"
+)
 
 // ExecuterInterface has Exec to wrap os commands.
 type ExecuterInterface interface {
@@ -9,7 +13,7 @@ type ExecuterInterface interface {
 
 type osExecuter struct{}
 
-// OSExecuter is real Executer
+// Executer is real Executer
 var Executer ExecuterInterface
 
 func init() {
@@ -19,4 +23,14 @@ func init() {
 func (o *osExecuter) Exec(command string, args ...string) ([]byte, error) {
 	out, err := exec.Command(command, args...).CombinedOutput()
 	return out, err
+}
+
+// MockExecuter is fake Executer.
+type MockExecuter struct{}
+
+// Exec returns command + args and put these to StdOut.
+func (m *MockExecuter) Exec(command string, args ...string) ([]byte, error) {
+	fmt.Println(command + " " + strings.Join(args, " "))
+	out := []byte(command + " " + strings.Join(args, " "))
+	return out, nil
 }
