@@ -8,7 +8,7 @@ import (
 	"github.com/mobingi/alm-agent/util"
 )
 
-func ExampleEnsureUser() {
+func TestEnsureUser(t *testing.T) {
 	tmpHomeDir, _ := ioutil.TempDir("", "home")
 	defer os.RemoveAll(tmpHomeDir)
 	userHomeDir = tmpHomeDir
@@ -18,10 +18,25 @@ func ExampleEnsureUser() {
 		return
 	}
 	EnsureUser("mobingi", "ssh-rsa PubKey")
-	// Output:
-	// useradd -m mobingi
-	// usermod -aG docker mobingi
-	// install -d -m 0700 -o mobingi -g mobingi WIP ...path.to
+	buf := util.GetMockBufferr()
+	t.Log(buf)
+	expected := "useradd -m mobingi"
+	actual := buf[0]
+	if actual != expected {
+		t.Fatalf("Expected: %s\n But: %s", expected, actual)
+	}
+
+	expected = "usermod -aG docker mobingi"
+	actual = buf[1]
+	if actual != expected {
+		t.Fatalf("Expected: %s\n But: %s", expected, actual)
+	}
+
+	expected = "install -d -m 0700 -o mobingi -g mobingi " + tmpHomeDir + "/mobingi/.ssh"
+	actual = buf[2]
+	if actual != expected {
+		t.Fatalf("Expected: %s\n But: %s", expected, actual)
+	}
 }
 
 func TestSshDirpath(t *testing.T) {

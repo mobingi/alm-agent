@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"os/exec"
 	"strings"
 )
@@ -28,9 +27,19 @@ func (o *osExecuter) Exec(command string, args ...string) ([]byte, error) {
 // MockExecuter is fake Executer.
 type MockExecuter struct{}
 
+// MockBuffer collects commndline inputs.
+var MockBuffer []string
+
 // Exec returns command + args and put these to StdOut.
 func (m *MockExecuter) Exec(command string, args ...string) ([]byte, error) {
-	fmt.Println(command + " " + strings.Join(args, " "))
-	out := []byte(command + " " + strings.Join(args, " "))
+	cl := command + " " + strings.Join(args, " ")
+	MockBuffer = append(MockBuffer, cl)
+	// fmt.Println(cl)
+	out := []byte(cl)
 	return out, nil
+}
+
+// GetMockBufferr returns buffered commands
+func GetMockBufferr() []string {
+	return MockBuffer
 }
