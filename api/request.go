@@ -12,6 +12,7 @@ import (
 	"github.com/mobingi/alm-agent/util"
 )
 
+// GetServerConfig retrives serverconfig from file or API.
 func GetServerConfig(sclocation string) (*serverConfig.Config, error) {
 	u, err := url.Parse(sclocation)
 	if err != nil {
@@ -48,6 +49,7 @@ func GetServerConfig(sclocation string) (*serverConfig.Config, error) {
 	return conf, nil
 }
 
+// GetStsToken to STS token for CWLogs
 func GetStsToken() (*StsToken, error) {
 	values := url.Values{}
 	values.Set("user_id", c.getConfig().UserID)
@@ -61,6 +63,7 @@ func GetStsToken() (*StsToken, error) {
 	return &stsToken, nil
 }
 
+// WriteTempToken to save STS token for CWLogs container
 func WriteTempToken(token *StsToken) error {
 	region := logregion
 
@@ -97,6 +100,7 @@ region=%s
 	return nil
 }
 
+// SendInstanceStatus send container app status to API
 func SendInstanceStatus(serverID, status string) error {
 	values := url.Values{}
 	values.Set("instance_id", serverID)
@@ -113,6 +117,7 @@ func SendInstanceStatus(serverID, status string) error {
 	return err
 }
 
+// SendSpotShutdownEvent nortifies that instance detects shutdown event.
 func SendSpotShutdownEvent(serverID string) error {
 	values := url.Values{}
 	values.Set("user_id", c.getConfig().UserID)
@@ -123,6 +128,7 @@ func SendSpotShutdownEvent(serverID string) error {
 	return err
 }
 
+// GetAccessToken requests token of user for auth by API.
 func GetAccessToken() error {
 	values := url.Values{}
 	values.Set("grant_type", "client_credentials")

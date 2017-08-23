@@ -31,6 +31,7 @@ type apiToken struct {
 
 var apitoken apiToken
 
+// StsToken for CWLogs
 type StsToken struct {
 	AccessKeyID     string
 	SecretAccessKey string
@@ -51,6 +52,7 @@ func (c *client) buildURI(path string) string {
 	return c.getConfig().APIHost + path
 }
 
+// SetConfig updates client.config.
 func SetConfig(conf *config.Config) error {
 	c.setConfig(conf)
 	return nil
@@ -70,6 +72,7 @@ func init() {
 	c = &client{}
 }
 
+// Get wraps HTTP GET Request
 var Get = func(path string, values url.Values, target interface{}) error {
 	log.Debugf("%#v", c.getConfig())
 	log.Debugf("%#v", apitoken)
@@ -103,6 +106,7 @@ var Get = func(path string, values url.Values, target interface{}) error {
 	return nil
 }
 
+// Post wraps HTTP Post Request
 var Post = func(path string, values url.Values, target interface{}) error {
 	log.Debugf("%#v", c.getConfig())
 	req, err := http.NewRequest("POST", c.buildURI(path), strings.NewReader(values.Encode()))
