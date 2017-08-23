@@ -15,7 +15,10 @@ import (
 	"github.com/mobingi/alm-agent/server_config"
 )
 
-var wg sync.WaitGroup
+var (
+	wg              sync.WaitGroup
+	agentConfigPath = "/opt/mobingi/etc/alm-agent.cfg"
+)
 
 func debug() bool {
 	if os.Getenv("DEBUG") != "" {
@@ -31,8 +34,6 @@ func init() {
 	}
 
 }
-
-var agentConfigPath = "/opt/mobingi/etc/alm-agent.cfg"
 
 func main() {
 	instance := machine.NewMachine()
