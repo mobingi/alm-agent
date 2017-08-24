@@ -53,10 +53,11 @@ func main() {
 	}
 	log.Debugf("%#v", svConfig)
 
+	stsToken, err := api.GetStsToken()
 	creds := credentials.NewStaticCredentials(
-		agentConfig.AccessKey,
-		agentConfig.SecretKey,
-		"",
+		stsToken.AccessKeyID,
+		stsToken.SecretAccessKey,
+		stsToken.SessionToken,
 	)
 
 	awsconfig := aws.NewConfig().WithCredentials(creds).WithRegion(instance.Region)
