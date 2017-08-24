@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 	"time"
@@ -244,10 +243,6 @@ func (d *Docker) imagePull() (string, error) {
 }
 
 func (d *Docker) containerCreate(name string, dir string, isApp bool) (*Container, error) {
-	if isApp {
-		d.prepareLogsDir()
-	}
-
 	config := &container.Config{
 		Image: d.Image,
 		Env:   d.Envs,
@@ -310,56 +305,6 @@ func (d *Docker) containerCreate(name string, dir string, isApp bool) (*Containe
 	res, err := d.Client.ContainerCreate(context.Background(), config, hostConfig, networkingConfig, name)
 	log.Debugf("hostConfig: %#v", hostConfig)
 	return &Container{Name: name, ID: res.ID}, err
-}
-
-// to keep compatibility with older modaemon
-func (d *Docker) prepareLogsDir() error {
-	if util.FileExists(containerLogsLocation + "log") {
-		return nil
-	}
-
-	log.Debug("prepareLogsDir: Start")
-	ep := []string{
-		"/bin/sh",
-	}
-	cmd := []string{
-		"-c",
-		"while true ; do sleep 1 ; done",
-	}
-	config := &container.Config{
-		Image:      d.Image,
-		Entrypoint: ep,
-		Cmd:        cmd,
-	}
-
-	hostConfig := &container.HostConfig{}
-	res, err := d.Client.ContainerCreate(context.Background(), config, hostConfig, &network.NetworkingConfig{}, "preparelogs")
-	if err != nil {
-		log.Errorf("prepareLogsDir.ContainerCreate: %#v", err)
-	}
-
-	options := types.ContainerStartOptions{}
-	err = d.Client.ContainerStart(context.Background(), res.ID, options)
-	if err != nil {
-		log.Errorf("prepareLogsDir.ContainerStart: %#v", err)
-	}
-
-	os.MkdirAll(containerLogsLocation, 0755)
-
-	err = exec.Command("docker", "cp", res.ID+":/var/log", containerLogsLocation).Run()
-	if err != nil {
-		log.Errorf("prepareLogsDir.copyFromContainerLogsLocation: %#v", err)
-	}
-	//	tmpcID := strings.TrimSpace(string(out))
-	err = d.Client.ContainerKill(context.Background(), "preparelogs", "KILL")
-	if err != nil {
-		log.Errorf("prepareLogsDir.ContainerKill: %#v", err)
-	}
-	err = d.Client.ContainerRemove(context.Background(), "preparelogs", types.ContainerRemoveOptions{})
-	if err != nil {
-		log.Errorf("prepareLogsDir.ContainerRemove: %#v", err)
-	}
-	return nil
 }
 
 func (d *Docker) containerStart(c *Container) error {
