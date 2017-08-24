@@ -4,17 +4,15 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFileExists(t *testing.T) {
+	assert := assert.New(t)
 	tmpFile, _ := ioutil.TempFile("", "tmptest")
 	defer os.Remove(tmpFile.Name())
 
-	if !FileExists(tmpFile.Name()) {
-		t.Error("File exists but returns false.")
-	}
-
-	if FileExists("/tmp/path/to/not/exists") {
-		t.Error("File does not exists but returns true.")
-	}
+	assert.True(FileExists(tmpFile.Name()))
+	assert.False(FileExists("/tmp/path/to/not/exists"))
 }
