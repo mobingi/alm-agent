@@ -9,17 +9,21 @@ import (
 )
 
 func TestEnsureUser(t *testing.T) {
-	util.ClearMockBuffer()
+	defer util.ClearMockBuffer()
 	tmpHomeDir, _ := ioutil.TempDir("", "home")
-
 	defer os.RemoveAll(tmpHomeDir)
-	userHomeDir = tmpHomeDir
 
-	util.Executer = &util.MockExecuter{}
+	origuserHomeDir := userHomeDir
+	userHomeDir = tmpHomeDir
+	defer func() { userHomeDir = origuserHomeDir }()
+
 	orig_setLogin := setLogin
+	defer func() { setLogin = orig_setLogin }()
 	setLogin = func(username string, sshkey string) {
 		return
 	}
+
+	util.Executer = &util.MockExecuter{}
 	EnsureUser("mobingi", "ssh-rsa PubKey")
 	buf := util.GetMockBuffer()
 	t.Log(buf)
@@ -41,10 +45,6 @@ func TestEnsureUser(t *testing.T) {
 		t.Fatalf("Expected: %s\n But: %s", expected, actual)
 	}
 
-	// TearDown
-	userHomeDir = "/home"
-	setLogin = orig_setLogin
-	util.ClearMockBuffer()
 }
 
 func TestSshDirpath(t *testing.T) {
@@ -54,7 +54,10 @@ func TestSshDirpath(t *testing.T) {
 		t.Fatalf("Expected: %s\n But: %s", expected, actual)
 	}
 
+	origuserHomeDir := userHomeDir
 	userHomeDir = "/tmp"
+	defer func() { userHomeDir = origuserHomeDir }()
+
 	expected = "/tmp/mobingi/.ssh"
 	actual = sshDirpath("mobingi")
 	if actual != expected {

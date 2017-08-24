@@ -3,6 +3,7 @@ package util
 import "testing"
 
 func TestRealExec(t *testing.T) {
+	defer ClearMockBuffer()
 	expected := "Hello Agent!"
 	out, err := Executer.Exec("echo", "-n", expected)
 	if err != nil {
@@ -14,11 +15,10 @@ func TestRealExec(t *testing.T) {
 	if actual != expected {
 		t.Fatalf("Expected: %s\n But: %s", expected, actual)
 	}
-	MockBuffer = nil
 }
 
 func TestMockExec(t *testing.T) {
-	ClearMockBuffer()
+	defer ClearMockBuffer()
 	Executer = &MockExecuter{}
 	expected := "echo -n Mocked"
 	out, err := Executer.Exec("echo", "-n", "Mocked")
@@ -31,11 +31,10 @@ func TestMockExec(t *testing.T) {
 	if actual != expected {
 		t.Fatalf("Expected: %s\n But: %s", expected, actual)
 	}
-	ClearMockBuffer()
 }
 
 func TestMockedExecuter(t *testing.T) {
-	ClearMockBuffer()
+	defer ClearMockBuffer()
 	Executer = &MockExecuter{}
 	Executer.Exec("echo", "-n", "Mocked")
 	Executer.Exec("/bin/true", "but", "Mocked")
@@ -53,5 +52,4 @@ func TestMockedExecuter(t *testing.T) {
 	if actual != expected {
 		t.Fatalf("Expected: %s\n But: %s", expected, actual)
 	}
-	ClearMockBuffer()
 }
