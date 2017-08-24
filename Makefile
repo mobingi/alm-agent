@@ -20,10 +20,10 @@ deps: setup
 	dep ensure -v
 
 test: deps
-	go test -v ${PACKAGES_ALL}
+	go test -v ${PACKAGES_ALL} -cover
 
 race: deps
-	go test -v -race ${PACKAGES_ALL}
+	go test -v -race ${PACKAGES_ALL} -cover
 
 lint: setup
 	go vet ${PACKAGES_ALL}
