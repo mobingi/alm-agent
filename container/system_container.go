@@ -8,7 +8,7 @@ import (
 // NewSysDocker returns docker client
 func NewSysDocker(c *config.Config, id string) (*Docker, error) {
 	docker := &Docker{
-		Image: "mobingi/mo-awslogs",
+		Image: "mobingi/alm-awslogs",
 		Envs:  []string{"STACK_ID=" + c.StackID, "INSTANCE_ID=" + id},
 	}
 

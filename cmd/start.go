@@ -84,7 +84,7 @@ func Start(c *cli.Context) error {
 	log.Debugf("%#v", ld)
 
 	log.Debug("Step: ld.StartContainer")
-	logContainer, err := ld.StartContainer("mo-awslogs", "", false)
+	logContainer, err := ld.StartContainer("alm-awslogs", "", false)
 	if err != nil {
 		return err
 	}
