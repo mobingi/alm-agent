@@ -17,6 +17,7 @@ type Config struct {
 	StorageService     string
 	LogBucket          string
 	ServerRole         string
+	Flag               string
 }
 
 func Load(b []byte) (*Config, error) {
