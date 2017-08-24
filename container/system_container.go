@@ -1,8 +1,8 @@
 package container
 
 import (
-	"github.com/derekparker/delve/config"
 	"github.com/docker/docker/client"
+	"github.com/mobingi/alm-agent/config"
 )
 
 // NewSysDocker returns docker client
