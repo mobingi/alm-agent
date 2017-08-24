@@ -55,7 +55,7 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
-	logContainer, err := ld.GetContainer("mo-awslogs")
+	logContainer, err := ld.GetContainer("alm-awslogs")
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func Update(c *cli.Context) error {
 	if logImageUpdated {
 		ld.StopContainer(logContainer)
 		ld.RemoveContainer(logContainer)
-		_, err := ld.StartContainer("mo-awslogs", "", false)
+		_, err := ld.StartContainer("alm-awslogs", "", false)
 		if err != nil {
 			return err
 		}

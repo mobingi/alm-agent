@@ -14,6 +14,7 @@ setup:
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 	go get -u github.com/jteeuwen/go-bindata/...
+	go get github.com/BurntSushi/toml/cmd/tomlv
 
 deps: setup
 	dep ensure -v
