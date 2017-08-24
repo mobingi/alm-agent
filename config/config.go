@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 )
 
-// Config is a struct which has config data from modaemon.cfg
+// Config is a struct which has config data from alm-agent.cfg
 type Config struct {
 	UserID             string
 	StackID            string

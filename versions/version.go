@@ -73,7 +73,7 @@ func ensure(v *GoLatest, newVer string) {
 	var err error
 
 	os.MkdirAll(filepath.Join(basedir, "v"+newVer), 0700)
-	tmpdir, _ := ioutil.TempDir("", "modaemon")
+	tmpdir, _ := ioutil.TempDir("", "alm-agent")
 	defer os.RemoveAll(tmpdir)
 
 	tmpPath := filepath.Join(tmpdir, "alm-agent.tgz")

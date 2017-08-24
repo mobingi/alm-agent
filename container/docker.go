@@ -66,7 +66,7 @@ func NewDocker(c *config.Config, s *serverConfig.Config) (*Docker, error) {
 	chain := &iptables.ChainInfo{Name: "DOCKER", Table: "nat"}
 	docker.Pm.SetIptablesChain(chain, "docker0")
 
-	defaultHeaders := map[string]string{"User-Agent": "modaemon"}
+	defaultHeaders := map[string]string{"User-Agent": "mobingi alm-agent"}
 	cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.24", nil, defaultHeaders)
 	docker.Client = cli
 
