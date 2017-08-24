@@ -40,7 +40,10 @@ type Docker struct {
 }
 
 var (
+	dockerAPIVer          = "v1.24"
+	dockerSock            = "unix:///var/run/docker.sock"
 	containerLogsLocation = "/var/log/alm-agent/container"
+	defaultUA             = "mobingi alm-agent"
 )
 
 // NewDocker is construcor for DockerClient
@@ -66,8 +69,8 @@ func NewDocker(c *config.Config, s *serverConfig.Config) (*Docker, error) {
 	chain := &iptables.ChainInfo{Name: "DOCKER", Table: "nat"}
 	docker.Pm.SetIptablesChain(chain, "docker0")
 
-	defaultHeaders := map[string]string{"User-Agent": "mobingi alm-agent"}
-	cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.24", nil, defaultHeaders)
+	defaultHeaders := map[string]string{"User-Agent": defaultUA}
+	cli, err := client.NewClient(dockerSock, dockerAPIVer, nil, defaultHeaders)
 	docker.Client = cli
 
 	return docker, err

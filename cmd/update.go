@@ -9,7 +9,6 @@ import (
 	"github.com/mobingi/alm-agent/code"
 	"github.com/mobingi/alm-agent/config"
 	"github.com/mobingi/alm-agent/container"
-	molog "github.com/mobingi/alm-agent/log"
 	"github.com/mobingi/alm-agent/login"
 	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
@@ -45,7 +44,7 @@ func Update(c *cli.Context) error {
 		return err
 	}
 
-	ld, err := molog.NewDocker(conf, serverid)
+	ld, err := container.NewSysDocker(conf, serverid)
 	if err != nil {
 		return err
 	}
