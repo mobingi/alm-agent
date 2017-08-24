@@ -10,8 +10,6 @@ type Config struct {
 	UserID             string
 	StackID            string
 	LogicalStakID      string
-	AccessKey          string
-	SecretKey          string
 	APIHost            string
 	AuthorizationToken string
 	StorageService     string
