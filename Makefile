@@ -13,6 +13,7 @@ setup:
 	go get -u github.com/golang/dep/cmd/dep
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
+	go get -u github.com/jteeuwen/go-bindata/...
 
 deps: setup
 	dep ensure -v

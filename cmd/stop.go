@@ -12,6 +12,7 @@ import (
 	"golang.org/x/net/context"
 )
 
+// Stop alm-agent start
 func Stop(c *cli.Context) error {
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {
