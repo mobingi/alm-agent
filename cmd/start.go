@@ -16,6 +16,7 @@ import (
 	"github.com/urfave/cli"
 )
 
+// Start alm-agent start
 func Start(c *cli.Context) error {
 	log.Debug("Step: config.LoadFromFile")
 

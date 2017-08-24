@@ -15,6 +15,7 @@ import (
 	"github.com/urfave/cli"
 )
 
+// Update alm-agent update
 func Update(c *cli.Context) error {
 	serverid, err := util.GetServerID(c.GlobalString("provider"))
 	if err != nil {

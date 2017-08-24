@@ -2,13 +2,12 @@ package container
 
 import (
 	"github.com/derekparker/delve/config"
-	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 )
 
 // NewSysDocker returns docker client
-func NewSysDocker(c *config.Config, id string) (*container.Docker, error) {
-	docker := &container.Docker{
+func NewSysDocker(c *config.Config, id string) (*Docker, error) {
+	docker := &Docker{
 		Image: "mobingi/mo-awslogs",
 		Envs:  []string{"STACK_ID=" + c.StackID, "INSTANCE_ID=" + id},
 	}
