@@ -8,6 +8,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: setup
+          command: make setup
+      - run:
           name: verifydata
           command: make verifydata
       - restore_cache:

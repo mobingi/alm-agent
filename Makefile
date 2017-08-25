@@ -16,7 +16,7 @@ setup:
 	go get -u github.com/jteeuwen/go-bindata/...
 	go get github.com/BurntSushi/toml/cmd/tomlv
 
-deps: setup
+deps:
 	dep ensure -v
 
 bindata:
