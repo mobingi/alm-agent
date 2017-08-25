@@ -108,20 +108,6 @@ func main() {
 			Before: beforeActions,
 		},
 		{
-			Name:   "start",
-			Usage:  "start active container",
-			Action: cmd.Start,
-			Flags:  flags,
-			Before: beforeActions,
-		},
-		{
-			Name:   "update",
-			Usage:  "update code and image, then switch container",
-			Action: cmd.Update,
-			Flags:  flags,
-			Before: beforeActions,
-		},
-		{
 			Name:   "stop",
 			Usage:  "stop active container",
 			Action: cmd.Stop,
