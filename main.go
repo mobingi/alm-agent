@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"sort"
 	"strings"
 
@@ -17,6 +18,7 @@ import (
 var agentConfigPath = "/opt/mobingi/etc/alm-agent.cfg"
 
 func init() {
+	log.SetOutput(os.Stdout)
 	cli.ErrWriter = &FatalWriter{cli.ErrWriter}
 }
 
