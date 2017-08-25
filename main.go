@@ -94,9 +94,30 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
+			Name:   "register",
+			Usage:  "initialize alm-agent and start containers",
+			Action: cmd.Register,
+			Flags:  flags,
+			Before: beforeActions,
+		},
+		{
+			Name:   "ensure",
+			Usage:  "start or update containers",
+			Action: cmd.Ensure,
+			Flags:  flags,
+			Before: beforeActions,
+		},
+		{
 			Name:   "start",
 			Usage:  "start active container",
 			Action: cmd.Start,
+			Flags:  flags,
+			Before: beforeActions,
+		},
+		{
+			Name:   "update",
+			Usage:  "update code and image, then switch container",
+			Action: cmd.Update,
 			Flags:  flags,
 			Before: beforeActions,
 		},
@@ -106,13 +127,6 @@ func main() {
 			Action: cmd.Stop,
 			Flags:  flags,
 			Before: globalOptions,
-		},
-		{
-			Name:   "update",
-			Usage:  "update code and image, then switch container",
-			Action: cmd.Update,
-			Flags:  flags,
-			Before: beforeActions,
 		},
 		{
 			Name:   "noop",
