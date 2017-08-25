@@ -19,6 +19,15 @@ setup:
 deps: setup
 	dep ensure -v
 
+bindata:
+	tomlv _data/*.toml
+	go-bindata ./_data/
+
+verifydata:
+	tomlv _data/*.toml
+	go-bindata -o ./checkbin.go ./_data/
+	diff checkbin.go bindata.go > /dev/null
+
 test: deps
 	go test -v ${PACKAGES_ALL} -cover
 
