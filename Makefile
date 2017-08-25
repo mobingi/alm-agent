@@ -25,8 +25,9 @@ bindata:
 
 verifydata:
 	tomlv _data/*.toml
-	go-bindata -o ./checkbin.go ./_data/
-	diff checkbin.go bindata.go > /dev/null
+	go-bindata -o ./checkbin ./_data/
+	diff checkbin bindata.go > /dev/null
+	rm ./checkbin
 
 test: deps
 	go test -v ${PACKAGES_ALL} -cover
