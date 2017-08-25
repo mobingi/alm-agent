@@ -24,42 +24,41 @@ func Ensure(c *cli.Context) error {
 		return err
 	}
 
+	conf, err := config.LoadFromFile(c.String("config"))
+
+	if err != nil {
+		return err
+	}
+	log.Debugf("%#v", conf)
+	api.SetConfig(conf)
+	err = api.GetAccessToken()
+	if err != nil {
+		return err
+	}
+
+	if initialize {
+		api.SendInstanceStatus(serverid, "starting")
+	}
+
+	stsToken, err := api.GetStsToken()
+	if err != nil {
+		api.SendInstanceStatus(serverid, "error")
+		return err
+	}
+
+	api.WriteTempToken(stsToken)
+
+	log.Debug("Step: api.GetServerConfig")
+	log.Debugf("Flag: %#v", c.String("serverconfig"))
+	s, err := api.GetServerConfig(c.String("serverconfig"))
+	if err != nil {
+		api.SendInstanceStatus(serverid, "error")
+		return err
+	}
+	log.Debugf("%#v", s)
+
 	if initialize {
 		// All of old Start commdnad
-		if err != nil {
-			return err
-		}
-
-		conf, err := config.LoadFromFile(c.String("config"))
-		if err != nil {
-			return err
-		}
-		log.Debugf("%#v", conf)
-		api.SetConfig(conf)
-		err = api.GetAccessToken()
-		if err != nil {
-			return err
-		}
-
-		api.SendInstanceStatus(serverid, "starting")
-
-		stsToken, err := api.GetStsToken()
-		if err != nil {
-			api.SendInstanceStatus(serverid, "error")
-			return err
-		}
-
-		api.WriteTempToken(stsToken)
-
-		log.Debug("Step: apiClient.GetServerConfig")
-		log.Debugf("Flag: %#v", c.String("serverconfig"))
-		s, err := api.GetServerConfig(c.String("serverconfig"))
-		if err != nil {
-			api.SendInstanceStatus(serverid, "error")
-			return err
-		}
-		log.Debugf("%#v", s)
-
 		for x, y := range s.Users {
 			login.EnsureUser(x, y.PublicKey)
 		}
@@ -117,36 +116,8 @@ func Ensure(c *cli.Context) error {
 			api.SendInstanceStatus(serverid, "error")
 			return err
 		}
-
-		log.Debug("Step: serverConfig.WriteUpdated")
-		if err := serverConfig.WriteUpdated(s); err != nil {
-			return err
-		}
-
 	} else {
-		conf, err := config.LoadFromFile(c.String("config"))
-		if err != nil {
-			return err
-		}
-
-		api.SetConfig(conf)
-		err = api.GetAccessToken()
-		if err != nil {
-			return err
-		}
-
-		stsToken, err := api.GetStsToken()
-		if err != nil {
-			return err
-		}
-
-		api.WriteTempToken(stsToken)
-
-		s, err := api.GetServerConfig(c.String("serverconfig"))
-		if err != nil {
-			return err
-		}
-
+		// All of old Update commdnad
 		ld, err := container.NewSysDocker(conf, serverid)
 		if err != nil {
 			return err
@@ -162,16 +133,6 @@ func Ensure(c *cli.Context) error {
 			return err
 		}
 
-		d, err := container.NewDocker(conf, s)
-		if err != nil {
-			return err
-		}
-
-		oldContainer, err := d.GetContainer("active")
-		if err != nil {
-			return err
-		}
-
 		if logContainer == nil && oldContainer == nil {
 			return Start(c)
 		}
@@ -183,6 +144,16 @@ func Ensure(c *cli.Context) error {
 			if err != nil {
 				return err
 			}
+		}
+
+		d, err := container.NewDocker(conf, s)
+		if err != nil {
+			return err
+		}
+
+		oldContainer, err := d.GetContainer("active")
+		if err != nil {
+			return err
 		}
 
 		update, err := serverConfig.NeedsUpdate(s)
@@ -238,11 +209,11 @@ func Ensure(c *cli.Context) error {
 		d.RemoveContainer(oldContainer)
 
 		d.RenameContainer(newContainer, "active")
+	}
 
-		if err := serverConfig.WriteUpdated(s); err != nil {
-			return err
-		}
-
+	log.Debug("Step: serverConfig.WriteUpdated")
+	if err := serverConfig.WriteUpdated(s); err != nil {
+		return err
 	}
 
 	var wg sync.WaitGroup
