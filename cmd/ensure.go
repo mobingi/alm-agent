@@ -18,145 +18,234 @@ import (
 // Ensure start or replace container with newest config
 func Ensure(c *cli.Context) error {
 	var initialize bool
-
-	serverid, err := util.GetServerID(c.GlobalString("provider"))
-	if err != nil {
-		return err
-	}
-
-	// detect where come from to merge Start and Update
 	initialize = (c.Command.Name == "register")
 
-	log.Debug("Step: config.LoadFromFile")
-
-	conf, err := config.LoadFromFile(c.String("config"))
-	if err != nil {
-		return err
-	}
-
-	api.SetConfig(conf)
-	err = api.GetAccessToken()
-	if err != nil {
-		return err
-	}
-
 	if initialize {
+		// All of old Start commdnad
+		serverid, err := util.GetServerID(c.GlobalString("provider"))
+		if err != nil {
+			return err
+		}
+
+		conf, err := config.LoadFromFile(c.String("config"))
+		if err != nil {
+			return err
+		}
+		log.Debugf("%#v", conf)
+		api.SetConfig(conf)
+		err = api.GetAccessToken()
+		if err != nil {
+			return err
+		}
+
 		api.SendInstanceStatus(serverid, "starting")
-	}
 
-	if initialize {
-		Start(c)
-	} else {
-		Update(c)
-	}
-	return nil
-
-	stsToken, err := api.GetStsToken()
-	if err != nil {
-		return err
-	}
-
-	api.WriteTempToken(stsToken)
-
-	s, err := api.GetServerConfig(c.String("serverconfig"))
-	if err != nil {
-		return err
-	}
-
-	ld, err := container.NewSysDocker(conf, serverid)
-	if err != nil {
-		return err
-	}
-
-	logImageUpdated, err := ld.CheckImageUpdated()
-	if err != nil {
-		return err
-	}
-
-	logContainer, err := ld.GetContainer("alm-awslogs")
-	if err != nil {
-		return err
-	}
-
-	d, err := container.NewDocker(conf, s)
-	if err != nil {
-		return err
-	}
-
-	oldContainer, err := d.GetContainer("active")
-	if err != nil {
-		return err
-	}
-
-	if logContainer == nil && oldContainer == nil {
-		return Start(c)
-	}
-
-	if logImageUpdated {
-		ld.StopContainer(logContainer)
-		ld.RemoveContainer(logContainer)
-		_, err := ld.StartContainer("alm-awslogs", "", false)
+		stsToken, err := api.GetStsToken()
 		if err != nil {
+			api.SendInstanceStatus(serverid, "error")
 			return err
 		}
-	}
 
-	update, err := serverConfig.NeedsUpdate(s)
-	if err != nil {
-		return err
-	}
-	if !update {
-		return nil
-	}
+		api.WriteTempToken(stsToken)
 
-	for x, y := range s.Users {
-		login.EnsureUser(x, y.PublicKey)
-	}
+		log.Debug("Step: apiClient.GetServerConfig")
+		log.Debugf("Flag: %#v", c.String("serverconfig"))
+		s, err := api.GetServerConfig(c.String("serverconfig"))
+		if err != nil {
+			api.SendInstanceStatus(serverid, "error")
+			return err
+		}
+		log.Debugf("%#v", s)
 
-	codeDir := ""
-	codeUpdated := false
-	if s.Code != "" {
-		code := code.New(s)
-		if code.Key != "" {
-			err = code.PrivateRepo()
-			if err != nil {
-				return err
+		for x, y := range s.Users {
+			login.EnsureUser(x, y.PublicKey)
+		}
+
+		codeDir := ""
+		if s.Code != "" {
+			code := code.New(s)
+			if code.Key != "" {
+				log.Debug("Step: code.PrivateRepo")
+				err = code.PrivateRepo()
+				if err != nil {
+					return err
+				}
 			}
-		}
 
-		codeUpdated, err = code.CheckUpdate()
-		if err != nil {
-			return err
-		}
-
-		if codeUpdated {
 			codeDir, err = code.Get()
 			if err != nil {
 				return err
 			}
-		} else {
-			codeDir = code.Path
 		}
-	}
 
-	api.SendInstanceStatus(serverid, "updating")
-	d.MapPort(oldContainer) // For regenerating port map information
+		log.Debug("Step: NewSysDocker")
+		ld, err := container.NewSysDocker(conf, serverid)
+		if err != nil {
+			return err
+		}
+		log.Debugf("%#v", ld)
 
-	newContainer, err := d.StartContainer("standby", codeDir, true)
-	if err != nil {
-		return err
-	}
+		log.Debug("Step: ld.StartContainer")
+		logContainer, err := ld.StartContainer("alm-awslogs", "", false)
+		if err != nil {
+			return err
+		}
+		log.Debugf("%#v", logContainer)
 
-	d.UnmapPort()
-	d.MapPort(newContainer)
+		log.Debug("Step: container.NewDocker")
+		d, err := container.NewDocker(conf, s)
+		if err != nil {
+			api.SendInstanceStatus(serverid, "error")
+			return err
+		}
+		log.Debugf("%#v", d)
 
-	d.StopContainer(oldContainer)
-	d.RemoveContainer(oldContainer)
+		log.Debug("Step: d.StartContainer")
+		newContainer, err := d.StartContainer("active", codeDir, true)
+		if err != nil {
+			api.SendInstanceStatus(serverid, "error")
+			return err
+		}
+		log.Debugf("%#v", newContainer)
 
-	d.RenameContainer(newContainer, "active")
+		log.Debug("Step: d.MapPort")
+		err = d.MapPort(newContainer)
+		if err != nil {
+			api.SendInstanceStatus(serverid, "error")
+			return err
+		}
 
-	if err := serverConfig.WriteUpdated(s); err != nil {
-		return err
+		log.Debug("Step: serverConfig.WriteUpdated")
+		if err := serverConfig.WriteUpdated(s); err != nil {
+			return err
+		}
+
+	} else {
+		// All of old Update commdnad
+		serverid, err := util.GetServerID(c.GlobalString("provider"))
+		if err != nil {
+			return err
+		}
+
+		conf, err := config.LoadFromFile(c.String("config"))
+		if err != nil {
+			return err
+		}
+
+		api.SetConfig(conf)
+		err = api.GetAccessToken()
+		if err != nil {
+			return err
+		}
+
+		stsToken, err := api.GetStsToken()
+		if err != nil {
+			return err
+		}
+
+		api.WriteTempToken(stsToken)
+
+		s, err := api.GetServerConfig(c.String("serverconfig"))
+		if err != nil {
+			return err
+		}
+
+		ld, err := container.NewSysDocker(conf, serverid)
+		if err != nil {
+			return err
+		}
+
+		logImageUpdated, err := ld.CheckImageUpdated()
+		if err != nil {
+			return err
+		}
+
+		logContainer, err := ld.GetContainer("alm-awslogs")
+		if err != nil {
+			return err
+		}
+
+		d, err := container.NewDocker(conf, s)
+		if err != nil {
+			return err
+		}
+
+		oldContainer, err := d.GetContainer("active")
+		if err != nil {
+			return err
+		}
+
+		if logContainer == nil && oldContainer == nil {
+			return Start(c)
+		}
+
+		if logImageUpdated {
+			ld.StopContainer(logContainer)
+			ld.RemoveContainer(logContainer)
+			_, err := ld.StartContainer("alm-awslogs", "", false)
+			if err != nil {
+				return err
+			}
+		}
+
+		update, err := serverConfig.NeedsUpdate(s)
+		if err != nil {
+			return err
+		}
+		if !update {
+			return nil
+		}
+
+		for x, y := range s.Users {
+			login.EnsureUser(x, y.PublicKey)
+		}
+
+		codeDir := ""
+		codeUpdated := false
+		if s.Code != "" {
+			code := code.New(s)
+			if code.Key != "" {
+				err = code.PrivateRepo()
+				if err != nil {
+					return err
+				}
+			}
+
+			codeUpdated, err = code.CheckUpdate()
+			if err != nil {
+				return err
+			}
+
+			if codeUpdated {
+				codeDir, err = code.Get()
+				if err != nil {
+					return err
+				}
+			} else {
+				codeDir = code.Path
+			}
+		}
+
+		api.SendInstanceStatus(serverid, "updating")
+		d.MapPort(oldContainer) // For regenerating port map information
+
+		newContainer, err := d.StartContainer("standby", codeDir, true)
+		if err != nil {
+			return err
+		}
+
+		d.UnmapPort()
+		d.MapPort(newContainer)
+
+		d.StopContainer(oldContainer)
+		d.RemoveContainer(oldContainer)
+
+		d.RenameContainer(newContainer, "active")
+
+		if err := serverConfig.WriteUpdated(s); err != nil {
+			return err
+		}
+
 	}
 
 	var wg sync.WaitGroup
