@@ -19,10 +19,13 @@ import (
 func Ensure(c *cli.Context) error {
 	var initialize bool
 	initialize = (c.Command.Name == "register")
+	serverid, err := util.GetServerID(c.GlobalString("provider"))
+	if err != nil {
+		return err
+	}
 
 	if initialize {
 		// All of old Start commdnad
-		serverid, err := util.GetServerID(c.GlobalString("provider"))
 		if err != nil {
 			return err
 		}
@@ -121,12 +124,6 @@ func Ensure(c *cli.Context) error {
 		}
 
 	} else {
-		// All of old Update commdnad
-		serverid, err := util.GetServerID(c.GlobalString("provider"))
-		if err != nil {
-			return err
-		}
-
 		conf, err := config.LoadFromFile(c.String("config"))
 		if err != nil {
 			return err
