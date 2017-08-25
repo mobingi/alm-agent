@@ -46,7 +46,7 @@ func Register(c *cli.Context) error {
 
 	// crontab
 	log.Warn("crontab entry")
-	cmdstr = "echo '* * * * * /opt/mobingi/alm-agent/current/alm-agent -U ensure >> /var/log/alm-agent.log' > /tmp/crontab.alm-agent"
+	cmdstr = "echo '* * * * * /opt/mobingi/alm-agent/current/alm-agent -U ensure >> /var/log/alm-agent.log 2&>1' > /tmp/crontab.alm-agent"
 	out, _ = util.Executer.Exec("sh", "-c", cmdstr)
 	log.Debug(string(out))
 	cmdstr = "crontab /tmp/crontab.alm-agent"
