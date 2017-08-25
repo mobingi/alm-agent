@@ -84,7 +84,7 @@ func _dataAddon_containersToml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "_data/addon_containers.toml", size: 100, mode: os.FileMode(420), modTime: time.Unix(1503630887, 0)}
+	info := bindataFileInfo{name: "_data/addon_containers.toml", size: 100, mode: os.FileMode(420), modTime: time.Unix(1503673319, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
