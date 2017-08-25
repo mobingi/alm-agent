@@ -9,52 +9,24 @@ import (
 // Register alm-agent register
 func Register(c *cli.Context) error {
 	// TODO: refactor it !!
-	var cmdstr string
+	var cmdstrs = []string{
+		"mkdir -p /var/log/alm-agent/containerlogs /var/log/alm-agent/container",
+		"ssh-keyscan -t rsa -H github.com | tee /etc/ssh/ssh_known_hosts",
+		"ssh-keyscan -t dsa -H github.com | tee /etc/ssh/ssh_known_hosts",
+		"ssh-keyscan -t rsa -H bitbucket.org | tee -a /etc/ssh/ssh_known_hosts",
+		"ssh-keyscan -t dsa -H bitbucket.org | tee -a /etc/ssh/ssh_known_hosts",
+		"ssh-keyscan -t rsa -H gitlab.com | tee -a /etc/ssh/ssh_known_hosts",
+		"ssh-keyscan -t dsa -H gitlab.com | tee -a /etc/ssh/ssh_known_hosts",
+		"echo '* * * * * /opt/mobingi/alm-agent/current/alm-agent -U ensure >> /var/log/alm-agent.log 2&>1' > /tmp/crontab.alm-agent",
+		"crontab /tmp/crontab.alm-agent",
+		"rm -f /tmp/crontab.alm-agent",
+	}
 	var out []byte
 
-	// mkdirs
-	log.Warn("mkdirs")
-	cmdstr = "mkdir -p /var/log/alm-agent/containerlogs /var/log/alm-agent/container"
-	out, _ = util.Executer.Exec("sh", "-c", cmdstr)
-	log.Debug(string(out))
-
-	// known_hosts
-	log.Warn("set known_hosts")
-	cmdstr = "ssh-keyscan -t rsa -H github.com | tee /etc/ssh/ssh_known_hosts"
-	out, _ = util.Executer.Exec("sh", "-c", cmdstr)
-	log.Debug(string(out))
-
-	cmdstr = "ssh-keyscan -t dsa -H github.com | tee -a /etc/ssh/ssh_known_hosts"
-	out, _ = util.Executer.Exec("sh", "-c", cmdstr)
-	log.Debug(string(out))
-
-	cmdstr = "ssh-keyscan -t rsa -H bitbucket.org | tee -a /etc/ssh/ssh_known_hosts"
-	out, _ = util.Executer.Exec("sh", "-c", cmdstr)
-	log.Debug(string(out))
-
-	cmdstr = "ssh-keyscan -t dsa -H bitbucket.org | tee -a /etc/ssh/ssh_known_hosts"
-	out, _ = util.Executer.Exec("sh", "-c", cmdstr)
-	log.Debug(string(out))
-
-	cmdstr = "ssh-keyscan -t rsa -H gitlab.com | tee -a /etc/ssh/ssh_known_hosts"
-	out, _ = util.Executer.Exec("sh", "-c", cmdstr)
-	log.Debug(string(out))
-
-	cmdstr = "ssh-keyscan -t dsa -H gitlab.com | tee -a /etc/ssh/ssh_known_hosts"
-	out, _ = util.Executer.Exec("sh", "-c", cmdstr)
-	log.Debug(string(out))
-
-	// crontab
-	log.Warn("crontab entry")
-	cmdstr = "echo '* * * * * /opt/mobingi/alm-agent/current/alm-agent -U ensure >> /var/log/alm-agent.log 2&>1' > /tmp/crontab.alm-agent"
-	out, _ = util.Executer.Exec("sh", "-c", cmdstr)
-	log.Debug(string(out))
-	cmdstr = "crontab /tmp/crontab.alm-agent"
-	out, _ = util.Executer.Exec("sh", "-c", cmdstr)
-	log.Debug(string(out))
-	cmdstr = "rm -f /tmp/crontab.alm-agent"
-	out, _ = util.Executer.Exec("sh", "-c", cmdstr)
-	log.Debug(string(out))
+	for _, cmdstr := range cmdstrs {
+		out, _ = util.Executer.Exec("sh", "-c", cmdstr)
+		log.Debug(string(out))
+	}
 
 	err := Ensure(c)
 	return err
