@@ -133,8 +133,19 @@ func Ensure(c *cli.Context) error {
 			return err
 		}
 
+		d, err := container.NewDocker(conf, s)
+		if err != nil {
+			return err
+		}
+
+		oldContainer, err := d.GetContainer("active")
+		if err != nil {
+			return err
+		}
+
 		if logContainer == nil && oldContainer == nil {
-			return Start(c)
+			// return Start(c)
+			return nil
 		}
 
 		if logImageUpdated {
@@ -144,16 +155,6 @@ func Ensure(c *cli.Context) error {
 			if err != nil {
 				return err
 			}
-		}
-
-		d, err := container.NewDocker(conf, s)
-		if err != nil {
-			return err
-		}
-
-		oldContainer, err := d.GetContainer("active")
-		if err != nil {
-			return err
 		}
 
 		update, err := serverConfig.NeedsUpdate(s)
