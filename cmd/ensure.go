@@ -4,8 +4,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	log "github.com/Sirupsen/logrus"
 	"github.com/mobingi/alm-agent/api"
+	"github.com/mobingi/alm-agent/bindata"
 	"github.com/mobingi/alm-agent/code"
 	"github.com/mobingi/alm-agent/config"
 	"github.com/mobingi/alm-agent/container"
@@ -28,6 +30,10 @@ func Ensure(c *cli.Context) error {
 	}
 
 	conf, err := config.LoadFromFile(c.String("config"))
+
+	syscons := &container.SystemContainers{}
+	syscondata, _ := bindata.Asset("_data/sys_containers.toml")
+	toml.Decode(string(syscondata), &syscons)
 
 	if err != nil {
 		return err
@@ -84,7 +90,7 @@ func Ensure(c *cli.Context) error {
 		}
 
 		log.Debug("Step: NewSysDocker")
-		ld, err := container.NewSysDocker(conf)
+		ld, err := container.NewSysDocker(conf, &syscons.Container[0])
 		if err != nil {
 			return err
 		}
@@ -121,7 +127,7 @@ func Ensure(c *cli.Context) error {
 		}
 	} else {
 		// All of old Update commdnad
-		ld, err := container.NewSysDocker(conf)
+		ld, err := container.NewSysDocker(conf, &syscons.Container[0])
 		if err != nil {
 			return err
 		}
