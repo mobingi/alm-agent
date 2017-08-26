@@ -25,6 +25,16 @@ var RoutesV2 = &route{
 	Sts:               "/v2/alm/sts",
 }
 
+// RoutesV3 points API v3. to figure out what has been implemented.
+var RoutesV3 = &route{
+	AccessToken:       "/v3/access_token",
+	EventSpotShutdown: "/v3/event/spot/shutdown",
+	InstanceStatus:    "/v3/alm/instance/status",
+	// Real => ServerConfig:      "/v3/alm/template/.{{StackID}}/container",
+	ServerConfig: "/v3/alm/template/",
+	Sts:          "/v3/alm/sts",
+}
+
 // GetAccessToken requests token of user for auth by API.
 func GetAccessToken() error {
 	values := url.Values{}
