@@ -89,14 +89,14 @@ func (v *VolFuncs) LogsVol() []string {
 }
 
 // StartSysContainer starts docker container
-func (d *Docker) StartSysContainer(name string, s *SystemContainer) (*Container, error) {
+func (d *Docker) StartSysContainer(s *SystemContainer) (*Container, error) {
 
 	_, err := d.imagePull()
 	if err != nil {
 		return nil, err
 	}
 
-	c, err := d.sysContainerCreate(name, s)
+	c, err := d.sysContainerCreate(s)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (d *Docker) StartSysContainer(name string, s *SystemContainer) (*Container,
 	return c, nil
 }
 
-func (d *Docker) sysContainerCreate(name string, s *SystemContainer) (*Container, error) {
+func (d *Docker) sysContainerCreate(s *SystemContainer) (*Container, error) {
 	config := &container.Config{
 		Image: d.Image,
 		Env:   d.Envs,
@@ -144,9 +144,9 @@ func (d *Docker) sysContainerCreate(name string, s *SystemContainer) (*Container
 	)
 
 	networkingConfig := &network.NetworkingConfig{}
-	log.Infof("creating container \"%s\" from image \"%s\"", name, d.Image)
-	res, err := d.Client.ContainerCreate(context.Background(), config, hostConfig, networkingConfig, name)
+	log.Infof("creating container \"%s\" from image \"%s\"", s.Name, d.Image)
+	res, err := d.Client.ContainerCreate(context.Background(), config, hostConfig, networkingConfig, s.Name)
 	log.Debugf("hostConfig: %#v", hostConfig)
 
-	return &Container{Name: name, ID: res.ID}, err
+	return &Container{Name: s.Name, ID: res.ID}, err
 }

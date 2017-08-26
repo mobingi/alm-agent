@@ -65,12 +65,46 @@ func Ensure(c *cli.Context) error {
 	}
 	log.Debugf("%#v", s)
 
-	if initialize {
-		// All of old Start commdnad
+	update, err := serverConfig.NeedsUpdate(s)
+	if update {
 		for x, y := range s.Users {
 			login.EnsureUser(x, y.PublicKey)
 		}
+	}
 
+	// System Containers
+	log.Debug("Step: NewSysDockers")
+	for _, syscon := range syscons.Container {
+		log.Debugf("%#v", syscon)
+		sc, err := container.NewSysDocker(conf, &syscon)
+		if err != nil {
+			return err
+		}
+
+		log.Debugf("Step: sc.StartContainer")
+		log.Debugf("%#v", sc)
+
+		sysImageUpdated, err := sc.CheckImageUpdated()
+		if err != nil {
+			return err
+		}
+
+		sysContainer, err := sc.GetContainer(syscon.Name)
+		if err != nil {
+			return err
+		}
+
+		if sysImageUpdated && sysContainer == nil {
+			sc.StopContainer(sysContainer)
+			sc.RemoveContainer(sysContainer)
+		}
+
+		sysContainer, _ = sc.StartSysContainer(&syscon)
+		log.Debugf("%#v", sysContainer)
+	}
+
+	if initialize {
+		// All of old Start command
 		codeDir := ""
 		if s.Code != "" {
 			code := code.New(s)
@@ -88,20 +122,7 @@ func Ensure(c *cli.Context) error {
 			}
 		}
 
-		log.Debug("Step: NewSysDocker")
-		ld, err := container.NewSysDocker(conf, &syscons.Container[0])
-		if err != nil {
-			return err
-		}
-		log.Debugf("%#v", ld)
-
-		log.Debug("Step: ld.StartContainer")
-		logContainer, err := ld.StartContainer("alm-awslogs", "", false)
-		if err != nil {
-			return err
-		}
-		log.Debugf("%#v", logContainer)
-
+		// User Container
 		log.Debug("Step: container.NewDocker")
 		d, err := container.NewDocker(conf, s)
 		if err != nil {
@@ -126,21 +147,6 @@ func Ensure(c *cli.Context) error {
 		}
 	} else {
 		// All of old Update commdnad
-		ld, err := container.NewSysDocker(conf, &syscons.Container[0])
-		if err != nil {
-			return err
-		}
-
-		logImageUpdated, err := ld.CheckImageUpdated()
-		if err != nil {
-			return err
-		}
-
-		logContainer, err := ld.GetContainer("alm-awslogs")
-		if err != nil {
-			return err
-		}
-
 		d, err := container.NewDocker(conf, s)
 		if err != nil {
 			return err
@@ -151,30 +157,12 @@ func Ensure(c *cli.Context) error {
 			return err
 		}
 
-		if logContainer == nil && oldContainer == nil {
-			// return Start(c)
-			return nil
+		if oldContainer == nil {
+			update = true
 		}
 
-		if logImageUpdated {
-			ld.StopContainer(logContainer)
-			ld.RemoveContainer(logContainer)
-			_, err := ld.StartContainer("alm-awslogs", "", false)
-			if err != nil {
-				return err
-			}
-		}
-
-		update, err := serverConfig.NeedsUpdate(s)
-		if err != nil {
-			return err
-		}
 		if !update {
 			return nil
-		}
-
-		for x, y := range s.Users {
-			login.EnsureUser(x, y.PublicKey)
 		}
 
 		codeDir := ""
@@ -204,7 +192,9 @@ func Ensure(c *cli.Context) error {
 		}
 
 		api.SendInstanceStatus("updating")
-		d.MapPort(oldContainer) // For regenerating port map information
+		if oldContainer != nil {
+			d.MapPort(oldContainer) // For regenerating port map information
+		}
 
 		newContainer, err := d.StartContainer("standby", codeDir, true)
 		if err != nil {
@@ -214,8 +204,10 @@ func Ensure(c *cli.Context) error {
 		d.UnmapPort()
 		d.MapPort(newContainer)
 
-		d.StopContainer(oldContainer)
-		d.RemoveContainer(oldContainer)
+		if oldContainer != nil {
+			d.StopContainer(oldContainer)
+			d.RemoveContainer(oldContainer)
+		}
 
 		d.RenameContainer(newContainer, "active")
 	}
