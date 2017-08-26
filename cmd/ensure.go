@@ -121,7 +121,7 @@ func Ensure(c *cli.Context) error {
 		}
 	} else {
 		// All of old Update commdnad
-		ld, err := container.NewSysDocker(conf, metavars.ServerID)
+		ld, err := container.NewSysDocker(conf)
 		if err != nil {
 			return err
 		}
