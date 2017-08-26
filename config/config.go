@@ -5,18 +5,17 @@ import (
 	"io/ioutil"
 )
 
-// Config is a struct which has config data from modaemon.cfg
+// Config is a struct which has config data from alm-agent.cfg
 type Config struct {
 	UserID             string
 	StackID            string
 	LogicalStakID      string
-	AccessKey          string
-	SecretKey          string
 	APIHost            string
 	AuthorizationToken string
 	StorageService     string
 	LogBucket          string
 	ServerRole         string
+	Flag               string
 }
 
 func Load(b []byte) (*Config, error) {

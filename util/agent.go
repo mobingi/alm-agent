@@ -8,12 +8,13 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/mobingi/alm-agent/metavars"
 )
 
 var (
 	ec2METAENDPOINT       = "http://169.254.169.254/"
 	ecsMETAENDPOINT       = "http://100.100.100.200/"
-	containerLogsLocation = "/var/log/alm-agent/containerlogs"
+	containerLogsLocation = "/var/log/alm-agent/container"
 )
 
 // FetchContainerState fetches state of application in running container.
@@ -33,13 +34,14 @@ func FetchContainerState() string {
 }
 
 // GetServerID returns string that identify VM on running provider. (e.g. instance ID)
-func GetServerID(s string) (string, error) {
+func GetServerID(s string) error {
 	sid, err := getServerID(s)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return sid, nil
+	metavars.ServerID = sid
+	return nil
 }
 
 func getServerID(provider string) (string, error) {

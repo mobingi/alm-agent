@@ -1,0 +1,5 @@
+[[addon]]
+  name = "dummy"
+  image = "tianon/sleeping-beauty:latest"
+  envfuncs = []
+  volfuncs = []

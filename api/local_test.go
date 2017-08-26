@@ -11,9 +11,12 @@ import (
 )
 
 func TestWriteTempToken(t *testing.T) {
-	tmpAWSDir, _ := ioutil.TempDir("", "containerLogs")
-	awsConfDir = filepath.Join(tmpAWSDir, ".aws")
+	tmpAWSDir, _ := ioutil.TempDir("", "TestWriteTempToken")
 	defer os.RemoveAll(tmpAWSDir)
+
+	origawsConfDir := awsConfDir
+	awsConfDir = filepath.Join(tmpAWSDir, ".aws")
+	defer func() { awsConfDir = origawsConfDir }()
 
 	sts := &StsToken{
 		AccessKeyID:     "ASIAXXXXXXXXXXXXXXX",

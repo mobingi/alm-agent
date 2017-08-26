@@ -3,7 +3,6 @@ package login
 import (
 	"fmt"
 	"io/ioutil"
-	"os/exec"
 	"os/user"
 	"path/filepath"
 	"strconv"
@@ -13,6 +12,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/mobingi/alm-agent/util"
 )
+
+var userHomeDir = "/home"
 
 var protectedUsers = []string{
 	"adm",
@@ -43,6 +44,7 @@ var protectedUsers = []string{
 	"uucp",
 }
 
+// EnsureUser stores publickey for users
 func EnsureUser(username string, sshkey string) {
 
 	log.Debug("Step: ensureUser")
@@ -57,9 +59,9 @@ func EnsureUser(username string, sshkey string) {
 	_, err := user.Lookup(username)
 	if err != nil {
 		log.Infof("Step: Useradd %s\n", username)
-		exec.Command("useradd", "-m", username).Run()
-		exec.Command("usermod", "-aG", "docker", username).Run()
-		exec.Command("install", "-d", "-m", "0700", "-o", username, "-g", username, sshDirpath(username)).Run()
+		util.Executer.Exec("useradd", "-m", username)
+		util.Executer.Exec("usermod", "-aG", "docker", username)
+		util.Executer.Exec("install", "-d", "-m", "0700", "-o", username, "-g", username, sshDirpath(username))
 	} else {
 		log.Debugf("User %s already exists.\n", username)
 	}
@@ -76,7 +78,7 @@ func EnsureUser(username string, sshkey string) {
 }
 
 func sshDirpath(username string) string {
-	return filepath.Join("/home", username, ".ssh")
+	return filepath.Join(userHomeDir, username, ".ssh")
 }
 
 func checkIsKeySame(username string, sshkey string) bool {
@@ -85,7 +87,7 @@ func checkIsKeySame(username string, sshkey string) bool {
 	return strings.Contains(string(dat), sshkey)
 }
 
-func setLogin(username string, sshkey string) {
+var setLogin = func(username string, sshkey string) {
 	log.Debugf("Step: setLogin for %s.\n", username)
 	content := fmt.Sprintf("command=\"docker exec -t -i active /bin/bash\" %s", sshkey)
 	err := ioutil.WriteFile(filepath.Join(sshDirpath(username), "authorized_keys"), []byte(content), 0600)
@@ -96,4 +98,5 @@ func setLogin(username string, sshkey string) {
 	uid, _ := strconv.Atoi(currentUser.Uid)
 	gid, _ := strconv.Atoi(currentUser.Gid)
 	syscall.Chown(filepath.Join(sshDirpath(username), "authorized_keys"), uid, gid)
+	return
 }
