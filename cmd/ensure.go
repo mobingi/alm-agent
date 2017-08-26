@@ -84,7 +84,7 @@ func Ensure(c *cli.Context) error {
 		}
 
 		log.Debug("Step: NewSysDocker")
-		ld, err := container.NewSysDocker(conf, metavars.ServerID)
+		ld, err := container.NewSysDocker(conf)
 		if err != nil {
 			return err
 		}
