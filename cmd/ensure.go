@@ -10,6 +10,7 @@ import (
 	"github.com/mobingi/alm-agent/config"
 	"github.com/mobingi/alm-agent/container"
 	"github.com/mobingi/alm-agent/login"
+	"github.com/mobingi/alm-agent/metavars"
 	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
 	"github.com/urfave/cli"
@@ -18,8 +19,10 @@ import (
 // Ensure start or replace container with newest config
 func Ensure(c *cli.Context) error {
 	var initialize bool
+	var err error
+
 	initialize = (c.Command.Name == "register")
-	serverid, err := util.GetServerID(c.GlobalString("provider"))
+	err = util.GetServerID(c.GlobalString("provider"))
 	if err != nil {
 		return err
 	}
@@ -37,12 +40,12 @@ func Ensure(c *cli.Context) error {
 	}
 
 	if initialize {
-		api.SendInstanceStatus(serverid, "starting")
+		api.SendInstanceStatus(metavars.ServerID, "starting")
 	}
 
 	stsToken, err := api.GetStsToken()
 	if err != nil {
-		api.SendInstanceStatus(serverid, "error")
+		api.SendInstanceStatus(metavars.ServerID, "error")
 		return err
 	}
 
@@ -52,7 +55,7 @@ func Ensure(c *cli.Context) error {
 	log.Debugf("Flag: %#v", c.String("serverconfig"))
 	s, err := api.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
-		api.SendInstanceStatus(serverid, "error")
+		api.SendInstanceStatus(metavars.ServerID, "error")
 		return err
 	}
 	log.Debugf("%#v", s)
@@ -81,7 +84,7 @@ func Ensure(c *cli.Context) error {
 		}
 
 		log.Debug("Step: NewSysDocker")
-		ld, err := container.NewSysDocker(conf, serverid)
+		ld, err := container.NewSysDocker(conf, metavars.ServerID)
 		if err != nil {
 			return err
 		}
@@ -97,7 +100,7 @@ func Ensure(c *cli.Context) error {
 		log.Debug("Step: container.NewDocker")
 		d, err := container.NewDocker(conf, s)
 		if err != nil {
-			api.SendInstanceStatus(serverid, "error")
+			api.SendInstanceStatus(metavars.ServerID, "error")
 			return err
 		}
 		log.Debugf("%#v", d)
@@ -105,7 +108,7 @@ func Ensure(c *cli.Context) error {
 		log.Debug("Step: d.StartContainer")
 		newContainer, err := d.StartContainer("active", codeDir, true)
 		if err != nil {
-			api.SendInstanceStatus(serverid, "error")
+			api.SendInstanceStatus(metavars.ServerID, "error")
 			return err
 		}
 		log.Debugf("%#v", newContainer)
@@ -113,12 +116,12 @@ func Ensure(c *cli.Context) error {
 		log.Debug("Step: d.MapPort")
 		err = d.MapPort(newContainer)
 		if err != nil {
-			api.SendInstanceStatus(serverid, "error")
+			api.SendInstanceStatus(metavars.ServerID, "error")
 			return err
 		}
 	} else {
 		// All of old Update commdnad
-		ld, err := container.NewSysDocker(conf, serverid)
+		ld, err := container.NewSysDocker(conf, metavars.ServerID)
 		if err != nil {
 			return err
 		}
@@ -195,7 +198,7 @@ func Ensure(c *cli.Context) error {
 			}
 		}
 
-		api.SendInstanceStatus(serverid, "updating")
+		api.SendInstanceStatus(metavars.ServerID, "updating")
 		d.MapPort(oldContainer) // For regenerating port map information
 
 		newContainer, err := d.StartContainer("standby", codeDir, true)
@@ -233,7 +236,7 @@ func Ensure(c *cli.Context) error {
 				return
 			case s := <-state:
 				if s != "" {
-					api.SendInstanceStatus(serverid, s)
+					api.SendInstanceStatus(metavars.ServerID, s)
 				}
 				if s == "complete" {
 					done <- true
