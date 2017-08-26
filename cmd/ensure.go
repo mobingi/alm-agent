@@ -132,7 +132,7 @@ func Ensure(c *cli.Context) error {
 		log.Debugf("%#v", d)
 
 		log.Debug("Step: d.StartContainer")
-		newContainer, err := d.StartContainer("active", codeDir, true)
+		newContainer, err := d.StartContainer("active", codeDir)
 		if err != nil {
 			api.SendInstanceStatus("error")
 			return err
@@ -196,7 +196,7 @@ func Ensure(c *cli.Context) error {
 			d.MapPort(oldContainer) // For regenerating port map information
 		}
 
-		newContainer, err := d.StartContainer("standby", codeDir, true)
+		newContainer, err := d.StartContainer("standby", codeDir)
 		if err != nil {
 			return err
 		}

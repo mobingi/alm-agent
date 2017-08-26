@@ -135,14 +135,14 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 }
 
 // StartContainer starts docker container
-func (d *Docker) StartContainer(name string, dir string, isApp bool) (*Container, error) {
+func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 
 	_, err := d.imagePull()
 	if err != nil {
 		return nil, err
 	}
 
-	c, err := d.containerCreate(name, dir, isApp)
+	c, err := d.containerCreate(name, dir)
 	if err != nil {
 		return nil, err
 	}
@@ -242,7 +242,7 @@ func (d *Docker) imagePull() (string, error) {
 	return buf.String(), nil
 }
 
-func (d *Docker) containerCreate(name string, dir string, isApp bool) (*Container, error) {
+func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 	config := &container.Config{
 		Image: d.Image,
 		Env:   d.Envs,
@@ -286,17 +286,8 @@ func (d *Docker) containerCreate(name string, dir string, isApp bool) (*Containe
 		}
 	}
 
-	if isApp {
 		bindLog := containerLogsLocation + "/log:/var/log"
 		hostConfig.Binds = append(hostConfig.Binds, bindLog)
-	} else {
-		hostConfig.Binds = append(
-			hostConfig.Binds,
-			"/root/.aws/awslogs_creds.conf:/etc/awslogs/awscli.conf",
-			"/var/log:/var/log",
-			containerLogsLocation+":/var/container",
-			"/opt/awslogs:/var/lib/awslogs",
-		)
 	}
 
 	networkingConfig := &network.NetworkingConfig{}
