@@ -4,6 +4,7 @@ import (
 	"net/url"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/mobingi/alm-agent/metavars"
 	"github.com/mobingi/alm-agent/server_config"
 )
 
@@ -92,17 +93,17 @@ func GetStsToken() (*StsToken, error) {
 }
 
 // SendInstanceStatus send container app status to API
-func SendInstanceStatus(serverID, status string) error {
-	values := url.Values{}
-	values.Set("instance_id", serverID)
-	values.Set("stack_id", c.getConfig().StackID)
-	values.Set("status", status)
-
+func SendInstanceStatus(status string) error {
 	// use for debug enviromnent
-	if serverID == "" {
+	if metavars.ServerID == "" {
 		log.Warnf("Skiped sending status to API(serverid is empty): %s", status)
 		return nil
 	}
+
+	values := url.Values{}
+	values.Set("instance_id", metavars.ServerID)
+	values.Set("stack_id", c.getConfig().StackID)
+	values.Set("status", status)
 
 	err := Post(RoutesV2.InstanceStatus, values, nil)
 	if err != nil {

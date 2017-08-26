@@ -12,7 +12,6 @@ import (
 	"github.com/mobingi/alm-agent/config"
 	"github.com/mobingi/alm-agent/container"
 	"github.com/mobingi/alm-agent/login"
-	"github.com/mobingi/alm-agent/metavars"
 	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
 	"github.com/urfave/cli"
@@ -46,12 +45,12 @@ func Ensure(c *cli.Context) error {
 	}
 
 	if initialize {
-		api.SendInstanceStatus(metavars.ServerID, "starting")
+		api.SendInstanceStatus("starting")
 	}
 
 	stsToken, err := api.GetStsToken()
 	if err != nil {
-		api.SendInstanceStatus(metavars.ServerID, "error")
+		api.SendInstanceStatus("error")
 		return err
 	}
 
@@ -61,7 +60,7 @@ func Ensure(c *cli.Context) error {
 	log.Debugf("Flag: %#v", c.String("serverconfig"))
 	s, err := api.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
-		api.SendInstanceStatus(metavars.ServerID, "error")
+		api.SendInstanceStatus("error")
 		return err
 	}
 	log.Debugf("%#v", s)
@@ -106,7 +105,7 @@ func Ensure(c *cli.Context) error {
 		log.Debug("Step: container.NewDocker")
 		d, err := container.NewDocker(conf, s)
 		if err != nil {
-			api.SendInstanceStatus(metavars.ServerID, "error")
+			api.SendInstanceStatus("error")
 			return err
 		}
 		log.Debugf("%#v", d)
@@ -114,7 +113,7 @@ func Ensure(c *cli.Context) error {
 		log.Debug("Step: d.StartContainer")
 		newContainer, err := d.StartContainer("active", codeDir, true)
 		if err != nil {
-			api.SendInstanceStatus(metavars.ServerID, "error")
+			api.SendInstanceStatus("error")
 			return err
 		}
 		log.Debugf("%#v", newContainer)
@@ -122,7 +121,7 @@ func Ensure(c *cli.Context) error {
 		log.Debug("Step: d.MapPort")
 		err = d.MapPort(newContainer)
 		if err != nil {
-			api.SendInstanceStatus(metavars.ServerID, "error")
+			api.SendInstanceStatus("error")
 			return err
 		}
 	} else {
@@ -204,7 +203,7 @@ func Ensure(c *cli.Context) error {
 			}
 		}
 
-		api.SendInstanceStatus(metavars.ServerID, "updating")
+		api.SendInstanceStatus("updating")
 		d.MapPort(oldContainer) // For regenerating port map information
 
 		newContainer, err := d.StartContainer("standby", codeDir, true)
@@ -242,7 +241,7 @@ func Ensure(c *cli.Context) error {
 				return
 			case s := <-state:
 				if s != "" {
-					api.SendInstanceStatus(metavars.ServerID, s)
+					api.SendInstanceStatus(s)
 				}
 				if s == "complete" {
 					done <- true
