@@ -24,9 +24,16 @@ type SystemContainers struct {
 	Container []SystemContainer
 }
 
+// EnvHandle builds string to append to ENV.
 type EnvHandle func(*config.Config) string
+
+// EnvFuncs contains funcs of EnvHandle
 type EnvFuncs struct{}
+
+// VolHandle builds []string to volume mount.
 type VolHandle func() []string
+
+// VolFuncs contains funcs of VolHandle
 type VolFuncs struct{}
 
 var envFuncs = &EnvFuncs{}
