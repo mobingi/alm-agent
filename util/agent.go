@@ -8,6 +8,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/mobingi/alm-agent/metavars"
 )
 
 var (
@@ -33,13 +34,14 @@ func FetchContainerState() string {
 }
 
 // GetServerID returns string that identify VM on running provider. (e.g. instance ID)
-func GetServerID(s string) (string, error) {
+func GetServerID(s string) error {
 	sid, err := getServerID(s)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return sid, nil
+	metavars.ServerID = sid
+	return nil
 }
 
 func getServerID(provider string) (string, error) {

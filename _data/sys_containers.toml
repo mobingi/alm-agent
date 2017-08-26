@@ -1,0 +1,5 @@
+[[container]]
+  name = "alm-awslogs"
+  image = "mobingi/alm-awslogs"
+  envfuncs = ['stack_id', 'instance_id']
+  volfuncs = ['logs_vol']

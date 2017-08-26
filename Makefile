@@ -16,17 +16,19 @@ setup:
 	go get -u github.com/jteeuwen/go-bindata/...
 	go get github.com/BurntSushi/toml/cmd/tomlv
 
-deps: setup
+deps:
 	dep ensure -v
 
 bindata:
 	tomlv _data/*.toml
 	go-bindata ./_data/
+	go-bindata -o ./bindata/bindata.go -pkg bindata -nometadata ./_data/
 
 verifydata:
 	tomlv _data/*.toml
-	go-bindata -o ./checkbin.go ./_data/
-	diff checkbin.go bindata.go > /dev/null
+	go-bindata -o ./checkbin -pkg bindata -nometadata ./_data/
+	diff ./checkbin ./bindata/bindata.go > /dev/null
+	rm ./checkbin
 
 test: deps
 	go test -v ${PACKAGES_ALL} -cover
