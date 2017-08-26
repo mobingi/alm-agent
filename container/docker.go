@@ -286,9 +286,8 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 		}
 	}
 
-		bindLog := containerLogsLocation + "/log:/var/log"
-		hostConfig.Binds = append(hostConfig.Binds, bindLog)
-	}
+	bindLog := containerLogsLocation + "/log:/var/log"
+	hostConfig.Binds = append(hostConfig.Binds, bindLog)
 
 	networkingConfig := &network.NetworkingConfig{}
 
