@@ -8,7 +8,6 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/mobingi/alm-agent/config"
-	"github.com/mobingi/alm-agent/metavars"
 )
 
 // SystemContainer uses log
@@ -22,30 +21,6 @@ type SystemContainer struct {
 // SystemContainers is slice of SystemContainer
 type SystemContainers struct {
 	Container []SystemContainer
-}
-
-// EnvHandle builds string to append to ENV.
-type EnvHandle func(*config.Config) string
-
-// EnvFuncs contains funcs of EnvHandle
-type EnvFuncs struct{}
-
-// VolHandle builds []string to volume mount.
-type VolHandle func() []string
-
-// VolFuncs contains funcs of VolHandle
-type VolFuncs struct{}
-
-var envFuncs = &EnvFuncs{}
-var volFuncs = &VolFuncs{}
-
-var handleEnvMap = map[string]EnvHandle{
-	"stack_id":    envFuncs.StackID,
-	"instance_id": envFuncs.InstanceID,
-}
-
-var handleVolMap = map[string]VolHandle{
-	"logs_vol": volFuncs.LogsVol,
 }
 
 // NewSysDocker returns docker client
@@ -65,27 +40,6 @@ func NewSysDocker(c *config.Config, s *SystemContainer) (*Docker, error) {
 	docker.Client = cli
 
 	return docker, err
-}
-
-// StackID resolves stack_id
-func (e *EnvFuncs) StackID(c *config.Config) string {
-	return "STACK_ID=" + c.StackID
-}
-
-// InstanceID resolves instance_id
-func (e *EnvFuncs) InstanceID(c *config.Config) string {
-	return "INSTANCE_ID=" + metavars.ServerID
-}
-
-// LogsVol resolves logs_vol
-func (v *VolFuncs) LogsVol() []string {
-	vols := []string{
-		"/root/.aws/awslogs_creds.conf:/etc/awslogs/awscli.conf",
-		"/var/log:/var/log",
-		containerLogsLocation + ":/var/container",
-		"/opt/awslogs:/var/lib/awslogs",
-	}
-	return vols
 }
 
 // StartSysContainer starts docker container
