@@ -4,6 +4,9 @@ package metavars
 
 var (
 	// ServerID is identifier of VM around provider.
-	// such as Insacen ID.
+	// such as Instance ID.
 	ServerID string
+
+	// ReportEnabled  true => send error report to rollbar
+	ReportEnabled bool
 )

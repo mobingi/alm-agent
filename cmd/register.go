@@ -29,5 +29,8 @@ func Register(c *cli.Context) error {
 	}
 
 	err := Ensure(c)
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
