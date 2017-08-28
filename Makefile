@@ -6,7 +6,7 @@ CIRCLE_BRANCH ?= develop
 LDFLAGS := -X 'github.com/mobingi/alm-agent/versions.Version=$(VERSION).$(MINOR_VERSION)'
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Revision=$(CIRCLE_SHA1)'
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Branch=$(CIRCLE_BRANCH)'
-LDFLAGS += -X 'RollbarToken=$(ROLLBAR_CLIENT_TOKEN)'
+LDFLAGS += -X 'main.RollbarToken=$(ROLLBAR_CLIENT_TOKEN)'
 PACKAGES_ALL = $(shell go list ./... | grep -v '/vendor/')
 PACKAGES_MAIN = $(shell go list ./... | grep -v '/vendor/' | grep -v '/addons/')
 
