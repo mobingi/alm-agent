@@ -98,6 +98,8 @@ func Ensure(c *cli.Context) error {
 		if sysImageUpdated && sysContainer != nil {
 			sc.StopContainer(sysContainer)
 			sc.RemoveContainer(sysContainer)
+		} else if sysContainer.State == "exited" {
+			sc.RemoveContainer(sysContainer)
 		}
 
 		sysContainer, _ = sc.StartSysContainer(&syscon)
@@ -158,7 +160,7 @@ func Ensure(c *cli.Context) error {
 			return cli.NewExitError(err, 1)
 		}
 
-		if oldContainer == nil {
+		if oldContainer == nil || oldContainer.State == "exited" {
 			update = true
 		}
 
@@ -205,8 +207,10 @@ func Ensure(c *cli.Context) error {
 		d.UnmapPort()
 		d.MapPort(newContainer)
 
-		if oldContainer != nil {
+		if oldContainer != nil && oldContainer.State == "running" {
 			d.StopContainer(oldContainer)
+			d.RemoveContainer(oldContainer)
+		} else if oldContainer.State == "exited" {
 			d.RemoveContainer(oldContainer)
 		}
 

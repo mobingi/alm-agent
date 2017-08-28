@@ -95,6 +95,7 @@ func (d *Docker) GetContainer(name string) (*Container, error) {
 	filter.Set(fmt.Sprintf("name=%s", name))
 	options := types.ContainerListOptions{
 		Filters: filter.Value(),
+		All:     true,
 	}
 	res, err := d.Client.ContainerList(context.Background(), options)
 	if err != nil {
@@ -107,7 +108,7 @@ func (d *Docker) GetContainer(name string) (*Container, error) {
 
 	name = strings.TrimPrefix(res[0].Names[0], "/")
 
-	c := &Container{ID: res[0].ID, Name: name}
+	c := &Container{ID: res[0].ID, Name: name, State: res[0].State}
 	c.IP, err = d.getIPAddress(c)
 	if err != nil {
 		return nil, err
@@ -121,6 +122,7 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 	filter.Set(fmt.Sprintf("ancestor=%s", ancestor))
 	options := types.ContainerListOptions{
 		Filters: filter.Value(),
+		All:     true,
 	}
 	res, err := d.Client.ContainerList(context.Background(), options)
 	if err != nil {

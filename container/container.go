@@ -4,10 +4,10 @@ import "net"
 
 // Container means docker container
 type Container struct {
-	Name string
-	ID   string
-	IP   net.IP
-	*State
+	Name  string
+	ID    string
+	IP    net.IP
+	State string
 }
 
 // State is state of Container from Docker API.
@@ -26,9 +26,9 @@ type Container struct {
     "FinishedAt": "2017-08-27T05:34:22.564500324Z"
 	},
 */
-type State struct {
-	Status   string
-	Running  bool
-	ExitCode int
-	Error    string
-}
+// type State struct {
+// 	Status   string
+// 	Running  bool
+// 	ExitCode int
+// 	Error    string
+// }
