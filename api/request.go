@@ -12,8 +12,10 @@ type route struct {
 	AccessToken,
 	EventSpotShutdown,
 	InstanceStatus,
+	ContainerStatus,
 	ServerConfig,
-	Sts string
+	Sts,
+	LogsSTS string
 }
 
 // RoutesV2 points API v2. to figure out what has been implemented.
@@ -29,10 +31,11 @@ var RoutesV2 = &route{
 var RoutesV3 = &route{
 	AccessToken:       "/v3/access_token",
 	EventSpotShutdown: "/v3/event/spot/shutdown",
-	InstanceStatus:    "/v3/alm/instance/status",
-	// Real => ServerConfig:      "/v3/alm/template/.{{StackID}}/container",
-	ServerConfig: "/v3/alm/template/",
-	Sts:          "/v3/alm/sts",
+	InstanceStatus:    "/v3/alm/agent/instance_status",
+	ContainerStatus:   "/v3/alm/agent/container_status",
+	ServerConfig:      "/v3/alm/agent/config",
+	Sts:               "/v3/alm/sts",
+	LogsSTS:           "/v3/alm/agent/logs_access_token",
 }
 
 // GetAccessToken requests token of user for auth by API.
