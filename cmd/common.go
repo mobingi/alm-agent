@@ -5,7 +5,7 @@ import (
 	"github.com/stvp/rollbar"
 )
 
-func sendReport(error) {
+func sendReport(err error) {
 	if !metavars.ReportEnabled {
 		return
 	}
