@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"sort"
 	"strings"
@@ -127,15 +126,5 @@ func main() {
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 
-	app.RunAndExitOnError()
-}
-
-// FatalWriter just initiaizes cliErrWriter
-type FatalWriter struct {
-	cliErrWriter io.Writer
-}
-
-func (f *FatalWriter) Write(p []byte) (n int, err error) {
-	log.Error(string(p))
-	return 0, nil
+	app.Run(os.Args)
 }
