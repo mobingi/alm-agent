@@ -39,22 +39,22 @@ func Stop(c *cli.Context) error {
 	d.MapPort(activeContainer) // For regenerating port map information
 	d.UnmapPort()
 
-	cli, err := client.NewEnvClient()
+	dockerCli, err := client.NewEnvClient()
 	if err != nil {
 		return cli.NewExitError(err, 1)
 	}
 
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
+	containers, err := dockerCli.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
 		return cli.NewExitError(err, 1)
 	}
 
 	timeout := 3 * time.Second
 	for _, c := range containers {
-		if err := cli.ContainerStop(context.Background(), c.ID, &timeout); err != nil {
+		if err := dockerCli.ContainerStop(context.Background(), c.ID, &timeout); err != nil {
 			return cli.NewExitError(err, 1)
 		}
-		if err := cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{}); err != nil {
+		if err := dockerCli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{}); err != nil {
 			return cli.NewExitError(err, 1)
 		}
 	}
