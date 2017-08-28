@@ -93,8 +93,9 @@ func Ensure(c *cli.Context) error {
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
+		log.Debugf("%#v", sysContainer)
 
-		if sysImageUpdated && sysContainer == nil {
+		if sysImageUpdated && sysContainer != nil {
 			sc.StopContainer(sysContainer)
 			sc.RemoveContainer(sysContainer)
 		}
