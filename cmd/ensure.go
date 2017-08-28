@@ -25,7 +25,7 @@ func Ensure(c *cli.Context) error {
 	initialize = (c.Command.Name == "register")
 	err = util.GetServerID(c.GlobalString("provider"))
 	if err != nil {
-		return err
+		return cli.NewExitError(err, 1)
 	}
 
 	conf, err := config.LoadFromFile(c.String("config"))
@@ -35,13 +35,13 @@ func Ensure(c *cli.Context) error {
 	toml.Decode(string(syscondata), &syscons)
 
 	if err != nil {
-		return err
+		return cli.NewExitError(err, 1)
 	}
 	log.Debugf("%#v", conf)
 	api.SetConfig(conf)
 	err = api.GetAccessToken()
 	if err != nil {
-		return err
+		return cli.NewExitError(err, 1)
 	}
 
 	if initialize {
@@ -51,7 +51,7 @@ func Ensure(c *cli.Context) error {
 	stsToken, err := api.GetStsToken()
 	if err != nil {
 		api.SendInstanceStatus("error")
-		return err
+		return cli.NewExitError(err, 1)
 	}
 
 	api.WriteTempToken(stsToken)
@@ -61,7 +61,7 @@ func Ensure(c *cli.Context) error {
 	s, err := api.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
 		api.SendInstanceStatus("error")
-		return err
+		return cli.NewExitError(err, 1)
 	}
 	log.Debugf("%#v", s)
 
@@ -78,7 +78,7 @@ func Ensure(c *cli.Context) error {
 		log.Debugf("%#v", syscon)
 		sc, err := container.NewSysDocker(conf, &syscon)
 		if err != nil {
-			return err
+			return cli.NewExitError(err, 1)
 		}
 
 		log.Debugf("Step: sc.StartContainer")
@@ -86,12 +86,12 @@ func Ensure(c *cli.Context) error {
 
 		sysImageUpdated, err := sc.CheckImageUpdated()
 		if err != nil {
-			return err
+			return cli.NewExitError(err, 1)
 		}
 
 		sysContainer, err := sc.GetContainer(syscon.Name)
 		if err != nil {
-			return err
+			return cli.NewExitError(err, 1)
 		}
 
 		if sysImageUpdated && sysContainer == nil {
@@ -112,13 +112,13 @@ func Ensure(c *cli.Context) error {
 				log.Debug("Step: code.PrivateRepo")
 				err = code.PrivateRepo()
 				if err != nil {
-					return err
+					return cli.NewExitError(err, 1)
 				}
 			}
 
 			codeDir, err = code.Get()
 			if err != nil {
-				return err
+				return cli.NewExitError(err, 1)
 			}
 		}
 
@@ -127,7 +127,7 @@ func Ensure(c *cli.Context) error {
 		d, err := container.NewDocker(conf, s)
 		if err != nil {
 			api.SendInstanceStatus("error")
-			return err
+			return cli.NewExitError(err, 1)
 		}
 		log.Debugf("%#v", d)
 
@@ -135,7 +135,7 @@ func Ensure(c *cli.Context) error {
 		newContainer, err := d.StartContainer("active", codeDir)
 		if err != nil {
 			api.SendInstanceStatus("error")
-			return err
+			return cli.NewExitError(err, 1)
 		}
 		log.Debugf("%#v", newContainer)
 
@@ -143,18 +143,18 @@ func Ensure(c *cli.Context) error {
 		err = d.MapPort(newContainer)
 		if err != nil {
 			api.SendInstanceStatus("error")
-			return err
+			return cli.NewExitError(err, 1)
 		}
 	} else {
 		// All of old Update commdnad
 		d, err := container.NewDocker(conf, s)
 		if err != nil {
-			return err
+			return cli.NewExitError(err, 1)
 		}
 
 		oldContainer, err := d.GetContainer("active")
 		if err != nil {
-			return err
+			return cli.NewExitError(err, 1)
 		}
 
 		if oldContainer == nil {
@@ -172,19 +172,19 @@ func Ensure(c *cli.Context) error {
 			if code.Key != "" {
 				err = code.PrivateRepo()
 				if err != nil {
-					return err
+					return cli.NewExitError(err, 1)
 				}
 			}
 
 			codeUpdated, err = code.CheckUpdate()
 			if err != nil {
-				return err
+				return cli.NewExitError(err, 1)
 			}
 
 			if codeUpdated {
 				codeDir, err = code.Get()
 				if err != nil {
-					return err
+					return cli.NewExitError(err, 1)
 				}
 			} else {
 				codeDir = code.Path
@@ -198,7 +198,7 @@ func Ensure(c *cli.Context) error {
 
 		newContainer, err := d.StartContainer("standby", codeDir)
 		if err != nil {
-			return err
+			return cli.NewExitError(err, 1)
 		}
 
 		d.UnmapPort()
@@ -214,7 +214,7 @@ func Ensure(c *cli.Context) error {
 
 	log.Debug("Step: serverConfig.WriteUpdated")
 	if err := serverConfig.WriteUpdated(s); err != nil {
-		return err
+		return cli.NewExitError(err, 1)
 	}
 
 	var wg sync.WaitGroup

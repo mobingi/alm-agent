@@ -16,23 +16,23 @@ import (
 func Stop(c *cli.Context) error {
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {
-		return err
+		return cli.NewExitError(err, 1)
 	}
 	api.SetConfig(conf)
 
 	err = api.GetAccessToken()
 	if err != nil {
-		return err
+		return cli.NewExitError(err, 1)
 	}
 
 	s, err := api.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
-		return err
+		return cli.NewExitError(err, 1)
 	}
 
 	d, err := container.NewDocker(conf, s)
 	if err != nil {
-		return err
+		return cli.NewExitError(err, 1)
 	}
 
 	activeContainer, err := d.GetContainer("active")
@@ -41,21 +41,21 @@ func Stop(c *cli.Context) error {
 
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		return err
+		return cli.NewExitError(err, 1)
 	}
 
 	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
-		return err
+		return cli.NewExitError(err, 1)
 	}
 
 	timeout := 3 * time.Second
 	for _, c := range containers {
 		if err := cli.ContainerStop(context.Background(), c.ID, &timeout); err != nil {
-			return err
+			return cli.NewExitError(err, 1)
 		}
 		if err := cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{}); err != nil {
-			return err
+			return cli.NewExitError(err, 1)
 		}
 	}
 
