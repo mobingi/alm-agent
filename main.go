@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"sort"
 	"strings"
@@ -10,21 +11,46 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/mobingi/alm-agent/cmd"
+	"github.com/mobingi/alm-agent/metavars"
 	"github.com/mobingi/alm-agent/versions"
+	"github.com/stvp/rollbar"
 	"github.com/urfave/cli"
 )
 
 var agentConfigPath = "/opt/mobingi/etc/alm-agent.cfg"
+
+// RollbarToken is post_client_item token of rollbar.com
+// it should be set on build.
+var RollbarToken string
 
 func init() {
 	log.SetOutput(os.Stdout)
 	cli.ErrWriter = &FatalWriter{cli.ErrWriter}
 }
 
+// FatalWriter uses for cliErrWriter
+type FatalWriter struct {
+	cliErrWriter io.Writer
+}
+
+func (f *FatalWriter) Write(p []byte) (n int, err error) {
+	log.Error(string(p))
+	return 0, nil
+}
+
 func globalOptions(c *cli.Context) error {
 	if c.GlobalBool("verbose") {
 		log.SetLevel(log.DebugLevel)
 		log.Debug("Loglevel is set to DebugLevel.")
+	}
+
+	if c.GlobalBool("enablereport") {
+		metavars.ReportEnabled = true
+
+		// initialize rollbar client
+		rollbar.Token = RollbarToken
+		rollbar.Environment = versions.Branch
+		rollbar.Platform = "client"
 	}
 
 	return nil
@@ -78,6 +104,10 @@ func main() {
 			Value: "aws",
 			Usage: "set `Provider`",
 		},
+		cli.BoolFlag{
+			Name:  "enablereport, R",
+			Usage: "Send crash report to rollbar.",
+		},
 	}
 
 	// Common Flags for commands
@@ -127,4 +157,5 @@ func main() {
 	sort.Sort(cli.FlagsByName(app.Flags))
 
 	app.Run(os.Args)
+	rollbar.Wait()
 }

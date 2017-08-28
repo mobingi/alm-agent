@@ -121,6 +121,12 @@
   version = "v1.1.4"
 
 [[projects]]
+  name = "github.com/stvp/rollbar"
+  packages = ["."]
+  revision = "caefb75816bddf0dfab37b5490265c09511c962d"
+  version = "v0.5.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/tcnksm/go-latest"
   packages = ["."]
@@ -165,6 +171,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "86d05f08bfbdaa9722a004716186cfe09fd59822adb0c536579d5343459c276a"
+  inputs-digest = "a2e840d2feb9127ebc4aeeab7ab7071ca02a7c787d5a9bfb8b009245efe81abb"
   solver-name = "gps-cdcl"
   solver-version = 1
