@@ -23,6 +23,8 @@ func Ensure(c *cli.Context) error {
 	var err error
 
 	initialize = (c.Command.Name == "register")
+	util.AgentID()
+
 	err = util.GetServerID(c.GlobalString("provider"))
 	if err != nil {
 		return cli.NewExitError(err, 1)

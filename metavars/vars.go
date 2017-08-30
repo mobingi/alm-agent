@@ -9,4 +9,7 @@ var (
 
 	// ReportEnabled  true => send error report to rollbar
 	ReportEnabled bool
+
+	// AgentID is unique identifer of alm-agent
+	AgentID string
 )
