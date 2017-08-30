@@ -24,7 +24,7 @@ type Config struct {
 	GitReference         string
 	GitPrivateKey        string
 	Ports                []int
-	Updated              int
+	Updated              uint
 	Users                map[string]*PubKey
 	EnvironmentVariables map[string]string
 }
@@ -48,7 +48,7 @@ func NeedsUpdate(c *Config) (bool, error) {
 	log.Debugf("updated of %s is %s", versionPath, fu)
 	log.Debugf("updated of serverconfig is %s", cu)
 
-	if fu != cu {
+	if fu < cu {
 		return true, nil
 	}
 
