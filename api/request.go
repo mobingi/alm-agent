@@ -12,6 +12,7 @@ type route struct {
 	AccessToken,
 	EventSpotShutdown,
 	InstanceStatus,
+	AgentStatus,
 	ContainerStatus,
 	ServerConfig,
 	Sts,
@@ -31,7 +32,7 @@ var RoutesV2 = &route{
 var RoutesV3 = &route{
 	AccessToken:       "/v3/access_token",
 	EventSpotShutdown: "/v3/event/spot/shutdown",
-	InstanceStatus:    "/v3/alm/agent/instance_status",
+	AgentStatus:       "/v3/alm/agent/agent_status",
 	ContainerStatus:   "/v3/alm/agent/container_status",
 	ServerConfig:      "/v3/alm/agent/config",
 	Sts:               "/v3/alm/sts",
