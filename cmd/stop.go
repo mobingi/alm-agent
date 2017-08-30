@@ -8,6 +8,7 @@ import (
 	"github.com/mobingi/alm-agent/api"
 	"github.com/mobingi/alm-agent/config"
 	"github.com/mobingi/alm-agent/container"
+	"github.com/mobingi/alm-agent/util"
 	"github.com/urfave/cli"
 	"golang.org/x/net/context"
 )
