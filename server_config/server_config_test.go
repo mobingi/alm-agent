@@ -34,7 +34,7 @@ func TestNeedsUpdate(t *testing.T) {
 	assert.True(actual)
 
 	// local > server
-	tc.Updated = uint(1400000000)
+	tc.Updated = uint(20000000)
 	actual, _ = NeedsUpdate(tc)
 	assert.False(actual)
 }
