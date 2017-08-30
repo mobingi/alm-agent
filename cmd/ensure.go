@@ -47,12 +47,12 @@ func Ensure(c *cli.Context) error {
 	}
 
 	if initialize {
-		api.SendInstanceStatus("starting")
+		api.SendAgentStatus("starting", "")
 	}
 
 	stsToken, err := api.GetStsToken()
 	if err != nil {
-		api.SendInstanceStatus("error")
+		api.SendAgentStatus("error", err.Error())
 		return cli.NewExitError(err, 1)
 	}
 
@@ -62,7 +62,7 @@ func Ensure(c *cli.Context) error {
 	log.Debugf("Flag: %#v", c.String("serverconfig"))
 	s, err := api.GetServerConfig(c.String("serverconfig"))
 	if err != nil {
-		api.SendInstanceStatus("error")
+		api.SendAgentStatus("error", err.Error())
 		return cli.NewExitError(err, 1)
 	}
 	log.Debugf("%#v", s)
@@ -129,9 +129,11 @@ func Ensure(c *cli.Context) error {
 
 		// User Container
 		log.Debug("Step: container.NewDocker")
+		api.SendContainerStatus("starting")
+
 		d, err := container.NewDocker(conf, s)
 		if err != nil {
-			api.SendInstanceStatus("error")
+			api.SendAgentStatus("error", err.Error())
 			return cli.NewExitError(err, 1)
 		}
 		log.Debugf("%#v", d)
@@ -139,7 +141,7 @@ func Ensure(c *cli.Context) error {
 		log.Debug("Step: d.StartContainer")
 		newContainer, err := d.StartContainer("active", codeDir)
 		if err != nil {
-			api.SendInstanceStatus("error")
+			api.SendAgentStatus("error", err.Error())
 			return cli.NewExitError(err, 1)
 		}
 		log.Debugf("%#v", newContainer)
@@ -147,7 +149,7 @@ func Ensure(c *cli.Context) error {
 		log.Debug("Step: d.MapPort")
 		err = d.MapPort(newContainer)
 		if err != nil {
-			api.SendInstanceStatus("error")
+			api.SendAgentStatus("error", err.Error())
 			return cli.NewExitError(err, 1)
 		}
 	} else {
@@ -196,7 +198,7 @@ func Ensure(c *cli.Context) error {
 			}
 		}
 
-		api.SendInstanceStatus("updating")
+		api.SendContainerStatus("updating")
 		if oldContainer != nil {
 			d.MapPort(oldContainer) // For regenerating port map information
 		}
@@ -237,10 +239,12 @@ func Ensure(c *cli.Context) error {
 			select {
 			case <-cancel:
 				log.Error("Container update processing timed out.")
+				api.SendContainerStatus("unknown")
+				api.SendAgentStatus("error", "Container update processing timed out.")
 				return
 			case s := <-state:
 				if s != "" {
-					api.SendInstanceStatus(s)
+					api.SendContainerStatus(s)
 				}
 				if s == "complete" {
 					done <- true
@@ -264,5 +268,6 @@ LOOP:
 	}
 
 	wg.Wait()
+	api.SendAgentStatus("uptodate", "")
 	return nil
 }

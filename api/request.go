@@ -113,7 +113,9 @@ func SendAgentStatus(status, message string) error {
 	values.Set("stack_id", c.getConfig().StackID)
 	values.Set("agent_id", metavars.AgentID)
 	values.Set("status", status)
-	values.Set("message", message)
+	if message != "" {
+		values.Set("message", message)
+	}
 
 	if metavars.ServerID != "" {
 		values.Set("instance_id", metavars.ServerID)
@@ -173,6 +175,6 @@ func SendSpotShutdownEvent(serverID string) error {
 	values.Set("stack_id", c.getConfig().StackID)
 	values.Set("instance_id", serverID)
 
-	err := Post(RoutesV2.EventSpotShutdown, values, nil)
+	err := Post(RoutesV3.EventSpotShutdown, values, nil)
 	return err
 }
