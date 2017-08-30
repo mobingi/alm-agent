@@ -46,7 +46,7 @@ func GetAccessToken() error {
 	values.Set("client_id", c.getConfig().StackID)
 	values.Set("client_secret", c.getConfig().AuthorizationToken)
 
-	err := Post(RoutesV2.AccessToken, values, &apitoken)
+	err := Post(RoutesV3.AccessToken, values, &apitoken)
 	if err != nil {
 		return err
 	}
@@ -83,8 +83,9 @@ func getServerConfigFromAPI(sc *serverConfig.Config) error {
 
 	values := url.Values{}
 	values.Set("stack_id", c.getConfig().StackID)
+	values.Set("flag", c.getConfig().Flag)
 
-	err := Get(RoutesV2.ServerConfig, values, sc)
+	err := Get(RoutesV3.ServerConfig, values, sc)
 	if err != nil {
 		return err
 	}
@@ -95,10 +96,10 @@ func getServerConfigFromAPI(sc *serverConfig.Config) error {
 // GetStsToken to STS token for CWLogs
 func GetStsToken() (*StsToken, error) {
 	values := url.Values{}
-	values.Set("user_id", c.getConfig().UserID)
 	values.Set("stack_id", c.getConfig().StackID)
+	values.Set("service", "logs")
 
-	err := Get(RoutesV2.Sts, values, &stsToken)
+	err := Get(RoutesV3.Sts, values, &stsToken)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +107,46 @@ func GetStsToken() (*StsToken, error) {
 	return &stsToken, nil
 }
 
+// SendAgentStatus send agent status to API
+func SendAgentStatus(status, message string) error {
+	values := url.Values{}
+	values.Set("stack_id", c.getConfig().StackID)
+	values.Set("agent_id", metavars.AgentID)
+	values.Set("status", status)
+	values.Set("message", message)
+
+	if metavars.ServerID != "" {
+		values.Set("instance_id", metavars.ServerID)
+	}
+
+	err := Post(RoutesV3.AgentStatus, values, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// SendContainerStatus send container app status to API
+func SendContainerStatus(status string) error {
+	values := url.Values{}
+	values.Set("stack_id", c.getConfig().StackID)
+	values.Set("agent_id", metavars.AgentID)
+	values.Set("container_id", metavars.ServerID)
+	values.Set("status", status)
+
+	if metavars.ServerID != "" {
+		values.Set("instance_id", metavars.ServerID)
+	}
+
+	err := Post(RoutesV3.ContainerStatus, values, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // SendInstanceStatus send container app status to API
+// only V2
 func SendInstanceStatus(status string) error {
 	// use for debug enviromnent
 	if metavars.ServerID == "" {

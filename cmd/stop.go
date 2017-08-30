@@ -14,6 +14,7 @@ import (
 
 // Stop alm-agent start
 func Stop(c *cli.Context) error {
+	util.AgentID()
 	conf, err := config.LoadFromFile(c.String("config"))
 	if err != nil {
 		return cli.NewExitError(err, 1)
