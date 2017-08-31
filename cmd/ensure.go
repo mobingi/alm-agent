@@ -97,11 +97,13 @@ func Ensure(c *cli.Context) error {
 		}
 		log.Debugf("%#v", sysContainer)
 
-		if sysImageUpdated && sysContainer != nil {
-			sc.StopContainer(sysContainer)
-			sc.RemoveContainer(sysContainer)
-		} else if sysContainer.State == "exited" {
-			sc.RemoveContainer(sysContainer)
+		if sysContainer != nil {
+			if sysImageUpdated {
+				sc.StopContainer(sysContainer)
+				sc.RemoveContainer(sysContainer)
+			} else if sysContainer.State == "exited" {
+				sc.RemoveContainer(sysContainer)
+			}
 		}
 
 		sysContainer, _ = sc.StartSysContainer(&syscon)
