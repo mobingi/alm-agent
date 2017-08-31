@@ -14,7 +14,6 @@ func TestLoad(t *testing.T) {
     "StackId": "mo-5447826c870e7-6ZIfI6Lf0-tk",
     "APIHost": "https://apidev.mobingi.com",
     "AuthorizationToken": "OHBXMGvtlecNNTF0u4KGB5WcZ05GVu",
-    "LogBucket": "mocloud-customers",
     "Flag": "web01"
 }
 `

@@ -11,8 +11,6 @@ type Config struct {
 	StackID            string
 	APIHost            string
 	AuthorizationToken string
-	StorageService     string
-	LogBucket          string
 	Flag               string
 }
 
