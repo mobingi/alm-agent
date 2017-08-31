@@ -12,6 +12,7 @@ import (
 
 	"github.com/mobingi/alm-agent/cmd"
 	"github.com/mobingi/alm-agent/metavars"
+	"github.com/mobingi/alm-agent/util"
 	"github.com/mobingi/alm-agent/versions"
 	"github.com/stvp/rollbar"
 	"github.com/urfave/cli"
@@ -155,6 +156,12 @@ func main() {
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
+
+	defer util.UnLock("alm-agent")
+	if err := util.Lock("alm-agent"); err != nil {
+		log.Info("Other alm-agent running... Exit.")
+		os.Exit(0)
+	}
 
 	app.Run(os.Args)
 	rollbar.Wait()
