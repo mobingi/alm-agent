@@ -7,7 +7,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/mobingi/alm-agent/addons/aws/machine"
 	"github.com/mobingi/alm-agent/api"
@@ -53,12 +52,8 @@ func main() {
 	}
 	log.Debugf("%#v", svConfig)
 
-	stsToken, err := api.GetStsToken()
-	creds := credentials.NewStaticCredentials(
-		stsToken.AccessKeyID,
-		stsToken.SecretAccessKey,
-		stsToken.SessionToken,
-	)
+	// use EC2 InstanceRole
+	creds := aws.IAMCreds()
 
 	awsconfig := aws.NewConfig().WithCredentials(creds).WithRegion(instance.Region)
 
