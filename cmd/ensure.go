@@ -206,7 +206,7 @@ func Ensure(c *cli.Context) error {
 		}
 
 		// standby exists?
-		stc := d.GetContainer("standby")
+		stc, _ := d.GetContainer("standby")
 		if stc != nil {
 			if stc.State == "exited" {
 				d.RemoveContainer(stc)
@@ -224,11 +224,13 @@ func Ensure(c *cli.Context) error {
 		d.UnmapPort()
 		d.MapPort(newContainer)
 
-		if oldContainer != nil && oldContainer.State == "running" {
-			d.StopContainer(oldContainer)
-			d.RemoveContainer(oldContainer)
-		} else if oldContainer.State == "exited" {
-			d.RemoveContainer(oldContainer)
+		if oldContainer != nil {
+			if oldContainer.State == "running" {
+				d.StopContainer(oldContainer)
+				d.RemoveContainer(oldContainer)
+			} else if oldContainer.State == "exited" {
+				d.RemoveContainer(oldContainer)
+			}
 		}
 
 		d.RenameContainer(newContainer, "active")
