@@ -4,6 +4,7 @@ import (
 	"net/url"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/mobingi/alm-agent/metavars"
 	"github.com/mobingi/alm-agent/server_config"
 )
 
@@ -11,8 +12,11 @@ type route struct {
 	AccessToken,
 	EventSpotShutdown,
 	InstanceStatus,
+	AgentStatus,
+	ContainerStatus,
 	ServerConfig,
-	Sts string
+	Sts,
+	LogsSTS string
 }
 
 // RoutesV2 points API v2. to figure out what has been implemented.
@@ -24,6 +28,17 @@ var RoutesV2 = &route{
 	Sts:               "/v2/alm/sts",
 }
 
+// RoutesV3 points API v3. to figure out what has been implemented.
+var RoutesV3 = &route{
+	AccessToken:       "/v3/access_token",
+	EventSpotShutdown: "/v3/event/spot/shutdown",
+	AgentStatus:       "/v3/alm/agent/agent_status",
+	ContainerStatus:   "/v3/alm/agent/container_status",
+	ServerConfig:      "/v3/alm/agent/config",
+	Sts:               "/v3/alm/sts",
+	LogsSTS:           "/v3/alm/agent/logs_access_token",
+}
+
 // GetAccessToken requests token of user for auth by API.
 func GetAccessToken() error {
 	values := url.Values{}
@@ -31,7 +46,7 @@ func GetAccessToken() error {
 	values.Set("client_id", c.getConfig().StackID)
 	values.Set("client_secret", c.getConfig().AuthorizationToken)
 
-	err := Post(RoutesV2.AccessToken, values, &apitoken)
+	err := Post(RoutesV3.AccessToken, values, &apitoken)
 	if err != nil {
 		return err
 	}
@@ -68,8 +83,9 @@ func getServerConfigFromAPI(sc *serverConfig.Config) error {
 
 	values := url.Values{}
 	values.Set("stack_id", c.getConfig().StackID)
+	values.Set("flag", c.getConfig().Flag)
 
-	err := Get(RoutesV2.ServerConfig, values, sc)
+	err := Get(RoutesV3.ServerConfig, values, sc)
 	if err != nil {
 		return err
 	}
@@ -80,10 +96,10 @@ func getServerConfigFromAPI(sc *serverConfig.Config) error {
 // GetStsToken to STS token for CWLogs
 func GetStsToken() (*StsToken, error) {
 	values := url.Values{}
-	values.Set("user_id", c.getConfig().UserID)
 	values.Set("stack_id", c.getConfig().StackID)
+	values.Set("service", "logs")
 
-	err := Get(RoutesV2.Sts, values, &stsToken)
+	err := Get(RoutesV3.Sts, values, &stsToken)
 	if err != nil {
 		return nil, err
 	}
@@ -91,18 +107,59 @@ func GetStsToken() (*StsToken, error) {
 	return &stsToken, nil
 }
 
-// SendInstanceStatus send container app status to API
-func SendInstanceStatus(serverID, status string) error {
+// SendAgentStatus send agent status to API
+func SendAgentStatus(status, message string) error {
 	values := url.Values{}
-	values.Set("instance_id", serverID)
 	values.Set("stack_id", c.getConfig().StackID)
+	values.Set("agent_id", metavars.AgentID)
+	values.Set("status", status)
+	if message != "" {
+		values.Set("message", message)
+	}
+
+	if metavars.ServerID != "" {
+		values.Set("instance_id", metavars.ServerID)
+	}
+
+	err := Post(RoutesV3.AgentStatus, values, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// SendContainerStatus send container app status to API
+func SendContainerStatus(status string) error {
+	values := url.Values{}
+	values.Set("stack_id", c.getConfig().StackID)
+	values.Set("agent_id", metavars.AgentID)
+	values.Set("container_id", metavars.ServerID)
 	values.Set("status", status)
 
+	if metavars.ServerID != "" {
+		values.Set("instance_id", metavars.ServerID)
+	}
+
+	err := Post(RoutesV3.ContainerStatus, values, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// SendInstanceStatus send container app status to API
+// only V2
+func SendInstanceStatus(status string) error {
 	// use for debug enviromnent
-	if serverID == "" {
+	if metavars.ServerID == "" {
 		log.Warnf("Skiped sending status to API(serverid is empty): %s", status)
 		return nil
 	}
+
+	values := url.Values{}
+	values.Set("instance_id", metavars.ServerID)
+	values.Set("stack_id", c.getConfig().StackID)
+	values.Set("status", status)
 
 	err := Post(RoutesV2.InstanceStatus, values, nil)
 	if err != nil {
@@ -118,6 +175,6 @@ func SendSpotShutdownEvent(serverID string) error {
 	values.Set("stack_id", c.getConfig().StackID)
 	values.Set("instance_id", serverID)
 
-	err := Post(RoutesV2.EventSpotShutdown, values, nil)
+	err := Post(RoutesV3.EventSpotShutdown, values, nil)
 	return err
 }

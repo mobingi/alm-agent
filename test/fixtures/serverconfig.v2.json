@@ -1,0 +1,37 @@
+{
+  "updated": "1495677005",
+  "image": "mobingi/ubuntu-apache2-php7:7.1",
+  "gitRepo": "git://github.com/mobingilabs/default-site-php",
+  "gitReference": "master",
+  "gitPrivateKey": "-----BEGIN PRIVATE ...\n-----END PRIVATE KEY-----\n",
+  "environmentVariables": {
+    "DB_USERNAME": "dbuser",
+    "DB_PSSSWORD": "dbpass",
+    "Stage": "_development",
+    "my_hash": "User_defined_data"
+  },
+  "users": [
+    {
+      "name": "mobingi",
+      "publicKey": "ssh-rsa .... mo"
+    },
+    {
+      "name": "Wayland",
+      "publicKey": "ssh-rsa .... wa"
+    }
+  ],
+  "addon": [
+    {
+      "name": "mackerel",
+      "apiKey": "mackakey"
+    },
+    {
+      "name": "datadog",
+      "apiKey": "ddkey"
+    },
+    {
+      "name": "newrelic",
+      "apiKey": "nrkey"
+    }
+  ]
+}

@@ -6,6 +6,10 @@ Vagrant.configure("2") do |config|
     c.vm.box = 'ubuntu/trusty64'
     c.vm.provision :shell, path: File.expand_path('../vagrant/prov/ub14.sh', __FILE__)
     c.vm.synced_folder '.', '/home/vagrant/src/github.com/mobingi/alm-agent'
+    c.vm.provider "virtualbox" do |v|
+      v.memory = 1536
+      v.cpus = 2
+    end
   end
 
   # for plugin development

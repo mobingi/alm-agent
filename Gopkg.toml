@@ -16,9 +16,21 @@
   name = "github.com/aws/aws-sdk-go/aws/..."
 
 [[constraint]]
-  branch = "17.05.x"
+  revision = "89658bed64c2a8fe05a978e5b87dbec409d57a0f"
   name = "github.com/docker/docker/..."
 
 [[constraint]]
   branch = "master"
   name = "github.com/tcnksm/go-latest"
+
+[[constraint]]
+  name = "github.com/stretchr/testify"
+  version = "1.1.4"
+
+[[override]]
+  revision = "5d4e5de2f9962c2de8a7872128e2cc09dfdd99aa"
+  name = "github.com/docker/libnetwork"
+
+[[constraint]]
+  name = "github.com/stvp/rollbar"
+  version = "v0.5.0"

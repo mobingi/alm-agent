@@ -8,12 +8,15 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/docker/distribution/uuid"
+	"github.com/mobingi/alm-agent/metavars"
 )
 
 var (
 	ec2METAENDPOINT       = "http://169.254.169.254/"
 	ecsMETAENDPOINT       = "http://100.100.100.200/"
-	containerLogsLocation = "/var/log/alm-agent/containerlogs"
+	containerLogsLocation = "/var/log/alm-agent/container"
+	agentIDSavePath       = "/opt/mobingi/etc/alm-agent.id"
 )
 
 // FetchContainerState fetches state of application in running container.
@@ -33,13 +36,14 @@ func FetchContainerState() string {
 }
 
 // GetServerID returns string that identify VM on running provider. (e.g. instance ID)
-func GetServerID(s string) (string, error) {
+func GetServerID(s string) error {
 	sid, err := getServerID(s)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return sid, nil
+	metavars.ServerID = sid
+	return nil
 }
 
 func getServerID(provider string) (string, error) {
@@ -75,4 +79,17 @@ func getServerID(provider string) (string, error) {
 	}
 
 	return string(body), nil
+}
+
+// AgentID sets metavars.AgentID
+func AgentID() {
+	if FileExists(agentIDSavePath) {
+		dat, _ := ioutil.ReadFile(agentIDSavePath)
+		metavars.AgentID = string(dat)
+		return
+	}
+	id := uuid.Generate()
+	ioutil.WriteFile(agentIDSavePath, []byte(id.String()), 0644)
+	metavars.AgentID = id.String()
+	return
 }

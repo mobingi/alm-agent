@@ -3,7 +3,7 @@ package serverConfig
 import (
 	"fmt"
 	"io/ioutil"
-	"strings"
+	"strconv"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mobingi/alm-agent/util"
@@ -24,7 +24,7 @@ type Config struct {
 	GitReference         string
 	GitPrivateKey        string
 	Ports                []int
-	Updated              int
+	Updated              uint
 	Users                map[string]*PubKey
 	EnvironmentVariables map[string]string
 }
@@ -42,13 +42,12 @@ func NeedsUpdate(c *Config) (bool, error) {
 		return false, err
 	}
 
-	fu := strings.Trim(string(dat), "\n")
-	cu := fmt.Sprintf("%d", c.Updated)
+	fu, _ := strconv.ParseUint(string(dat), 10, 32)
 
 	log.Debugf("updated of %s is %s", versionPath, fu)
-	log.Debugf("updated of serverconfig is %s", cu)
+	log.Debugf("updated of serverconfig is %s", c.Updated)
 
-	if fu != cu {
+	if uint(fu) < c.Updated {
 		return true, nil
 	}
 

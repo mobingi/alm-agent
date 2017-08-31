@@ -31,6 +31,8 @@ func TestGetAccessToken(t *testing.T) {
 	}
 
 	SetConfig(tc)
+	origPost := Post
+	defer func() { Post = origPost }()
 	mockPost(
 		func(path string, values url.Values, target interface{}) error {
 			res := `{
@@ -81,6 +83,8 @@ func TestGetServerConfigFromAPI(t *testing.T) {
 	SetConfig(tc)
 
 	var sc = &serverConfig.Config{}
+	origGet := Get
+	defer func() { Get = origGet }()
 	mockGet(
 		func(path string, values url.Values, target interface{}) error {
 			res, _ := ioutil.ReadFile("../test/fixtures/serverconfig.v1.json")

@@ -2,22 +2,34 @@
 
 
 [[projects]]
+  name = "github.com/BurntSushi/toml"
+  packages = ["."]
+  revision = "b26d9c308763d68093482582cea63d69be07a0f0"
+  version = "v0.3.0"
+
+[[projects]]
   name = "github.com/Microsoft/go-winio"
   packages = ["."]
-  revision = "7ff89941bcb93df2e962467fb073c6e997b13cf0"
-  version = "v0.4.4"
+  revision = "78439966b38d69bf38227fbf57ac8a6fee70f69a"
+  version = "v0.4.5"
 
 [[projects]]
   name = "github.com/Sirupsen/logrus"
   packages = ["."]
-  revision = "a3f95b5c423586578a4e099b11a46c2479628cac"
-  version = "1.0.2"
+  revision = "f006c2ac4710855cf0f916dd6b77acf6b048dc6e"
+  version = "v1.0.3"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
   packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/xml/xmlutil","service/autoscaling","service/cloudformation","service/elb","service/sts"]
-  revision = "b33b08175d12b795daa7726c5577b39d06a2551c"
-  version = "v1.10.20"
+  revision = "e63027ac6e05f6d4ae9f97ce0294d7468ca652da"
+  version = "v1.10.33"
+
+[[projects]]
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/docker/distribution"
@@ -44,16 +56,15 @@
   version = "v0.3.1"
 
 [[projects]]
-  branch = "master"
   name = "github.com/docker/libnetwork"
   packages = ["iptables","portallocator","portmapper"]
-  revision = "4d23f49131dd66216b266bc26c8eebfddf187dd1"
+  revision = "5d4e5de2f9962c2de8a7872128e2cc09dfdd99aa"
 
 [[projects]]
   name = "github.com/go-ini/ini"
   packages = ["."]
-  revision = "d3de07a94d22b4a0972deb4b96d790c2c0ce8333"
-  version = "v1.28.0"
+  revision = "20b96f641a5ea98f2f8619ff4f3e061cff4833bd"
+  version = "v1.28.2"
 
 [[projects]]
   name = "github.com/godbus/dbus"
@@ -63,15 +74,9 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/golang/protobuf"
-  packages = ["proto"]
-  revision = "748d386b5c1ea99658fd69fe9f03991ce86a90c1"
-
-[[projects]]
-  branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "35d38108ba83757e9b6fc00e4ba7e2d597c651be"
+  revision = "78072f320213a7e011b5fb2700bcb9eb90efec37"
 
 [[projects]]
   branch = "master"
@@ -104,6 +109,24 @@
   version = "v0.8.0"
 
 [[projects]]
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/stretchr/testify"
+  packages = ["assert"]
+  revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
+  version = "v1.1.4"
+
+[[projects]]
+  name = "github.com/stvp/rollbar"
+  packages = ["."]
+  revision = "caefb75816bddf0dfab37b5490265c09511c962d"
+  version = "v0.5.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/tcnksm/go-latest"
   packages = ["."]
@@ -113,13 +136,13 @@
   branch = "v1"
   name = "github.com/urfave/cli"
   packages = ["."]
-  revision = "f6e8084112db1c3aa9c1e4144f024ab549ea08c1"
+  revision = "c717f7a2157ba1a8928c7d2137d626d07ec0a58f"
 
 [[projects]]
   branch = "master"
   name = "github.com/vishvananda/netlink"
   packages = [".","nl"]
-  revision = "a95659537721550a65cfc3638b664380696e38e1"
+  revision = "f5a6f697a596c788d474984a38a0ac4ba0719e93"
 
 [[projects]]
   branch = "master"
@@ -129,25 +152,25 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "81e90905daefcd6fd217b62423c0908922eadb30"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp","html","html/atom","proxy"]
-  revision = "f5079bd7f6f74e23c4d65efa0f4ce14cbd6a3c0f"
+  revision = "57efc9c3d9f91fb3277f8da1cff370539c4d3dc5"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "e312636bdaa2fac4f0acde9d17ab9fbad2b4ad10"
-
-[[projects]]
-  name = "google.golang.org/appengine"
-  packages = [".","internal","internal/app_identity","internal/base","internal/datastore","internal/log","internal/modules","internal/remote_api"]
-  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
-  version = "v1.0.0"
+  revision = "2d6f6f883a06fc0d5f4b14a81e4c28705ea64c15"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ea9e6d25264225b1da9e3516f304571d8a97cd64f149ac8bf40d5afffb6b9fd6"
+  inputs-digest = "a2e840d2feb9127ebc4aeeab7ab7071ca02a7c787d5a9bfb8b009245efe81abb"
   solver-name = "gps-cdcl"
   solver-version = 1
