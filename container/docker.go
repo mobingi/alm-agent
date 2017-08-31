@@ -180,6 +180,7 @@ func (d *Docker) MapPort(c *Container) error {
 		if err != nil {
 			return err
 		}
+		log.Infof("MapPort: %d", port)
 	}
 	return nil
 }
@@ -192,6 +193,7 @@ func (d *Docker) UnmapPort() error {
 		if err != nil {
 			return err
 		}
+		log.Infof("UnmapPort: %d", port)
 	}
 	return nil
 }
