@@ -205,6 +205,17 @@ func Ensure(c *cli.Context) error {
 			d.MapPort(oldContainer) // For regenerating port map information
 		}
 
+		// standby exists?
+		stc := d.GetContainer("standby")
+		if stc != nil {
+			if stc.State == "exited" {
+				d.RemoveContainer(stc)
+			} else {
+				d.StopContainer(stc)
+				d.RemoveContainer(stc)
+			}
+		}
+
 		newContainer, err := d.StartContainer("standby", codeDir)
 		if err != nil {
 			return cli.NewExitError(err, 1)
