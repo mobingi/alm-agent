@@ -42,10 +42,10 @@ func Lock(name string) error {
 // UnLock clears flock based lockfile
 // should call UnLock by defer
 func UnLock(name string) error {
-	log.Warnf("try util.UnLock %s", name)
+	log.Debugf("try util.UnLock %s", name)
 	syscall.Close(lockmap[name])
 
 	delete(lockmap, name)
-	log.Warnf("UnLocked %s", lockmap)
+	log.Debugf("UnLocked %s", lockmap)
 	return nil
 }
