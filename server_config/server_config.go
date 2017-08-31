@@ -19,9 +19,9 @@ type Config struct {
 	Image                string
 	DockerHubUserName    string
 	DockerHubPassword    string
-	Code                 string
 	CodeDir              string
 	GitReference         string
+	GitRepo              string
 	GitPrivateKey        string
 	Ports                []int
 	Updated              uint

@@ -113,7 +113,7 @@ func Ensure(c *cli.Context) error {
 	if initialize {
 		// All of old Start command
 		codeDir := ""
-		if s.Code != "" {
+		if s.GitRepo != "" {
 			code := code.New(s)
 			if code.Key != "" {
 				log.Debug("Step: code.PrivateRepo")
@@ -176,7 +176,7 @@ func Ensure(c *cli.Context) error {
 
 		codeDir := ""
 		codeUpdated := false
-		if s.Code != "" {
+		if s.GitRepo != "" {
 			code := code.New(s)
 			if code.Key != "" {
 				err = code.PrivateRepo()

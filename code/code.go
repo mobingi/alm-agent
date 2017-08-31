@@ -43,7 +43,7 @@ func New(s *serverConfig.Config) *Code {
 		ref = "master"
 	}
 	return &Code{
-		URL: s.Code,
+		URL: s.GitRepo,
 		Ref: ref,
 		Key: s.GitPrivateKey,
 	}
