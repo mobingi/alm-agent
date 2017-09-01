@@ -7,8 +7,8 @@ var (
 	// such as Instance ID.
 	ServerID string
 
-	// ReportEnabled  true => send error report to rollbar
-	ReportEnabled bool
+	// ReportDisabled  true => do not send error report to rollbar
+	ReportDisabled bool
 
 	// AgentID is unique identifer of alm-agent
 	AgentID string

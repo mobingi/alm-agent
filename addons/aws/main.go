@@ -7,7 +7,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/mobingi/alm-agent/addons/aws/machine"
 	"github.com/mobingi/alm-agent/api"
@@ -47,26 +47,38 @@ func main() {
 	}
 	log.Debugf("%#v", agentConfig)
 
+	api.SetConfig(agentConfig)
+	err = api.GetAccessToken()
+	if err != nil {
+		log.Fatal("Failed to Get Access Token from API")
+		os.Exit(1)
+	}
+
 	svConfig, err := api.GetServerConfig(agentConfig.APIHost)
 	if err != nil {
 		os.Exit(1)
 	}
 	log.Debugf("%#v", svConfig)
 
-	stsToken, err := api.GetStsToken()
-	creds := credentials.NewStaticCredentials(
-		stsToken.AccessKeyID,
-		stsToken.SecretAccessKey,
-		stsToken.SessionToken,
-	)
+	// use EC2 InstanceRole
+	sess := session.Must(session.NewSession())
+	metasvc := ec2metadata.New(sess)
+	region, err := metasvc.Region()
+	if err != nil {
+		log.Fatal("Faild to detect region.")
+		os.Exit(1)
+	}
 
-	awsconfig := aws.NewConfig().WithCredentials(creds).WithRegion(instance.Region)
+	awsconfig := &aws.Config{
+		Region: aws.String(region),
+	}
+	// new session with awsconfig
+	sess = session.Must(session.NewSession(awsconfig))
 
 	if debug() {
 		awsconfig.WithLogLevel(aws.LogDebug)
 	}
 
-	sess := session.Must(session.NewSession(awsconfig))
 	log.Debugf("%#v", sess)
 
 	wg.Add(1)
@@ -130,7 +142,11 @@ func isTerminateWait(sess *session.Session, instance *machine.Machine) bool {
 		log.Debugf("%#v", err)
 		return false
 	}
-	if asState == "Terminating:Wait" {
+	switch asState {
+	case "":
+		log.Debug("Not in ASG.")
+		os.Exit(0)
+	case "Terminating:Wait":
 		return true
 	}
 

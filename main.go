@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime/debug"
 	"sort"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 
 	"github.com/mobingi/alm-agent/cmd"
 	"github.com/mobingi/alm-agent/metavars"
+	"github.com/mobingi/alm-agent/util"
 	"github.com/mobingi/alm-agent/versions"
 	"github.com/stvp/rollbar"
 	"github.com/urfave/cli"
@@ -44,14 +46,14 @@ func globalOptions(c *cli.Context) error {
 		log.Debug("Loglevel is set to DebugLevel.")
 	}
 
-	if c.GlobalBool("enablereport") {
-		metavars.ReportEnabled = true
-
-		// initialize rollbar client
-		rollbar.Token = RollbarToken
-		rollbar.Environment = versions.Branch
-		rollbar.Platform = "client"
+	if c.GlobalBool("disablereport") || versions.Revision == "local-build" {
+		metavars.ReportDisabled = true
 	}
+
+	// initialize rollbar client
+	rollbar.Token = RollbarToken
+	rollbar.Environment = versions.Branch
+	rollbar.Platform = "client"
 
 	return nil
 }
@@ -79,6 +81,20 @@ func golatest() *versions.GoLatest {
 }
 
 func main() {
+	// report panic to rollbar
+	defer func() {
+		rec := recover()
+		if rec != nil {
+			log.Errorf("Agent Crashed!: %s", rec)
+			debug.PrintStack()
+			if !metavars.ReportDisabled {
+				rollbar.Error(rollbar.ERR, fmt.Errorf("%s", rec))
+				rollbar.Wait()
+			}
+			os.Exit(1)
+		}
+	}()
+
 	cli.VersionPrinter = func(c *cli.Context) {
 		b, _ := json.MarshalIndent(golatest(), "", "  ")
 		fmt.Println(string(b))
@@ -105,8 +121,8 @@ func main() {
 			Usage: "set `Provider`",
 		},
 		cli.BoolFlag{
-			Name:  "enablereport, R",
-			Usage: "Send crash report to rollbar.",
+			Name:  "disablereport, N",
+			Usage: "Do not send crash report to rollbar.",
 		},
 	}
 
@@ -155,6 +171,12 @@ func main() {
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
+
+	defer util.UnLock("alm-agent")
+	if err := util.Lock("alm-agent"); err != nil {
+		log.Info("Other alm-agent running... Exit.")
+		os.Exit(0)
+	}
 
 	app.Run(os.Args)
 	rollbar.Wait()
