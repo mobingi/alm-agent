@@ -48,6 +48,7 @@ func main() {
 	}
 	log.Debugf("%#v", agentConfig)
 
+	api.SetConfig(agentConfig)
 	svConfig, err := api.GetServerConfig(agentConfig.APIHost)
 	if err != nil {
 		os.Exit(1)
