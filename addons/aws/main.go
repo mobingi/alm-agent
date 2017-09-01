@@ -7,7 +7,6 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/mobingi/alm-agent/addons/aws/machine"
@@ -64,22 +63,17 @@ func main() {
 	// use EC2 InstanceRole
 	sess := session.Must(session.NewSession())
 	metasvc := ec2metadata.New(sess)
-	iaminfo, err := metasvc.IAMInfo()
-	if err != nil {
-		log.Fatal("did not be assigned InstanceRole for this instance.")
-		os.Exit(1)
-	}
 	region, err := metasvc.Region()
 	if err != nil {
 		log.Fatal("Faild to detect region.")
 		os.Exit(1)
 	}
 
-	creds := stscreds.NewCredentials(sess, iaminfo.InstanceProfileArn)
 	awsconfig := &aws.Config{
-		Credentials: creds,
-		Region:      &region,
+		Region: aws.String(region),
 	}
+	// new session with awsconfig
+	sess = session.Must(session.NewSession(awsconfig))
 
 	if debug() {
 		awsconfig.WithLogLevel(aws.LogDebug)
@@ -148,7 +142,11 @@ func isTerminateWait(sess *session.Session, instance *machine.Machine) bool {
 		log.Debugf("%#v", err)
 		return false
 	}
-	if asState == "Terminating:Wait" {
+	switch asState {
+	case "":
+		log.Debug("Not in ASG.")
+		os.Exit(0)
+	case "Terminating:Wait":
 		return true
 	}
 
