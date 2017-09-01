@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"errors"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/mobingi/alm-agent/util"
 	"github.com/urfave/cli"
@@ -18,11 +20,23 @@ func Register(c *cli.Context) error {
 		"ssh-keyscan -t rsa -H gitlab.com | tee -a /etc/ssh/ssh_known_hosts",
 		"ssh-keyscan -t dsa -H gitlab.com | tee -a /etc/ssh/ssh_known_hosts",
 		"crontab -l | grep -v 'current/alm-agent' > /tmp/crontab.alm-agent",
-		"echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent",
-		"crontab /tmp/crontab.alm-agent",
-		"rm -f /tmp/crontab.alm-agent",
 	}
 	var out []byte
+
+	provider := c.GlobalString("provider")
+	switch provider {
+	case "aws":
+		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
+		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent-addon-aws >> /var/log/alm-agent/aws.log 2>&1' >> /tmp/crontab.alm-agent")
+	case "alicloud":
+		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -P alicloud -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
+	case "localtest":
+		return nil
+	default:
+		return cli.NewExitError(errors.New("Provider `"+provider+"` is not supported."), 1)
+	}
+	cmdstrs = append(cmdstrs, "crontab /tmp/crontab.alm-agent")
+	cmdstrs = append(cmdstrs, "rm -f /tmp/crontab.alm-agent")
 
 	for _, cmdstr := range cmdstrs {
 		out, _ = util.Executer.Exec("sh", "-c", cmdstr)

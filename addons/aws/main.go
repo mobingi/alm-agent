@@ -7,7 +7,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
+	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/mobingi/alm-agent/addons/aws/machine"
 	"github.com/mobingi/alm-agent/api"
@@ -53,20 +54,30 @@ func main() {
 	}
 	log.Debugf("%#v", svConfig)
 
-	stsToken, err := api.GetStsToken()
-	creds := credentials.NewStaticCredentials(
-		stsToken.AccessKeyID,
-		stsToken.SecretAccessKey,
-		stsToken.SessionToken,
-	)
+	// use EC2 InstanceRole
+	sess := session.Must(session.NewSession())
+	metasvc := ec2metadata.New(sess)
+	iaminfo, err := metasvc.IAMInfo()
+	if err != nil {
+		log.Fatal("did not be assigned InstanceRole for this instance.")
+		os.Exit(1)
+	}
+	region, err := metasvc.Region()
+	if err != nil {
+		log.Fatal("Faild to detect region.")
+		os.Exit(1)
+	}
 
-	awsconfig := aws.NewConfig().WithCredentials(creds).WithRegion(instance.Region)
+	creds := stscreds.NewCredentials(sess, iaminfo.InstanceProfileArn)
+	awsconfig := &aws.Config{
+		Credentials: creds,
+		Region:      &region,
+	}
 
 	if debug() {
 		awsconfig.WithLogLevel(aws.LogDebug)
 	}
 
-	sess := session.Must(session.NewSession(awsconfig))
 	log.Debugf("%#v", sess)
 
 	wg.Add(1)
