@@ -91,8 +91,8 @@ func main() {
 				rollbar.Error(rollbar.ERR, fmt.Errorf("%s", rec))
 				rollbar.Wait()
 			}
+			os.Exit(1)
 		}
-		os.Exit(1)
 	}()
 
 	cli.VersionPrinter = func(c *cli.Context) {
