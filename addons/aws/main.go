@@ -61,7 +61,11 @@ func main() {
 	log.Debugf("%#v", svConfig)
 
 	// use EC2 InstanceRole
-	sess := session.Must(session.NewSession())
+	sess := session.Must(session.NewSessionWithOptions(
+		session.Options{
+			SharedConfigState: session.SharedConfigDisable,
+		}))
+
 	metasvc := ec2metadata.New(sess)
 	region, err := metasvc.Region()
 	if err != nil {
@@ -73,7 +77,11 @@ func main() {
 		Region: aws.String(region),
 	}
 	// new session with awsconfig
-	sess = session.Must(session.NewSession(awsconfig))
+	sess = session.Must(session.NewSessionWithOptions(
+		session.Options{
+			Config:            *awsconfig,
+			SharedConfigState: session.SharedConfigDisable,
+		}))
 
 	if debug() {
 		awsconfig.WithLogLevel(aws.LogDebug)
