@@ -49,6 +49,12 @@ func main() {
 	log.Debugf("%#v", agentConfig)
 
 	api.SetConfig(agentConfig)
+	err = api.GetAccessToken()
+	if err != nil {
+		log.Fatal("Failed to Get Access Token from API")
+		os.Exit(1)
+	}
+
 	svConfig, err := api.GetServerConfig(agentConfig.APIHost)
 	if err != nil {
 		os.Exit(1)
