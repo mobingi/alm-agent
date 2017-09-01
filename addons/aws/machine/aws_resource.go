@@ -28,7 +28,7 @@ func (m *Machine) GetCurrentStateOfAS(sess *session.Session) (string, error) {
 	}
 
 	log.Debugf("%#v", asresp)
-	if len(*asresp.AutoScalingInstances) == 0 {
+	if len(asresp.AutoScalingInstances) == 0 {
 		return "", nil
 	}
 	m.ASName = *asresp.AutoScalingInstances[0].AutoScalingGroupName

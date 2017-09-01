@@ -145,7 +145,7 @@ func isTerminateWait(sess *session.Session, instance *machine.Machine) bool {
 	switch asState {
 	case "":
 		log.Debug("Not in ASG.")
-		os.Exit0()
+		os.Exit(0)
 	case "Terminating:Wait":
 		return true
 	}
