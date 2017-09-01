@@ -6,7 +6,7 @@ import (
 )
 
 func sendReport(err error) {
-	if !metavars.ReportEnabled {
+	if metavars.ReportDisabled {
 		return
 	}
 
