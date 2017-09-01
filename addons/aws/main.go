@@ -78,8 +78,10 @@ func main() {
 	creds := stscreds.NewCredentials(sess, iaminfo.InstanceProfileArn)
 	awsconfig := &aws.Config{
 		Credentials: creds,
-		Region:      &region,
+		Region:      aws.String(region),
 	}
+	// new session with awsconfig
+	sess = session.Must(session.NewSession(awsconfig))
 
 	if debug() {
 		awsconfig.WithLogLevel(aws.LogDebug)
