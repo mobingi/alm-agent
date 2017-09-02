@@ -22,8 +22,8 @@
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
   packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/xml/xmlutil","service/autoscaling","service/cloudformation","service/elb","service/sts"]
-  revision = "e63027ac6e05f6d4ae9f97ce0294d7468ca652da"
-  version = "v1.10.33"
+  revision = "2dd0010a66ff968eb03c2507cfb5deab080c5d93"
+  version = "v1.10.37"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -33,21 +33,20 @@
 
 [[projects]]
   name = "github.com/docker/distribution"
-  packages = ["digest","reference"]
-  revision = "48294d928ced5dd9b378f7fd7c6f5da3ff3f2c89"
-  version = "v2.6.2"
+  packages = ["digestset","reference","uuid"]
+  revision = "b38e5838b7b2f2ad48e06ec4b500011976080621"
 
 [[projects]]
   name = "github.com/docker/docker"
-  packages = ["api/types","api/types/blkiodev","api/types/container","api/types/events","api/types/filters","api/types/mount","api/types/network","api/types/reference","api/types/registry","api/types/strslice","api/types/swarm","api/types/time","api/types/versions","api/types/volume","client","opts","pkg/tlsconfig"]
-  revision = "092cba3727bb9b4a2f0e922cd6c0f93ea270e363"
-  version = "v1.13.1"
+  packages = ["api","api/types","api/types/blkiodev","api/types/container","api/types/events","api/types/filters","api/types/image","api/types/mount","api/types/network","api/types/registry","api/types/strslice","api/types/swarm","api/types/time","api/types/versions","api/types/volume","client","opts","pkg/ioutils","pkg/longpath","pkg/system","pkg/tlsconfig"]
+  revision = "89658bed64c2a8fe05a978e5b87dbec409d57a0f"
+  version = "v17.05.0-ce"
 
 [[projects]]
+  branch = "master"
   name = "github.com/docker/go-connections"
   packages = ["nat","sockets","tlsconfig"]
-  revision = "990a1a1a70b0da4c4cb70e117971a4f0babfbf1a"
-  version = "v0.2.1"
+  revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
 
 [[projects]]
   name = "github.com/docker/go-units"
@@ -59,6 +58,12 @@
   name = "github.com/docker/libnetwork"
   packages = ["iptables","portallocator","portmapper"]
   revision = "5d4e5de2f9962c2de8a7872128e2cc09dfdd99aa"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/docker/libtrust"
+  packages = ["."]
+  revision = "aabc10ec26b754e797f9028f4589c5b7bd90dc20"
 
 [[projects]]
   name = "github.com/go-ini/ini"
@@ -76,7 +81,7 @@
   branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "78072f320213a7e011b5fb2700bcb9eb90efec37"
+  revision = "24139d56e97a44988087d461125ed6fab91c07ac"
 
 [[projects]]
   branch = "master"
@@ -97,10 +102,10 @@
   version = "0.2.2"
 
 [[projects]]
-  name = "github.com/opencontainers/runc"
-  packages = ["libcontainer/user"]
-  revision = "baf6536d6259209c3edfa2b22237af82942d3dfa"
-  version = "v0.1.1"
+  name = "github.com/opencontainers/go-digest"
+  packages = ["."]
+  revision = "aa2ec055abd10d26d539eb630a92241b781ce4bc"
+  version = "v1.0.0-rc0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -139,10 +144,9 @@
   revision = "c717f7a2157ba1a8928c7d2137d626d07ec0a58f"
 
 [[projects]]
-  branch = "master"
   name = "github.com/vishvananda/netlink"
   packages = [".","nl"]
-  revision = "f5a6f697a596c788d474984a38a0ac4ba0719e93"
+  revision = "1e86b2bee5b6a7d377e4c02bb7f98209d6a7297c"
 
 [[projects]]
   branch = "master"
@@ -160,17 +164,17 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","context/ctxhttp","html","html/atom","proxy"]
-  revision = "57efc9c3d9f91fb3277f8da1cff370539c4d3dc5"
+  revision = "66aacef3dd8a676686c7ae3716979581e8b03c47"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "2d6f6f883a06fc0d5f4b14a81e4c28705ea64c15"
+  revision = "7ddbeae9ae08c6a06a59597f0c9edbc5ff2444ce"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a2e840d2feb9127ebc4aeeab7ab7071ca02a7c787d5a9bfb8b009245efe81abb"
+  inputs-digest = "b3e9b7600e9bf7361f1d3af5b0eff63cf29a700583ef71b1e6d0c154455c6c5a"
   solver-name = "gps-cdcl"
   solver-version = 1
