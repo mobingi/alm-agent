@@ -33,13 +33,12 @@
 
 [[projects]]
   name = "github.com/docker/distribution"
-  packages = ["digest","reference","uuid"]
-  revision = "48294d928ced5dd9b378f7fd7c6f5da3ff3f2c89"
-  version = "v2.6.2"
+  packages = ["digestset","reference","uuid"]
+  revision = "b38e5838b7b2f2ad48e06ec4b500011976080621"
 
 [[projects]]
   name = "github.com/docker/docker"
-  packages = ["api","api/types","api/types/blkiodev","api/types/container","api/types/events","api/types/filters","api/types/image","api/types/mount","api/types/network","api/types/registry","api/types/strslice","api/types/swarm","api/types/time","api/types/versions","api/types/volume","client","opts","pkg/ioutils","pkg/longpath","pkg/parsers","pkg/system","pkg/tlsconfig"]
+  packages = ["api","api/types","api/types/blkiodev","api/types/container","api/types/events","api/types/filters","api/types/image","api/types/mount","api/types/network","api/types/registry","api/types/strslice","api/types/swarm","api/types/time","api/types/versions","api/types/volume","client","opts","pkg/ioutils","pkg/longpath","pkg/system","pkg/tlsconfig"]
   revision = "89658bed64c2a8fe05a978e5b87dbec409d57a0f"
   version = "v17.05.0-ce"
 
@@ -101,6 +100,12 @@
   packages = ["."]
   revision = "3433f3ea46d9f8019119e7dd41274e112a2359a9"
   version = "0.2.2"
+
+[[projects]]
+  name = "github.com/opencontainers/go-digest"
+  packages = ["."]
+  revision = "aa2ec055abd10d26d539eb630a92241b781ce4bc"
+  version = "v1.0.0-rc0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -171,6 +176,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "be2ce98ae0f4ea975e0e07985bfb3038b2b35226aa6a9c4871f1ec7f112a4014"
+  inputs-digest = "33b743e928235f6c4403459b45ba4338ac3ceae04ebe96de118968c6f86da6e9"
   solver-name = "gps-cdcl"
   solver-version = 1

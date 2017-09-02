@@ -39,3 +39,7 @@
 [[override]]
   name = "github.com/opencontainers/runc"
   revision =  "9c2d8d184e5da67c95d601382adf14862e4f2228"
+
+[[override]]
+  name = "github.com/docker/distribution"
+  revision =  "b38e5838b7b2f2ad48e06ec4b500011976080621"
