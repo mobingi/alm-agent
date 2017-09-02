@@ -31,7 +31,7 @@
   name = "github.com/stvp/rollbar"
   version = "v0.5.0"
 
-# depends on docker v17.05.0-ce
+# depends on docker v17.05.0-ce (only prone to error)
 [[override]]
   revision = "5d4e5de2f9962c2de8a7872128e2cc09dfdd99aa"
   name = "github.com/docker/libnetwork"
@@ -43,3 +43,7 @@
 [[override]]
   name = "github.com/docker/distribution"
   revision =  "b38e5838b7b2f2ad48e06ec4b500011976080621"
+
+[[override]]
+  name ="github.com/vishvananda/netlink"
+  revision = "1e86b2bee5b6a7d377e4c02bb7f98209d6a7297c"
