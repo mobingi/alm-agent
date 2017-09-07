@@ -14,7 +14,7 @@ func Register(c *cli.Context) error {
 	var cmdstrs = []string{
 		"mkdir -p /var/log/alm-agent/containerlogs /var/log/alm-agent/container",
 		"ssh-keyscan -t rsa -H github.com | tee /etc/ssh/ssh_known_hosts",
-		"ssh-keyscan -t dsa -H github.com | tee /etc/ssh/ssh_known_hosts",
+		"ssh-keyscan -t dsa -H github.com | tee -a /etc/ssh/ssh_known_hosts",
 		"ssh-keyscan -t rsa -H bitbucket.org | tee -a /etc/ssh/ssh_known_hosts",
 		"ssh-keyscan -t dsa -H bitbucket.org | tee -a /etc/ssh/ssh_known_hosts",
 		"ssh-keyscan -t rsa -H gitlab.com | tee -a /etc/ssh/ssh_known_hosts",
