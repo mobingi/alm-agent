@@ -19,4 +19,4 @@ $AWSCLI s3 cp ${version}/alm-agent.tgz s3://${bucket}/alm-agent/${CIRCLE_BRANCH}
 $AWSCLI s3 cp --cache-control 'max-age=3600' ${version}/alm-agent.tgz s3://${bucket}/alm-agent/${CIRCLE_BRANCH}/current/
 
 $AWSCLI s3 cp --content-type text/json ${version}/${INFO_FILE} s3://${bucket}/alm-agent/${CIRCLE_BRANCH}/${version}/
-$AWSCLI s3 cp --content-type text/json --cache-control 'max-age=180' ${version}/${INFO_FILE} s3://${bucket}/alm-agent/${CIRCLE_BRANCH}/current/
+$AWSCLI s3 cp --content-type text/json --cache-control 'max-age=1800' ${version}/${INFO_FILE} s3://${bucket}/alm-agent/${CIRCLE_BRANCH}/current/
