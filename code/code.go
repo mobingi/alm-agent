@@ -133,16 +133,22 @@ func (c *Code) PrivateRepo() error {
 	return nil
 }
 
+var (
+	globalKnownHosts = "/etc/ssh/ssh_known_hosts"
+	usersSshDir      = "~/.ssh"
+	usersKnownHosts  = "~/.ssh/known_hosts"
+)
+
 func createIdentityFile(key string) error {
 	log.Debug("Step: createIdentityFile")
-	sshDir := "/root/.ssh"
-	sshKey := path.Join(sshDir, "id_code")
+	sshKey := path.Join(usersSshDir, "id_alm_agent")
 
-	if !util.FileExists(sshDir) {
-		if err := os.Mkdir(sshDir, 0700); err != nil {
+	if !util.FileExists(usersSshDir) {
+		if err := os.Mkdir(usersSshDir, 0700); err != nil {
 			return err
 		}
 	}
+
 	if util.FileExists(sshKey) {
 		if err := os.Remove(sshKey); err != nil {
 			return err
@@ -191,7 +197,7 @@ func convertGithubGitURLToSSH(url *url.URL) string {
 
 func checkKnownHosts(url *url.URL) error {
 	log.Debug("Step: checkKnownHosts")
-	out, err := exec.Command("ssh-keygen", "-F", url.Host).Output()
+	out, err := exec.Command("ssh-keygen", "-F", url.Host, "-f", globalKnownHosts, "-f", usersKnownHosts).Output()
 	if string(out) == "" && err != nil {
 		out, err = exec.Command("ssh-keyscan", url.Host).Output()
 		if err != nil {
@@ -201,10 +207,9 @@ func checkKnownHosts(url *url.URL) error {
 			return fmt.Errorf("%s's ssh public key is empty", url.Host)
 		}
 
-		kh := "/root/.ssh/known_hosts"
-		log.Debugf("Add %s's public key to %s", url.Host, kh)
+		log.Debugf("Add %s's public key to %s", url.Host, globalKnownHosts)
 
-		file, err := os.OpenFile(kh, os.O_RDWR|os.O_APPEND, 0644)
+		file, err := os.OpenFile(globalKnownHosts, os.O_RDWR|os.O_APPEND, 0644)
 		if err != nil {
 			return err
 		}
@@ -218,9 +223,9 @@ func checkKnownHosts(url *url.URL) error {
 func writeSshConfig(url *url.URL) error {
 	log.Debug("Step: writeSshConfig")
 	c := `Host %s
-  IdentityFile /root/.ssh/id_code
+  IdentityFile %s
 `
-	configPath := "/root/.ssh/config"
+	configPath := path.Join(usersSshDir, "config")
 
 	if util.FileExists(configPath) {
 		if err := os.Remove(configPath); err != nil {
@@ -228,7 +233,7 @@ func writeSshConfig(url *url.URL) error {
 		}
 	}
 
-	config := fmt.Sprintf(c, url.Host)
+	config := fmt.Sprintf(c, url.Host, path.Join(usersSshDir, "id_alm_agent"))
 	err := ioutil.WriteFile(configPath, []byte(config), 0644)
 	if err != nil {
 		return err
