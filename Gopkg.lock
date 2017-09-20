@@ -20,10 +20,10 @@
   version = "v1.0.3"
 
 [[projects]]
+  branch = "master"
   name = "github.com/aws/aws-sdk-go"
   packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/xml/xmlutil","service/autoscaling","service/cloudformation","service/elb","service/sts"]
-  revision = "2dd0010a66ff968eb03c2507cfb5deab080c5d93"
-  version = "v1.10.37"
+  revision = "00b2e557c43c3637d4e2282f88a9cf3fd070ff89"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -175,6 +175,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b3e9b7600e9bf7361f1d3af5b0eff63cf29a700583ef71b1e6d0c154455c6c5a"
+  inputs-digest = "bfa2150dc5f6400666461a51837e78890b22c19fc8d23bc8e4176362fe4ff8b6"
   solver-name = "gps-cdcl"
   solver-version = 1
