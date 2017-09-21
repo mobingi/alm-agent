@@ -125,7 +125,7 @@ func (c *Code) PrivateRepo() error {
 		return err
 	}
 
-	err = writeSshConfig(url)
+	err = writeGitSshScript()
 	if err != nil {
 		return err
 	}
@@ -135,16 +135,17 @@ func (c *Code) PrivateRepo() error {
 
 var (
 	globalKnownHosts = "/etc/ssh/ssh_known_hosts"
-	usersSshDir      = "~/.ssh"
-	usersKnownHosts  = "~/.ssh/known_hosts"
+	sshDir           = "/opt/mobingi/etc/ssh"
+	sshKeyName       = "id_alm_agent"
+	gitSshScriptName = "git_ssh.sh"
 )
 
 func createIdentityFile(key string) error {
 	log.Debug("Step: createIdentityFile")
-	sshKey := path.Join(usersSshDir, "id_alm_agent")
+	sshKey := path.Join(sshDir, sshKeyName)
 
-	if !util.FileExists(usersSshDir) {
-		if err := os.Mkdir(usersSshDir, 0700); err != nil {
+	if !util.FileExists(sshDir) {
+		if err := os.Mkdir(sshDir, 0700); err != nil {
 			return err
 		}
 	}
@@ -197,7 +198,7 @@ func convertGithubGitURLToSSH(url *url.URL) string {
 
 func checkKnownHosts(url *url.URL) error {
 	log.Debug("Step: checkKnownHosts")
-	out, err := exec.Command("ssh-keygen", "-F", url.Host, "-f", globalKnownHosts, "-f", usersKnownHosts).Output()
+	out, err := exec.Command("ssh-keygen", "-F", url.Host, "-f", globalKnownHosts).Output()
 	if string(out) == "" && err != nil {
 		out, err = exec.Command("ssh-keyscan", url.Host).Output()
 		if err != nil {
@@ -220,21 +221,21 @@ func checkKnownHosts(url *url.URL) error {
 	return nil
 }
 
-func writeSshConfig(url *url.URL) error {
-	log.Debug("Step: writeSshConfig")
-	c := `Host %s
-  IdentityFile %s
+func writeGitSshScript() error {
+	log.Debug("Step: writeGitSshScript")
+	c := `#!/bin/sh
+exec ssh -i %s "$@"
 `
-	configPath := path.Join(usersSshDir, "config")
+	scriptPath := path.Join(sshDir, gitSshScriptName)
 
-	if util.FileExists(configPath) {
-		if err := os.Remove(configPath); err != nil {
+	if util.FileExists(scriptPath) {
+		if err := os.Remove(scriptPath); err != nil {
 			return err
 		}
 	}
 
-	config := fmt.Sprintf(c, url.Host, path.Join(usersSshDir, "id_alm_agent"))
-	err := ioutil.WriteFile(configPath, []byte(config), 0644)
+	s := fmt.Sprintf(c, path.Join(sshDir, sshKeyName))
+	err := ioutil.WriteFile(scriptPath, []byte(s), 0700)
 	if err != nil {
 		return err
 	}

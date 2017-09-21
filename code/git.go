@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"regexp"
 	"strings"
 
@@ -66,13 +67,15 @@ func (g *Git) checkUpdate() (bool, error) {
 func (g *Git) get() error {
 	if isTag.MatchString(g.ref) {
 		log.Infof("Executing git clone %s %s", g.url, g.path)
-		out, err := exec.Command("git", "clone", g.url, g.path).CombinedOutput()
+		cmd := exec.Command("git", "clone", g.url, g.path)
+		cmd.Env = append(os.Environ(), "GIT_SSH="+path.Join(sshDir, gitSshScriptName))
+		out, err := cmd.CombinedOutput()
 		if err != nil {
 			log.Error(string(out))
 		}
 
 		log.Infof("Executing git checkout %s ", g.ref)
-		cmd := exec.Command("git", "checkout", g.ref)
+		cmd = exec.Command("git", "checkout", g.ref)
 		cmd.Dir = g.path
 		err = cmd.Run()
 		if err != nil {
@@ -81,7 +84,9 @@ func (g *Git) get() error {
 		return err
 	} else {
 		log.Infof("Executing git clone -b %s %s %s", g.ref, g.url, g.path)
-		out, err := exec.Command("git", "clone", "-b", g.ref, g.url, g.path).CombinedOutput()
+		cmd := exec.Command("git", "clone", "-b", g.ref, g.url, g.path)
+		cmd.Env = append(os.Environ(), "GIT_SSH="+path.Join(sshDir, gitSshScriptName))
+		out, err := cmd.CombinedOutput()
 		if err != nil {
 			log.Error(string(out))
 		}
