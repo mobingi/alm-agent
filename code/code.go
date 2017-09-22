@@ -17,6 +17,25 @@ import (
 	"github.com/mobingi/alm-agent/util"
 )
 
+var (
+	knownHosts       = "/etc/ssh/ssh_known_hosts"
+	sshDir           = "/opt/mobingi/etc/ssh"
+	sshKeyName       = "id_alm_agent"
+	gitSshScriptName = "git_ssh.sh"
+)
+
+// ref. `man git-clone`
+// The following syntaxes may be used.
+// - ssh://[user@]host.xz[:port]/path/to/repo.git/
+// - git://host.xz[:port]/path/to/repo.git/
+// - http[s]://host.xz[:port]/path/to/repo.git/
+// - ftp[s]://host.xz[:port]/path/to/repo.git/
+// - [user@]host.xz:path/to/repo.git/
+var (
+	hasSchemeSyntax = regexp.MustCompile("^[^:]+://")
+	scpLikeSyntax   = regexp.MustCompile("^([^@]+@)?([^:]+):/?(.+)$")
+)
+
 type Code struct {
 	URL  string
 	Ref  string
@@ -133,13 +152,6 @@ func (c *Code) PrivateRepo() error {
 	return nil
 }
 
-var (
-	knownHosts       = "/etc/ssh/ssh_known_hosts"
-	sshDir           = "/opt/mobingi/etc/ssh"
-	sshKeyName       = "id_alm_agent"
-	gitSshScriptName = "git_ssh.sh"
-)
-
 func createIdentityFile(key string) error {
 	log.Debug("Step: createIdentityFile")
 	if !util.FileExists(sshDir) {
@@ -157,16 +169,6 @@ func createIdentityFile(key string) error {
 	}
 	return nil
 }
-
-// ref. `man git-clone`
-// The following syntaxes may be used.
-// - ssh://[user@]host.xz[:port]/path/to/repo.git/
-// - git://host.xz[:port]/path/to/repo.git/
-// - http[s]://host.xz[:port]/path/to/repo.git/
-// - ftp[s]://host.xz[:port]/path/to/repo.git/
-// - [user@]host.xz:path/to/repo.git/
-var hasSchemeSyntax = regexp.MustCompile("^[^:]+://")
-var scpLikeSyntax = regexp.MustCompile("^([^@]+@)?([^:]+):/?(.+)$")
 
 func parseURL(rawURL string) (*url.URL, error) {
 	log.Debug("Step: parseURL")
