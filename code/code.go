@@ -134,7 +134,7 @@ func (c *Code) PrivateRepo() error {
 }
 
 var (
-	globalKnownHosts = "/etc/ssh/ssh_known_hosts"
+	knownHosts       = "/etc/ssh/ssh_known_hosts"
 	sshDir           = "/opt/mobingi/etc/ssh"
 	sshKeyName       = "id_alm_agent"
 	gitSshScriptName = "git_ssh.sh"
@@ -142,14 +142,13 @@ var (
 
 func createIdentityFile(key string) error {
 	log.Debug("Step: createIdentityFile")
-	sshKey := path.Join(sshDir, sshKeyName)
-
 	if !util.FileExists(sshDir) {
 		if err := os.Mkdir(sshDir, 0700); err != nil {
 			return err
 		}
 	}
 
+	sshKey := path.Join(sshDir, sshKeyName)
 	if util.FileExists(sshKey) {
 		if err := os.Remove(sshKey); err != nil {
 			return err
@@ -198,7 +197,7 @@ func convertGithubGitURLToSSH(url *url.URL) string {
 
 func checkKnownHosts(url *url.URL) error {
 	log.Debug("Step: checkKnownHosts")
-	out, err := exec.Command("ssh-keygen", "-F", url.Host, "-f", globalKnownHosts).Output()
+	out, err := exec.Command("ssh-keygen", "-F", url.Host, "-f", knownHosts).Output()
 	if string(out) == "" && err != nil {
 		out, err = exec.Command("ssh-keyscan", url.Host).Output()
 		if err != nil {
@@ -208,9 +207,9 @@ func checkKnownHosts(url *url.URL) error {
 			return fmt.Errorf("%s's ssh public key is empty", url.Host)
 		}
 
-		log.Debugf("Add %s's public key to %s", url.Host, globalKnownHosts)
+		log.Debugf("Add %s's public key to %s", url.Host, knownHosts)
 
-		file, err := os.OpenFile(globalKnownHosts, os.O_RDWR|os.O_APPEND, 0644)
+		file, err := os.OpenFile(knownHosts, os.O_RDWR|os.O_APPEND, 0644)
 		if err != nil {
 			return err
 		}
@@ -226,16 +225,16 @@ func writeGitSshScript() error {
 	c := `#!/bin/sh
 exec ssh -i %s "$@"
 `
-	scriptPath := path.Join(sshDir, gitSshScriptName)
+	script := path.Join(sshDir, gitSshScriptName)
 
-	if util.FileExists(scriptPath) {
-		if err := os.Remove(scriptPath); err != nil {
+	if util.FileExists(script) {
+		if err := os.Remove(script); err != nil {
 			return err
 		}
 	}
 
 	s := fmt.Sprintf(c, path.Join(sshDir, sshKeyName))
-	err := ioutil.WriteFile(scriptPath, []byte(s), 0700)
+	err := ioutil.WriteFile(script, []byte(s), 0700)
 	if err != nil {
 		return err
 	}
