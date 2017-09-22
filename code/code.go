@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"time"
@@ -69,14 +69,14 @@ func (c *Code) CheckUpdate() (bool, error) {
 
 	if len(dirs) > 10 {
 		for _, dir := range dirs[10:] {
-			err := os.RemoveAll(path.Join(base, dir.Name()))
+			err := os.RemoveAll(filepath.Join(base, dir.Name()))
 			if err != nil {
 				return false, err
 			}
 		}
 	}
 
-	c.Path = path.Join(base, dirs[0].Name())
+	c.Path = filepath.Join(base, dirs[0].Name())
 	g := &Git{
 		url:  c.URL,
 		path: c.Path,
@@ -87,7 +87,7 @@ func (c *Code) CheckUpdate() (bool, error) {
 }
 
 func (c *Code) Get() (string, error) {
-	baseDir := path.Join("/srv", "code")
+	baseDir := filepath.Join("/srv", "code")
 	if !util.FileExists(baseDir) {
 		if err := os.MkdirAll(baseDir, 0755); err != nil {
 			return "", err
@@ -97,7 +97,7 @@ func (c *Code) Get() (string, error) {
 	t := time.Now().Format("20060102150405")
 	g := &Git{
 		url:  c.URL,
-		path: path.Join(baseDir, t),
+		path: filepath.Join(baseDir, t),
 		ref:  c.Ref,
 	}
 	err := g.get()
@@ -148,12 +148,7 @@ func createIdentityFile(key string) error {
 		}
 	}
 
-	sshKey := path.Join(sshDir, sshKeyName)
-	if util.FileExists(sshKey) {
-		if err := os.Remove(sshKey); err != nil {
-			return err
-		}
-	}
+	sshKey := filepath.Join(sshDir, sshKeyName)
 
 	log.Debugf("Create IdentityFile %s", sshKey)
 	err := ioutil.WriteFile(sshKey, []byte(key), 0600)
@@ -233,8 +228,8 @@ exec ssh -i %s "$@"
 		}
 	}
 
-	s := fmt.Sprintf(c, path.Join(sshDir, sshKeyName))
-	err := ioutil.WriteFile(script, []byte(s), 0700)
+	s := fmt.Sprintf(c, filepath.Join(sshDir, sshKeyName))
+	err := ioutil.WriteFile(filepath.Join(sshDir, gitSshScriptName), []byte(s), 0700)
 	if err != nil {
 		return err
 	}
