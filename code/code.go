@@ -143,7 +143,7 @@ var (
 func createIdentityFile(key string) error {
 	log.Debug("Step: createIdentityFile")
 	if !util.FileExists(sshDir) {
-		if err := os.Mkdir(sshDir, 0700); err != nil {
+		if err := os.MkdirAll(sshDir, 0700); err != nil {
 			return err
 		}
 	}
