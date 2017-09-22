@@ -220,13 +220,6 @@ func writeGitSshScript() error {
 	c := `#!/bin/sh
 exec ssh -i %s "$@"
 `
-	script := path.Join(sshDir, gitSshScriptName)
-
-	if util.FileExists(script) {
-		if err := os.Remove(script); err != nil {
-			return err
-		}
-	}
 
 	s := fmt.Sprintf(c, filepath.Join(sshDir, sshKeyName))
 	err := ioutil.WriteFile(filepath.Join(sshDir, gitSshScriptName), []byte(s), 0700)
