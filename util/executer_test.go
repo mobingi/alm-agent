@@ -28,7 +28,10 @@ func TestRealExecWithOpts(t *testing.T) {
 
 	assert := assert.New(t)
 
-	out, err := Executer.ExecWithOpts(tmpDir, []string{}, "pwd")
+	opts := &ExecOpts{
+		Dir: tmpDir,
+	}
+	out, err := Executer.ExecWithOpts(opts, "pwd")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +76,12 @@ func TestMockedExecuterWithOpts(t *testing.T) {
 	Executer = &MockExecuter{}
 
 	env := []string{"a=1", "b=2"}
-	Executer.ExecWithOpts("/tmp", env, "echo", "-n", "Mocked")
+	opts := &ExecOpts{
+		Dir: "/tmp",
+		Env: env,
+	}
+
+	Executer.ExecWithOpts(opts, "echo", "-n", "Mocked")
 
 	assert.Equal(MockBuffer[0], "echo -n Mocked")
 	assert.Equal(MockBuffer[1], "/tmp")
