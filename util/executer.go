@@ -1,6 +1,7 @@
 package util
 
 import (
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -35,7 +36,7 @@ func (o *osExecuter) Exec(command string, args ...string) ([]byte, error) {
 func (o *osExecuter) ExecWithOpts(opts *ExecOpts, command string, args ...string) ([]byte, error) {
 	cmd := exec.Command(command, args...)
 	cmd.Dir = opts.Dir
-	cmd.Env = opts.Env
+	cmd.Env = append(os.Environ(), opts.Env...)
 	out, err := cmd.CombinedOutput()
 	return out, err
 }
