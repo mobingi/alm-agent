@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -136,7 +135,7 @@ func (c *Code) PrivateRepo() error {
 
 	if url.Scheme == "git" && url.Host == "github.com" {
 		c.URL = convertGithubGitURLToSSH(url)
-		log.Debugf("Converted URL is %s.", c.URL)
+		log.Debugf("Converted URL is %s", c.URL)
 	}
 
 	err = checkKnownHosts(url)
@@ -194,9 +193,9 @@ func convertGithubGitURLToSSH(url *url.URL) string {
 
 func checkKnownHosts(url *url.URL) error {
 	log.Debug("Step: checkKnownHosts")
-	out, err := exec.Command("ssh-keygen", "-F", url.Host, "-f", knownHosts).Output()
+	out, err := util.Executer.Exec("ssh-keygen", "-F", url.Host, "-f", knownHosts)
 	if string(out) == "" && err != nil {
-		out, err = exec.Command("ssh-keyscan", url.Host).Output()
+		out, err := util.Executer.Exec("ssh-keyscan", url.Host)
 		if err != nil {
 			return err
 		}
@@ -222,7 +221,6 @@ func writeGitSshScript() error {
 	c := `#!/bin/sh
 exec ssh -i %s "$@"
 `
-
 	s := fmt.Sprintf(c, filepath.Join(sshDir, sshKeyName))
 	err := ioutil.WriteFile(filepath.Join(sshDir, gitSshScriptName), []byte(s), 0700)
 	if err != nil {

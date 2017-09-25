@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/mobingi/alm-agent/util"
 )
 
 type Git struct {
@@ -37,21 +38,20 @@ func (g *Git) checkUpdate() (bool, error) {
 		return true, nil
 	}
 
-	cmd := exec.Command("git", "fetch")
-	cmd.Dir = g.path
-	err = cmd.Run()
+	opts := &util.ExecOpts{}
+	opts.Env = []string{"GIT_SSH=" + filepath.Join(sshDir, gitSshScriptName)}
+	opts.Dir = g.path
+
+	out, err = util.Executer.ExecWithOpts(opts, "git", "fetch")
 	if err != nil {
-		return false, err
+		log.Error(string(out))
 	}
 
 	if isTag.MatchString(g.ref) {
-		cmd = exec.Command("git", "diff", g.ref)
+		out, err = util.Executer.ExecWithOpts(opts, "git", "diff", g.ref)
 	} else {
-		cmd = exec.Command("git", "diff", fmt.Sprintf("origin/%s", g.ref))
+		out, err = util.Executer.ExecWithOpts(opts, "git", "diff", fmt.Sprintf("origin/%s", g.ref))
 	}
-	cmd.Dir = g.path
-
-	out, err = cmd.Output()
 
 	if err != nil {
 		return false, err
@@ -65,28 +65,26 @@ func (g *Git) checkUpdate() (bool, error) {
 }
 
 func (g *Git) get() error {
+	opts := &util.ExecOpts{}
+	opts.Env = []string{"GIT_SSH=" + filepath.Join(sshDir, gitSshScriptName)}
+
 	if isTag.MatchString(g.ref) {
 		log.Infof("Executing git clone %s %s", g.url, g.path)
-		cmd := exec.Command("git", "clone", g.url, g.path)
-		cmd.Env = append(os.Environ(), "GIT_SSH="+path.Join(sshDir, gitSshScriptName))
-		out, err := cmd.CombinedOutput()
+		out, err := util.Executer.ExecWithOpts(opts, "git", "clone", g.url, g.path)
 		if err != nil {
 			log.Error(string(out))
 		}
 
 		log.Infof("Executing git checkout %s ", g.ref)
-		cmd = exec.Command("git", "checkout", g.ref)
-		cmd.Dir = g.path
-		err = cmd.Run()
+		opts.Dir = g.path
+		out, err = util.Executer.ExecWithOpts(opts, "git", "checkout", g.ref)
 		if err != nil {
-			return err
+			log.Error(string(out))
 		}
 		return err
 	} else {
 		log.Infof("Executing git clone -b %s %s %s", g.ref, g.url, g.path)
-		cmd := exec.Command("git", "clone", "-b", g.ref, g.url, g.path)
-		cmd.Env = append(os.Environ(), "GIT_SSH="+path.Join(sshDir, gitSshScriptName))
-		out, err := cmd.CombinedOutput()
+		out, err := util.Executer.ExecWithOpts(opts, "git", "clone", "-b", g.ref, g.url, g.path)
 		if err != nil {
 			log.Error(string(out))
 		}
