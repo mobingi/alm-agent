@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -259,10 +259,10 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 		hostConfig.Binds = append(hostConfig.Binds, bind)
 
 		initScriptFile := ""
-		if util.FileExists(path.Join(dir, "mobingi-init.sh")) {
-			initScriptFile = path.Join(dir, "mobingi-init.sh")
-		} else if util.FileExists(path.Join(dir, "mobingi-install.sh")) {
-			initScriptFile = path.Join(dir, "mobingi-install.sh")
+		if util.FileExists(filepath.Join(dir, "mobingi-init.sh")) {
+			initScriptFile = filepath.Join(dir, "mobingi-init.sh")
+		} else if util.FileExists(filepath.Join(dir, "mobingi-install.sh")) {
+			initScriptFile = filepath.Join(dir, "mobingi-install.sh")
 		}
 
 		if initScriptFile != "" {
