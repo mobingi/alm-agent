@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/api"
 	"github.com/mobingi/alm-agent/bindata"
 	"github.com/mobingi/alm-agent/code"
@@ -14,6 +13,7 @@ import (
 	"github.com/mobingi/alm-agent/login"
 	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
@@ -103,6 +103,9 @@ func Ensure(c *cli.Context) error {
 				sc.RemoveContainer(sysContainer)
 			} else if sysContainer.State == "exited" {
 				sc.RemoveContainer(sysContainer)
+			} else {
+				log.Debugf("system container %s is up to date.", syscon.Name)
+				continue
 			}
 		}
 
