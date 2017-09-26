@@ -1,7 +1,7 @@
 package machine
 
 import (
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/docker/docker/api/types"
 	"github.com/mobingi/alm-agent/config"

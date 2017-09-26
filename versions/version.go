@@ -13,7 +13,7 @@ import (
 	"sort"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/hashicorp/go-version"
 	latest "github.com/tcnksm/go-latest"
 )
