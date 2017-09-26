@@ -42,15 +42,15 @@ func (g *Git) checkUpdate() (bool, error) {
 	opts.Env = []string{"GIT_SSH=" + filepath.Join(sshDir, gitSshScriptName)}
 	opts.Dir = g.path
 
-	out, err = util.Executer.ExecWithOpts(opts, "git", "fetch")
+	out, err = util.Executor.ExecWithOpts(opts, "git", "fetch")
 	if err != nil {
 		log.Error(string(out))
 	}
 
 	if isTag.MatchString(g.ref) {
-		out, err = util.Executer.ExecWithOpts(opts, "git", "diff", g.ref)
+		out, err = util.Executor.ExecWithOpts(opts, "git", "diff", g.ref)
 	} else {
-		out, err = util.Executer.ExecWithOpts(opts, "git", "diff", fmt.Sprintf("origin/%s", g.ref))
+		out, err = util.Executor.ExecWithOpts(opts, "git", "diff", fmt.Sprintf("origin/%s", g.ref))
 	}
 
 	if err != nil {
@@ -70,21 +70,21 @@ func (g *Git) get() error {
 
 	if isTag.MatchString(g.ref) {
 		log.Infof("Executing git clone %s %s", g.url, g.path)
-		out, err := util.Executer.ExecWithOpts(opts, "git", "clone", g.url, g.path)
+		out, err := util.Executor.ExecWithOpts(opts, "git", "clone", g.url, g.path)
 		if err != nil {
 			log.Error(string(out))
 		}
 
 		log.Infof("Executing git checkout %s ", g.ref)
 		opts.Dir = g.path
-		out, err = util.Executer.ExecWithOpts(opts, "git", "checkout", g.ref)
+		out, err = util.Executor.ExecWithOpts(opts, "git", "checkout", g.ref)
 		if err != nil {
 			log.Error(string(out))
 		}
 		return err
 	} else {
 		log.Infof("Executing git clone -b %s %s %s", g.ref, g.url, g.path)
-		out, err := util.Executer.ExecWithOpts(opts, "git", "clone", "-b", g.ref, g.url, g.path)
+		out, err := util.Executor.ExecWithOpts(opts, "git", "clone", "-b", g.ref, g.url, g.path)
 		if err != nil {
 			log.Error(string(out))
 		}

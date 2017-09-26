@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-// ExecuterInterface has Exec to wrap os commands.
-type ExecuterInterface interface {
+// ExecutorInterface has Exec to wrap os commands.
+type ExecutorInterface interface {
 	Exec(cmd string, args ...string) ([]byte, error)
 	ExecWithOpts(execopts *ExecOpts, cmd string, args ...string) ([]byte, error)
 }
@@ -18,22 +18,22 @@ type ExecOpts struct {
 	Env []string
 }
 
-type osExecuter struct{}
+type osExecutor struct{}
 
-// Executer is real Executer
-var Executer ExecuterInterface
+// Executor is real Executor
+var Executor ExecutorInterface
 
 func init() {
-	Executer = &osExecuter{}
+	Executor = &osExecutor{}
 }
 
-func (o *osExecuter) Exec(command string, args ...string) ([]byte, error) {
+func (o *osExecutor) Exec(command string, args ...string) ([]byte, error) {
 	cmd := exec.Command(command, args...)
 	out, err := cmd.CombinedOutput()
 	return out, err
 }
 
-func (o *osExecuter) ExecWithOpts(opts *ExecOpts, command string, args ...string) ([]byte, error) {
+func (o *osExecutor) ExecWithOpts(opts *ExecOpts, command string, args ...string) ([]byte, error) {
 	cmd := exec.Command(command, args...)
 	cmd.Dir = opts.Dir
 	cmd.Env = append(os.Environ(), opts.Env...)
@@ -41,14 +41,14 @@ func (o *osExecuter) ExecWithOpts(opts *ExecOpts, command string, args ...string
 	return out, err
 }
 
-// MockExecuter is fake Executer.
-type MockExecuter struct{}
+// MockExecutor is fake Executor.
+type MockExecutor struct{}
 
 // MockBuffer collects commndline inputs.
 var MockBuffer []string
 
 // Exec returns command + args and put these to StdOut.
-func (m *MockExecuter) Exec(command string, args ...string) ([]byte, error) {
+func (m *MockExecutor) Exec(command string, args ...string) ([]byte, error) {
 	cl := command + " " + strings.Join(args, " ")
 	MockBuffer = append(MockBuffer, cl)
 	out := []byte(cl)
@@ -56,7 +56,7 @@ func (m *MockExecuter) Exec(command string, args ...string) ([]byte, error) {
 }
 
 // ExecWithOpts returns command + args and put these to StdOut.
-func (m *MockExecuter) ExecWithOpts(opts *ExecOpts, command string, args ...string) ([]byte, error) {
+func (m *MockExecutor) ExecWithOpts(opts *ExecOpts, command string, args ...string) ([]byte, error) {
 	cl := command + " " + strings.Join(args, " ")
 	MockBuffer = append(MockBuffer, cl)
 	MockBuffer = append(MockBuffer, opts.Dir)

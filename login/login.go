@@ -59,9 +59,9 @@ func EnsureUser(username string, sshkey string) {
 	_, err := user.Lookup(username)
 	if err != nil {
 		log.Infof("Step: Useradd %s\n", username)
-		util.Executer.Exec("useradd", "-m", username)
-		util.Executer.Exec("usermod", "-aG", "docker", username)
-		util.Executer.Exec("install", "-d", "-m", "0700", "-o", username, "-g", username, sshDirpath(username))
+		util.Executor.Exec("useradd", "-m", username)
+		util.Executor.Exec("usermod", "-aG", "docker", username)
+		util.Executor.Exec("install", "-d", "-m", "0700", "-o", username, "-g", username, sshDirpath(username))
 	} else {
 		log.Debugf("User %s already exists.\n", username)
 	}

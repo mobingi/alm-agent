@@ -14,7 +14,7 @@ func TestRealExec(t *testing.T) {
 	assert := assert.New(t)
 
 	expected := "Hello Agent!"
-	out, err := Executer.Exec("echo", "-n", expected)
+	out, err := Executor.Exec("echo", "-n", expected)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,7 +31,7 @@ func TestRealExecWithOpts(t *testing.T) {
 	opts := &ExecOpts{
 		Dir: tmpDir,
 	}
-	out, err := Executer.ExecWithOpts(opts, "pwd")
+	out, err := Executor.ExecWithOpts(opts, "pwd")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -45,35 +45,35 @@ func TestMockExec(t *testing.T) {
 
 	assert := assert.New(t)
 
-	Executer = &MockExecuter{}
+	Executor = &MockExecutor{}
 	expected := "echo -n Mocked"
-	out, err := Executer.Exec("echo", "-n", "Mocked")
+	out, err := Executor.Exec("echo", "-n", "Mocked")
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.Equal(string(out), expected)
 }
 
-func TestMockedExecuter(t *testing.T) {
+func TestMockedExecutor(t *testing.T) {
 	defer ClearMockBuffer()
 
 	assert := assert.New(t)
 
-	Executer = &MockExecuter{}
+	Executor = &MockExecutor{}
 
-	Executer.Exec("echo", "-n", "Mocked")
-	Executer.Exec("/bin/true", "but", "Mocked")
+	Executor.Exec("echo", "-n", "Mocked")
+	Executor.Exec("/bin/true", "but", "Mocked")
 
 	assert.Equal(MockBuffer[0], "echo -n Mocked")
 	assert.Equal(MockBuffer[1], "/bin/true but Mocked")
 }
 
-func TestMockedExecuterWithOpts(t *testing.T) {
+func TestMockedExecutorWithOpts(t *testing.T) {
 	defer ClearMockBuffer()
 
 	assert := assert.New(t)
 
-	Executer = &MockExecuter{}
+	Executor = &MockExecutor{}
 
 	env := []string{"a=1", "b=2"}
 	opts := &ExecOpts{
@@ -81,7 +81,7 @@ func TestMockedExecuterWithOpts(t *testing.T) {
 		Env: env,
 	}
 
-	Executer.ExecWithOpts(opts, "echo", "-n", "Mocked")
+	Executor.ExecWithOpts(opts, "echo", "-n", "Mocked")
 
 	assert.Equal(MockBuffer[0], "echo -n Mocked")
 	assert.Equal(MockBuffer[1], "/tmp")

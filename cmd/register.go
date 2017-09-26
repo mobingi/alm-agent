@@ -39,7 +39,7 @@ func Register(c *cli.Context) error {
 	cmdstrs = append(cmdstrs, "rm -f /tmp/crontab.alm-agent")
 
 	for _, cmdstr := range cmdstrs {
-		out, _ = util.Executer.Exec("sh", "-c", cmdstr)
+		out, _ = util.Executor.Exec("sh", "-c", cmdstr)
 		log.Debug(string(out))
 	}
 
