@@ -28,7 +28,7 @@ func (v *VolFuncs) LogsVol() []string {
 func (v *VolFuncs) MackerelVol() []string {
 	vols := []string{
 		"/var/run/docker.sock:/var/run/docker.sock",
-		"/var/lib/mackerel-agent/:/var/lib/mackerel-agent/"
+		"/var/lib/mackerel-agent/:/var/lib/mackerel-agent/",
 	}
 	return vols
 }

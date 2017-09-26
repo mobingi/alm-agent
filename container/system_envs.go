@@ -39,7 +39,9 @@ func (e *EnvFuncs) InstanceID(c *config.Config, _ interface{}) []string {
 
 // MackerelEnvs resolves mackerel_envs
 func (e *EnvFuncs) MackerelEnvs(c *config.Config, opts interface{}) []string {
+	log.Debugf("%#v", opts)
 	op := dproxy.New(opts)
+	log.Debugf("%#v", op)
 	apikey, err := op.M("apiKey").String()
 	if err != nil {
 		log.Error("Addon: Faild to get Mackerel APIKEY.")

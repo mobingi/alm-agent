@@ -27,6 +27,7 @@ setup:
 deps:
 	trash
 
+.PHONY: bindata
 bindata:
 	tomlv _data/*.toml
 	go-bindata -o ./bindata/bindata.go -pkg bindata -nometadata ./_data/

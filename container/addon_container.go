@@ -8,14 +8,14 @@ import (
 )
 
 // NewAddonDocker returns docker client
-func NewAddonDocker(c *config.Config, opts *serverConfig.Addon, s *SystemContainer) (*Docker, error) {
+func NewAddonDocker(c *config.Config, name string, opts *serverConfig.Addon, ac *SystemContainer) (*Docker, error) {
 	envs := []string{}
-	for _, envfunc := range s.EnvFuncs {
-		envs = append(envs, handleEnvMap[envfunc](c, opts)...)
+	for _, envfunc := range ac.EnvFuncs {
+		envs = append(envs, handleEnvMap[envfunc](c, &opts)...)
 	}
 
 	docker := &Docker{
-		Image: s.Image,
+		Image: ac.Image,
 		Envs:  envs,
 	}
 

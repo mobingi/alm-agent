@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	dproxy "github.com/koron/go-dproxy"
 	"github.com/mobingi/alm-agent/api"
 	"github.com/mobingi/alm-agent/bindata"
 	"github.com/mobingi/alm-agent/code"
@@ -35,6 +36,10 @@ func Ensure(c *cli.Context) error {
 	syscons := &container.SystemContainers{}
 	syscondata, _ := bindata.Asset("_data/sys_containers.toml")
 	toml.Decode(string(syscondata), &syscons)
+
+	addcons := &container.SystemContainers{}
+	addcondata, _ := bindata.Asset("_data/addon_containers.toml")
+	toml.Decode(string(addcondata), &addcons)
 
 	if err != nil {
 		return cli.NewExitError(err, 1)
@@ -111,6 +116,63 @@ func Ensure(c *cli.Context) error {
 
 		sysContainer, _ = sc.StartSysContainer(&syscon)
 		log.Debugf("%#v", sysContainer)
+	}
+
+	// Addon Containers
+	for _, addon := range s.Addons {
+		log.Debug("Step: NewAddonDockers")
+		a := dproxy.New(addon)
+		aName, err := a.M("name").String()
+		if aName == "" || err != nil {
+			log.Debugf("Failed?? to load addon container")
+			continue
+		}
+		log.Debugf("%#v", addon)
+
+		var addcon container.SystemContainer
+		for _, con := range addcons.Container {
+			if con.Name == aName {
+				addcon = con
+			} else {
+				log.Errorf("Addon container %s not defined.", aName)
+				continue
+			}
+		}
+
+		ac, err := container.NewAddonDocker(conf, aName, &addon, &addcon)
+		if err != nil {
+			log.Errorf("Failed to launch addon container")
+			continue
+		}
+
+		log.Debugf("Step: ac.StartContainer")
+		log.Debugf("%#v", ac)
+
+		addonImageUpdated, err := ac.CheckImageUpdated()
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+
+		addonContainer, err := ac.GetContainer(aName)
+		if err != nil {
+			return cli.NewExitError(err, 1)
+		}
+		log.Debugf("%#v", addonContainer)
+
+		if addonContainer != nil {
+			if addonImageUpdated {
+				ac.StopContainer(addonContainer)
+				ac.RemoveContainer(addonContainer)
+			} else if addonContainer.State == "exited" {
+				ac.RemoveContainer(addonContainer)
+			} else {
+				log.Debugf("system container %s is up to date.", aName)
+				continue
+			}
+		}
+
+		addonContainer, _ = ac.StartSysContainer(&addcon)
+		log.Debugf("%#v", addonContainer)
 	}
 
 	if initialize {
