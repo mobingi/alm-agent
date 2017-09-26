@@ -91,8 +91,13 @@ func (d *Docker) CheckImageUpdated() (bool, error) {
 
 // GetContainer returns container by name
 func (d *Docker) GetContainer(name string) (*Container, error) {
-	args := filters.Args{}
-	args.Add("name", name)
+	args := filters.NewArgs(
+		filters.KeyValuePair{
+			Key:   "name",
+			Value: name,
+		},
+	)
+	//	args.Add("name", name)
 	options := types.ContainerListOptions{
 		Filters: args,
 		All:     true,
@@ -118,8 +123,12 @@ func (d *Docker) GetContainer(name string) (*Container, error) {
 
 // GetContainerIDbyImage returns container by Image
 func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
-	args := filters.Args{}
-	args.Add("ancestor", ancestor)
+	args := filters.NewArgs(
+		filters.KeyValuePair{
+			Key:   "ancestor",
+			Value: ancestor,
+		},
+	)
 	options := types.ContainerListOptions{
 		Filters: args,
 		All:     true,
