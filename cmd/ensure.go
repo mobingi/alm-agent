@@ -139,7 +139,7 @@ func Ensure(c *cli.Context) error {
 			}
 		}
 
-		ac, err := container.NewAddonDocker(conf, aName, &addon, &addcon)
+		ac, err := container.NewAddonDocker(conf, aName, addon, &addcon)
 		if err != nil {
 			log.Errorf("Failed to launch addon container")
 			continue
