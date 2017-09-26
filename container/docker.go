@@ -11,16 +11,16 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/mobingi/alm-agent/config"
 	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
-	"github.com/docker/docker/opts"
 	"github.com/docker/libnetwork/iptables"
 	"github.com/docker/libnetwork/portmapper"
 	"golang.org/x/net/context"
@@ -91,10 +91,10 @@ func (d *Docker) CheckImageUpdated() (bool, error) {
 
 // GetContainer returns container by name
 func (d *Docker) GetContainer(name string) (*Container, error) {
-	filter := opts.NewFilterOpt()
-	filter.Set(fmt.Sprintf("name=%s", name))
+	args := filters.Args{}
+	args.Add("name", name)
 	options := types.ContainerListOptions{
-		Filters: filter.Value(),
+		Filters: args,
 		All:     true,
 	}
 	res, err := d.Client.ContainerList(context.Background(), options)
@@ -118,10 +118,10 @@ func (d *Docker) GetContainer(name string) (*Container, error) {
 
 // GetContainerIDbyImage returns container by Image
 func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
-	filter := opts.NewFilterOpt()
-	filter.Set(fmt.Sprintf("ancestor=%s", ancestor))
+	args := filters.Args{}
+	args.Add("ancestor", ancestor)
 	options := types.ContainerListOptions{
-		Filters: filter.Value(),
+		Filters: args,
 		All:     true,
 	}
 	res, err := d.Client.ContainerList(context.Background(), options)

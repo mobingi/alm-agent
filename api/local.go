@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
 )

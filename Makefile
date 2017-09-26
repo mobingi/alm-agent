@@ -1,5 +1,6 @@
 NAME := alm-agent
 VERSION := $(shell cat versions/version_base)
+DOCKER_REVISION := $(shell cat DOCKER_REVISION)
 MINOR_VERSION := $(shell date +%s)
 CIRCLE_SHA1 ?= $(shell git rev-parse HEAD)
 CIRCLE_BRANCH ?= develop
@@ -10,15 +11,21 @@ LDFLAGS += -X 'main.RollbarToken=$(ROLLBAR_CLIENT_TOKEN)'
 PACKAGES_ALL = $(shell go list ./... | grep -v '/vendor/')
 PACKAGES_MAIN = $(shell go list ./... | grep -v '/vendor/' | grep -v '/addons/')
 
+vendor.conf: setup
+	curl -LO https://raw.githubusercontent.com/moby/moby/${DOCKER_REVISION}/vendor.conf
+	echo >> vendor.conf
+	echo github.com/docker/docker ${DOCKER_REVISION} >> vendor.conf
+	cat vendor_append.conf >> vendor.conf
+
 setup:
-	go get -u github.com/golang/dep/cmd/dep
+	go get -u github.com/rancher/trash
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 	go get -u github.com/jteeuwen/go-bindata/...
 	go get github.com/BurntSushi/toml/cmd/tomlv
 
 deps:
-	dep ensure -v
+	trash
 
 bindata:
 	tomlv _data/*.toml

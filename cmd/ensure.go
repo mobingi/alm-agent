@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/api"
 	"github.com/mobingi/alm-agent/bindata"
 	"github.com/mobingi/alm-agent/code"

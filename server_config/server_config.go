@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"strconv"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/util"
 )
 
