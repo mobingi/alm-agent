@@ -28,8 +28,6 @@ jobs:
           key: godeps-{{ checksum "vendor.conf" }}
           paths:
             - "~/.trash-cache"
-            - "/go/src/golang.org"
-            - "/go/src/github.com/golang"
       - store_artifacts:
           path: bin/
           destination: bin
