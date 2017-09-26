@@ -1,5 +1,5 @@
 [[addon]]
-  name = "dummy"
-  image = "tianon/sleeping-beauty:latest"
-  envfuncs = []
-  volfuncs = []
+  name = "mackerel"
+  image = "mackerel/mackerel-agent:latest"
+  envfuncs = ['mackerel_envs']
+  volfuncs = ['mackerel_vol']

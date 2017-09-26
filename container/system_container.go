@@ -3,11 +3,11 @@ package container
 import (
 	"context"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/mobingi/alm-agent/config"
+	log "github.com/sirupsen/logrus"
 )
 
 // SystemContainer uses log
@@ -27,7 +27,7 @@ type SystemContainers struct {
 func NewSysDocker(c *config.Config, s *SystemContainer) (*Docker, error) {
 	envs := []string{}
 	for _, envfunc := range s.EnvFuncs {
-		envs = append(envs, handleEnvMap[envfunc](c))
+		envs = append(envs, handleEnvMap[envfunc](c, nil)...)
 	}
 
 	docker := &Docker{
@@ -88,8 +88,8 @@ func (d *Docker) sysContainerCreate(s *SystemContainer) (*Container, error) {
 	hostConfig := &container.HostConfig{}
 
 	vols := []string{}
-	for _, envfunc := range s.VolFuncs {
-		vols = append(vols, handleVolMap[envfunc]()...)
+	for _, volfunc := range s.VolFuncs {
+		vols = append(vols, handleVolMap[volfunc]()...)
 	}
 
 	hostConfig.Binds = append(

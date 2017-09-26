@@ -29,7 +29,6 @@ deps:
 
 bindata:
 	tomlv _data/*.toml
-	go-bindata ./_data/
 	go-bindata -o ./bindata/bindata.go -pkg bindata -nometadata ./_data/
 
 verifydata:

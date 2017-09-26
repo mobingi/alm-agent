@@ -13,13 +13,13 @@ func TestStackID(t *testing.T) {
 		StackID: "teststack",
 	}
 	assert := assert.New(t)
-	assert.Equal("STACK_ID=teststack", envFuncs.StackID(tc))
+	assert.Equal([]string{"STACK_ID=teststack"}, envFuncs.StackID(tc, nil))
 }
 
-func InstanceID(t *testing.T) {
+func TestInstanceID(t *testing.T) {
 	metavars.ServerID = "dummyid"
 	defer func() { metavars.ServerID = "" }()
 	tc := &config.Config{}
 	assert := assert.New(t)
-	assert.Equal("INSTANCE_ID=dummyid", envFuncs.InstanceID(tc))
+	assert.Equal([]string{"INSTANCE_ID=dummyid"}, envFuncs.InstanceID(tc, nil))
 }
