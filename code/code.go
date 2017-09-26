@@ -6,8 +6,7 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
-	"os/exec"
-	"path"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"time"
@@ -15,6 +14,25 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
+)
+
+var (
+	knownHosts       = "/etc/ssh/ssh_known_hosts"
+	sshDir           = "/opt/mobingi/etc/ssh"
+	sshKeyName       = "id_alm_agent"
+	gitSshScriptName = "git_ssh.sh"
+)
+
+// ref. `man git-clone`
+// The following syntaxes may be used.
+// - ssh://[user@]host.xz[:port]/path/to/repo.git/
+// - git://host.xz[:port]/path/to/repo.git/
+// - http[s]://host.xz[:port]/path/to/repo.git/
+// - ftp[s]://host.xz[:port]/path/to/repo.git/
+// - [user@]host.xz:path/to/repo.git/
+var (
+	hasSchemeSyntax = regexp.MustCompile("^[^:]+://")
+	scpLikeSyntax   = regexp.MustCompile("^([^@]+@)?([^:]+):/?(.+)$")
 )
 
 type Code struct {
@@ -69,14 +87,14 @@ func (c *Code) CheckUpdate() (bool, error) {
 
 	if len(dirs) > 10 {
 		for _, dir := range dirs[10:] {
-			err := os.RemoveAll(path.Join(base, dir.Name()))
+			err := os.RemoveAll(filepath.Join(base, dir.Name()))
 			if err != nil {
 				return false, err
 			}
 		}
 	}
 
-	c.Path = path.Join(base, dirs[0].Name())
+	c.Path = filepath.Join(base, dirs[0].Name())
 	g := &Git{
 		url:  c.URL,
 		path: c.Path,
@@ -87,7 +105,7 @@ func (c *Code) CheckUpdate() (bool, error) {
 }
 
 func (c *Code) Get() (string, error) {
-	baseDir := path.Join("/srv", "code")
+	baseDir := filepath.Join("/srv", "code")
 	if !util.FileExists(baseDir) {
 		if err := os.MkdirAll(baseDir, 0755); err != nil {
 			return "", err
@@ -97,7 +115,7 @@ func (c *Code) Get() (string, error) {
 	t := time.Now().Format("20060102150405")
 	g := &Git{
 		url:  c.URL,
-		path: path.Join(baseDir, t),
+		path: filepath.Join(baseDir, t),
 		ref:  c.Ref,
 	}
 	err := g.get()
@@ -117,7 +135,7 @@ func (c *Code) PrivateRepo() error {
 
 	if url.Scheme == "git" && url.Host == "github.com" {
 		c.URL = convertGithubGitURLToSSH(url)
-		log.Debugf("Converted URL is %s.", c.URL)
+		log.Debugf("Converted URL is %s", c.URL)
 	}
 
 	err = checkKnownHosts(url)
@@ -125,7 +143,7 @@ func (c *Code) PrivateRepo() error {
 		return err
 	}
 
-	err = writeSshConfig(url)
+	err = writeGitSshScript()
 	if err != nil {
 		return err
 	}
@@ -135,19 +153,13 @@ func (c *Code) PrivateRepo() error {
 
 func createIdentityFile(key string) error {
 	log.Debug("Step: createIdentityFile")
-	sshDir := "/root/.ssh"
-	sshKey := path.Join(sshDir, "id_code")
-
 	if !util.FileExists(sshDir) {
-		if err := os.Mkdir(sshDir, 0700); err != nil {
+		if err := os.MkdirAll(sshDir, 0700); err != nil {
 			return err
 		}
 	}
-	if util.FileExists(sshKey) {
-		if err := os.Remove(sshKey); err != nil {
-			return err
-		}
-	}
+
+	sshKey := filepath.Join(sshDir, sshKeyName)
 
 	log.Debugf("Create IdentityFile %s", sshKey)
 	err := ioutil.WriteFile(sshKey, []byte(key), 0600)
@@ -156,16 +168,6 @@ func createIdentityFile(key string) error {
 	}
 	return nil
 }
-
-// ref. `man git-clone`
-// The following syntaxes may be used.
-// - ssh://[user@]host.xz[:port]/path/to/repo.git/
-// - git://host.xz[:port]/path/to/repo.git/
-// - http[s]://host.xz[:port]/path/to/repo.git/
-// - ftp[s]://host.xz[:port]/path/to/repo.git/
-// - [user@]host.xz:path/to/repo.git/
-var hasSchemeSyntax = regexp.MustCompile("^[^:]+://")
-var scpLikeSyntax = regexp.MustCompile("^([^@]+@)?([^:]+):/?(.+)$")
 
 func parseURL(rawURL string) (*url.URL, error) {
 	log.Debug("Step: parseURL")
@@ -191,9 +193,9 @@ func convertGithubGitURLToSSH(url *url.URL) string {
 
 func checkKnownHosts(url *url.URL) error {
 	log.Debug("Step: checkKnownHosts")
-	out, err := exec.Command("ssh-keygen", "-F", url.Host).Output()
+	out, err := util.Executer.Exec("ssh-keygen", "-F", url.Host, "-f", knownHosts)
 	if string(out) == "" && err != nil {
-		out, err = exec.Command("ssh-keyscan", url.Host).Output()
+		out, err := util.Executer.Exec("ssh-keyscan", url.Host)
 		if err != nil {
 			return err
 		}
@@ -201,10 +203,9 @@ func checkKnownHosts(url *url.URL) error {
 			return fmt.Errorf("%s's ssh public key is empty", url.Host)
 		}
 
-		kh := "/root/.ssh/known_hosts"
-		log.Debugf("Add %s's public key to %s", url.Host, kh)
+		log.Debugf("Add %s's public key to %s", url.Host, knownHosts)
 
-		file, err := os.OpenFile(kh, os.O_RDWR|os.O_APPEND, 0644)
+		file, err := os.OpenFile(knownHosts, os.O_RDWR|os.O_APPEND, 0644)
 		if err != nil {
 			return err
 		}
@@ -215,21 +216,13 @@ func checkKnownHosts(url *url.URL) error {
 	return nil
 }
 
-func writeSshConfig(url *url.URL) error {
-	log.Debug("Step: writeSshConfig")
-	c := `Host %s
-  IdentityFile /root/.ssh/id_code
+func writeGitSshScript() error {
+	log.Debug("Step: writeGitSshScript")
+	c := `#!/bin/sh
+exec ssh -i %s "$@"
 `
-	configPath := "/root/.ssh/config"
-
-	if util.FileExists(configPath) {
-		if err := os.Remove(configPath); err != nil {
-			return err
-		}
-	}
-
-	config := fmt.Sprintf(c, url.Host)
-	err := ioutil.WriteFile(configPath, []byte(config), 0644)
+	s := fmt.Sprintf(c, filepath.Join(sshDir, sshKeyName))
+	err := ioutil.WriteFile(filepath.Join(sshDir, gitSshScriptName), []byte(s), 0700)
 	if err != nil {
 		return err
 	}
