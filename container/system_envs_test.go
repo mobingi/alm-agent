@@ -37,7 +37,7 @@ func TestMackerelEnvs(t *testing.T) {
 		"apikey=dummykey",
 		"auto_retirement=0",
 		"enable_docker_plugin=1",
-		"opts=-role testStack:testFlag",
+		"opts=-v -role testStack:testFlag",
 	}
 
 	js := `{"name": "mackarel", "apiKey": "dummykey"}`
