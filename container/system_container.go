@@ -16,6 +16,7 @@ type SystemContainer struct {
 	Image    string
 	EnvFuncs []string
 	VolFuncs []string
+	Restart  bool
 }
 
 // SystemContainers is slice of SystemContainer
