@@ -160,6 +160,7 @@ func Ensure(c *cli.Context) error {
 		log.Debugf("%#v", addonContainer)
 
 		if addonContainer != nil {
+			container.CompareToRestart(aName, ac, addonContainer, &addcon)
 			if addonImageUpdated {
 				ac.StopContainer(addonContainer)
 				ac.RemoveContainer(addonContainer)
