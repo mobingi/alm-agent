@@ -2,6 +2,9 @@ package container
 
 import (
 	"context"
+	"os"
+
+	"github.com/mobingi/alm-agent/metavars"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
@@ -84,6 +87,13 @@ func (d *Docker) sysContainerCreate(s *SystemContainer) (*Container, error) {
 		Image: d.Image,
 		Env:   d.Envs,
 	}
+
+	if metavars.ServerID == "" {
+		config.Hostname, _ = os.Hostname()
+	} else {
+		config.Hostname = metavars.ServerID
+	}
+
 	log.Debugf("ContainerConfig: %#v", config)
 
 	hostConfig := &container.HostConfig{}
