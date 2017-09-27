@@ -5,14 +5,17 @@ import (
 	"io/ioutil"
 	"strconv"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/util"
+	log "github.com/sirupsen/logrus"
 )
 
 // PubKey for SSH
 type PubKey struct {
 	PublicKey string
 }
+
+// Addon list of enabled addons
+type Addon interface{}
 
 // Config means application stack
 type Config struct {
@@ -27,6 +30,7 @@ type Config struct {
 	Updated              uint
 	Users                map[string]*PubKey
 	EnvironmentVariables map[string]string
+	Addons               []Addon `json:"addon"`
 }
 
 var versionPath = "/opt/mobingi/etc/configVersion"
