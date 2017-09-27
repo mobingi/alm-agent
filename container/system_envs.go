@@ -50,7 +50,7 @@ func (e *EnvFuncs) MackerelEnvs(c *config.Config, opts interface{}) []string {
 		"apikey=" + apikey,
 		"auto_retirement=0",
 		"enable_docker_plugin=1",
-		"opts=-role " + c.StackID + ":" + c.Flag,
+		"opts=-v -role " + c.StackID + ":" + c.Flag,
 	}
 	return envs
 }
