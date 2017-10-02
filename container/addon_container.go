@@ -3,7 +3,7 @@ package container
 import (
 	"github.com/mobingi/alm-agent/server_config"
 
-	"github.com/docker/docker/client"
+	"docker.io/go-docker"
 	"github.com/mobingi/alm-agent/config"
 )
 

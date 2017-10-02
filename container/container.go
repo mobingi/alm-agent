@@ -4,7 +4,7 @@ import (
 	"context"
 	"net"
 
-	"github.com/docker/docker/api/types/container"
+	"docker.io/go-docker/api/types/container"
 	log "github.com/sirupsen/logrus"
 )
 
