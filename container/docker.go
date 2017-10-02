@@ -16,11 +16,11 @@ import (
 	"github.com/mobingi/alm-agent/util"
 	log "github.com/sirupsen/logrus"
 
+	client "docker.io/go-docker"
 	"docker.io/go-docker/api/types"
 	"docker.io/go-docker/api/types/container"
 	"docker.io/go-docker/api/types/filters"
 	"docker.io/go-docker/api/types/network"
-	"docker.io/go-docker"
 	"github.com/docker/libnetwork/iptables"
 	"github.com/docker/libnetwork/portmapper"
 	"golang.org/x/net/context"

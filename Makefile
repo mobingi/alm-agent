@@ -18,14 +18,14 @@ vendor.conf: setup
 	cat vendor_append.conf >> vendor.conf
 
 setup:
-	go get -u github.com/rancher/trash
+	go get -u github.com/golang/dep/cmd/dep
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 	go get -u github.com/jteeuwen/go-bindata/...
 	go get github.com/BurntSushi/toml/cmd/tomlv
 
 deps:
-	trash
+	dep ensure
 
 .PHONY: bindata
 bindata:
