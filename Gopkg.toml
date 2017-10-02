@@ -63,7 +63,8 @@
   name = "github.com/tcnksm/go-latest"
 
 [[constraint]]
-  name = "github.com/urfave/cli.v1"
+  name = "github.com/urfave/cli"
+  revision = "v1"
 
 [[constraint]]
   name = "golang.org/x/net"
