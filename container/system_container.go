@@ -6,9 +6,9 @@ import (
 
 	"github.com/mobingi/alm-agent/metavars"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/client"
+	client "docker.io/go-docker"
+	"docker.io/go-docker/api/types/container"
+	"docker.io/go-docker/api/types/network"
 	"github.com/mobingi/alm-agent/config"
 	log "github.com/sirupsen/logrus"
 )

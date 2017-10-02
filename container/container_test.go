@@ -3,7 +3,7 @@ package container
 import (
 	"testing"
 
-	"github.com/docker/docker/api/types/container"
+	"docker.io/go-docker/api/types/container"
 	"github.com/stretchr/testify/assert"
 )
 

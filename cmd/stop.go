@@ -3,8 +3,8 @@ package cmd
 import (
 	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
+	client "docker.io/go-docker"
+	"docker.io/go-docker/api/types"
 	"github.com/mobingi/alm-agent/api"
 	"github.com/mobingi/alm-agent/config"
 	"github.com/mobingi/alm-agent/container"

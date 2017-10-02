@@ -8,8 +8,8 @@ LDFLAGS := -X 'github.com/mobingi/alm-agent/versions.Version=$(VERSION).$(MINOR_
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Revision=$(CIRCLE_SHA1)'
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Branch=$(CIRCLE_BRANCH)'
 LDFLAGS += -X 'main.RollbarToken=$(ROLLBAR_CLIENT_TOKEN)'
-PACKAGES_ALL = $(shell go list ./... | grep -v '/vendor/')
-PACKAGES_MAIN = $(shell go list ./... | grep -v '/vendor/' | grep -v '/addons/')
+PACKAGES_ALL = $(shell go list ./...')
+PACKAGES_MAIN = $(shell go list ./... | grep -v '/addons/')
 
 vendor.conf: setup
 	curl -LO https://raw.githubusercontent.com/moby/moby/${DOCKER_REVISION}/vendor.conf
@@ -18,14 +18,14 @@ vendor.conf: setup
 	cat vendor_append.conf >> vendor.conf
 
 setup:
-	go get -u github.com/rancher/trash
+	go get -u github.com/golang/dep/cmd/dep
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 	go get -u github.com/jteeuwen/go-bindata/...
 	go get github.com/BurntSushi/toml/cmd/tomlv
 
 deps:
-	trash
+	dep ensure -v
 
 .PHONY: bindata
 bindata:

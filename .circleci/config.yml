@@ -14,7 +14,7 @@ jobs:
           name: verifydata
           command: make verifydata
       - restore_cache:
-          key: godeps-{{ checksum "vendor.conf" }}
+          key: godeps-{{ checksum "Gopkg.lock" }}-{{ checksum "Gopkg.toml" }}
       - run:
           name: test and build maincli
           command: make cibuild
@@ -25,9 +25,11 @@ jobs:
           name: put version_info
           command: ./bin/alm-agent -v > ./bin/version_info.json
       - save_cache:
-          key: godeps-{{ checksum "vendor.conf" }}
+          key: godeps-{{ checksum "Gopkg.lock" }}-{{ checksum "Gopkg.toml" }}
           paths:
-            - "~/.trash-cache"
+            - "/go/src/golang.org"
+            - "/go/src/github.com/golang"
+            - "/go/src/docker.io"
       - store_artifacts:
           path: bin/
           destination: bin
