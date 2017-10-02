@@ -8,8 +8,8 @@ LDFLAGS := -X 'github.com/mobingi/alm-agent/versions.Version=$(VERSION).$(MINOR_
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Revision=$(CIRCLE_SHA1)'
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Branch=$(CIRCLE_BRANCH)'
 LDFLAGS += -X 'main.RollbarToken=$(ROLLBAR_CLIENT_TOKEN)'
-PACKAGES_ALL = $(shell go list ./... | grep -v '/vendor/')
-PACKAGES_MAIN = $(shell go list ./... | grep -v '/vendor/' | grep -v '/addons/')
+PACKAGES_ALL = $(shell go list ./...')
+PACKAGES_MAIN = $(shell go list ./... | grep -v '/addons/')
 
 vendor.conf: setup
 	curl -LO https://raw.githubusercontent.com/moby/moby/${DOCKER_REVISION}/vendor.conf
@@ -25,7 +25,7 @@ setup:
 	go get github.com/BurntSushi/toml/cmd/tomlv
 
 deps:
-	dep ensure
+	dep ensure -v
 
 .PHONY: bindata
 bindata:
