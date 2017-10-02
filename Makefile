@@ -1,6 +1,5 @@
 NAME := alm-agent
 VERSION := $(shell cat versions/version_base)
-DOCKER_REVISION := $(shell cat DOCKER_REVISION)
 MINOR_VERSION := $(shell date +%s)
 CIRCLE_SHA1 ?= $(shell git rev-parse HEAD)
 CIRCLE_BRANCH ?= develop
@@ -10,12 +9,6 @@ LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Branch=$(CIRCLE_BRANCH)'
 LDFLAGS += -X 'main.RollbarToken=$(ROLLBAR_CLIENT_TOKEN)'
 PACKAGES_ALL = $(shell go list ./...')
 PACKAGES_MAIN = $(shell go list ./... | grep -v '/addons/')
-
-vendor.conf: setup
-	curl -LO https://raw.githubusercontent.com/moby/moby/${DOCKER_REVISION}/vendor.conf
-	echo >> vendor.conf
-	echo github.com/docker/docker ${DOCKER_REVISION} >> vendor.conf
-	cat vendor_append.conf >> vendor.conf
 
 setup:
 	go get -u github.com/golang/dep/cmd/dep
