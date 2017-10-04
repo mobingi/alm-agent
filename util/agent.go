@@ -1,15 +1,16 @@
 package util
 
 import (
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/docker/distribution/uuid"
 	"github.com/mobingi/alm-agent/metavars"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -18,6 +19,10 @@ var (
 	containerLogsLocation = "/var/log/alm-agent/container"
 	agentIDSavePath       = "/opt/mobingi/etc/alm-agent.id"
 )
+
+type k5 struct {
+	Uuid string `json:"uuid"`
+}
 
 // FetchContainerState fetches state of application in running container.
 func FetchContainerState() string {
@@ -58,6 +63,8 @@ func getServerID(provider string) (string, error) {
 		endpoint = ec2METAENDPOINT + "/latest/meta-data/instance-id"
 	case "alicloud":
 		endpoint = ecsMETAENDPOINT + "/latest/meta-data/instance-id"
+	case "k5":
+		endpoint = ec2METAENDPOINT + "/openstack/latest/meta_data.json"
 	case "localtest":
 		return "", nil
 	default:
@@ -78,7 +85,23 @@ func getServerID(provider string) (string, error) {
 		return "", errors.New("Failed to get ServerID")
 	}
 
+	if provider == "k5" {
+		id, err := getUuidOfK5(body)
+		if err != nil {
+			return "", errors.New("Failed to get ServerID")
+		}
+		return id, nil
+	}
+
 	return string(body), nil
+}
+
+func getUuidOfK5(b []byte) (string, error) {
+	var k k5
+	if err := json.Unmarshal(b, &k); err != nil {
+		return "", err
+	}
+	return k.Uuid, nil
 }
 
 // AgentID sets metavars.AgentID
