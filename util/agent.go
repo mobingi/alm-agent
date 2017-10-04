@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	ec2METAENDPOINT       = "http://169.254.169.254/"
+	METAENDPOINT          = "http://169.254.169.254/"
 	ecsMETAENDPOINT       = "http://100.100.100.200/"
 	containerLogsLocation = "/var/log/alm-agent/container"
 	agentIDSavePath       = "/opt/mobingi/etc/alm-agent.id"
@@ -60,11 +60,11 @@ func getServerID(provider string) (string, error) {
 	var endpoint string
 	switch provider {
 	case "aws":
-		endpoint = ec2METAENDPOINT + "/latest/meta-data/instance-id"
+		endpoint = METAENDPOINT + "/latest/meta-data/instance-id"
 	case "alicloud":
 		endpoint = ecsMETAENDPOINT + "/latest/meta-data/instance-id"
 	case "k5":
-		endpoint = ec2METAENDPOINT + "/openstack/latest/meta_data.json"
+		endpoint = METAENDPOINT + "/openstack/latest/meta_data.json"
 	case "localtest":
 		return "", nil
 	default:
