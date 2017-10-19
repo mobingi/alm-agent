@@ -190,6 +190,11 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 	log.Debugf("ContainerConfig: %#v", config)
 
 	hostConfig := &container.HostConfig{}
+	hostConfig.Sysctls = map[string]string{
+		"net.core.somaxconn":           "40960",
+		"net.ipv4.ip_local_port_range": "10240 65535",
+	}
+
 	if dir != "" {
 		bind := fmt.Sprintf("%s:%s", dir, d.CodeDir)
 		hostConfig.Binds = append(hostConfig.Binds, bind)

@@ -20,6 +20,13 @@ func Register(c *cli.Context) error {
 		"ssh-keyscan -t rsa -H gitlab.com | tee -a /etc/ssh/ssh_known_hosts",
 		"ssh-keyscan -t dsa -H gitlab.com | tee -a /etc/ssh/ssh_known_hosts",
 		"crontab -l | grep -v 'current/alm-agent' > /tmp/crontab.alm-agent",
+		"echo /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.core.somaxconn = 65535 > /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.core.netdev_max_backlog = 20480 >> /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.ipv4.tcp_max_syn_backlog = 20480 >> /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.ipv4.tcp_tw_reuse = 1 >> /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.ipv4.ip_local_port_range = 10240 65535 >> /etc/sysctl.d/30-alm-agent.conf",
+		"sysctl -p -q /etc/sysctl.d/30-alm-agent.conf",
 	}
 	var out []byte
 
