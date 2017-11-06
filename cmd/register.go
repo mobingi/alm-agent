@@ -3,8 +3,8 @@ package cmd
 import (
 	"errors"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/mobingi/alm-agent/util"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
@@ -14,12 +14,21 @@ func Register(c *cli.Context) error {
 	var cmdstrs = []string{
 		"mkdir -p /var/log/alm-agent/containerlogs /var/log/alm-agent/container",
 		"ssh-keyscan -t rsa -H github.com | tee /etc/ssh/ssh_known_hosts",
-		"ssh-keyscan -t dsa -H github.com | tee /etc/ssh/ssh_known_hosts",
+		"ssh-keyscan -t dsa -H github.com | tee -a /etc/ssh/ssh_known_hosts",
 		"ssh-keyscan -t rsa -H bitbucket.org | tee -a /etc/ssh/ssh_known_hosts",
 		"ssh-keyscan -t dsa -H bitbucket.org | tee -a /etc/ssh/ssh_known_hosts",
 		"ssh-keyscan -t rsa -H gitlab.com | tee -a /etc/ssh/ssh_known_hosts",
 		"ssh-keyscan -t dsa -H gitlab.com | tee -a /etc/ssh/ssh_known_hosts",
 		"crontab -l | grep -v 'current/alm-agent' > /tmp/crontab.alm-agent",
+		"echo /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.core.somaxconn = 65535 > /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.core.netdev_max_backlog = 20480 >> /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.ipv4.tcp_max_syn_backlog = 20480 >> /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.ipv4.tcp_tw_reuse = 1 >> /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.ipv4.ip_local_port_range = 10240 65535 >> /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.netfilter.nf_conntrack_max = 200000 >> /etc/sysctl.d/30-alm-agent.conf",
+		"echo net.nf_conntrack_max = 200000 >> /etc/sysctl.d/30-alm-agent.conf",
+		"sysctl -p -q /etc/sysctl.d/30-alm-agent.conf",
 	}
 	var out []byte
 
@@ -30,6 +39,8 @@ func Register(c *cli.Context) error {
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent-addon-aws >> /var/log/alm-agent/aws.log 2>&1' >> /tmp/crontab.alm-agent")
 	case "alicloud":
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -P alicloud -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
+	case "k5":
+		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -P k5 -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
 	case "localtest":
 		return nil
 	default:
@@ -39,7 +50,7 @@ func Register(c *cli.Context) error {
 	cmdstrs = append(cmdstrs, "rm -f /tmp/crontab.alm-agent")
 
 	for _, cmdstr := range cmdstrs {
-		out, _ = util.Executer.Exec("sh", "-c", cmdstr)
+		out, _ = util.Executor.Exec("sh", "-c", cmdstr)
 		log.Debug(string(out))
 	}
 

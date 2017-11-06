@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"syscall"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 var lockbase = "/var/lock"

@@ -2,12 +2,15 @@ package container
 
 import (
 	"context"
+	"os"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/client"
+	"github.com/mobingi/alm-agent/metavars"
+
+	client "docker.io/go-docker"
+	"docker.io/go-docker/api/types/container"
+	"docker.io/go-docker/api/types/network"
 	"github.com/mobingi/alm-agent/config"
+	log "github.com/sirupsen/logrus"
 )
 
 // SystemContainer uses log
@@ -16,6 +19,7 @@ type SystemContainer struct {
 	Image    string
 	EnvFuncs []string
 	VolFuncs []string
+	Restart  bool
 }
 
 // SystemContainers is slice of SystemContainer
@@ -27,7 +31,7 @@ type SystemContainers struct {
 func NewSysDocker(c *config.Config, s *SystemContainer) (*Docker, error) {
 	envs := []string{}
 	for _, envfunc := range s.EnvFuncs {
-		envs = append(envs, handleEnvMap[envfunc](c))
+		envs = append(envs, handleEnvMap[envfunc](c, nil)...)
 	}
 
 	docker := &Docker{
@@ -83,13 +87,20 @@ func (d *Docker) sysContainerCreate(s *SystemContainer) (*Container, error) {
 		Image: d.Image,
 		Env:   d.Envs,
 	}
+
+	if metavars.ServerID == "" {
+		config.Hostname, _ = os.Hostname()
+	} else {
+		config.Hostname = metavars.ServerID
+	}
+
 	log.Debugf("ContainerConfig: %#v", config)
 
 	hostConfig := &container.HostConfig{}
 
 	vols := []string{}
-	for _, envfunc := range s.VolFuncs {
-		vols = append(vols, handleVolMap[envfunc]()...)
+	for _, volfunc := range s.VolFuncs {
+		vols = append(vols, handleVolMap[volfunc]()...)
 	}
 
 	hostConfig.Binds = append(

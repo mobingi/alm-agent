@@ -1,36 +1,70 @@
 
-[[constraint]]
-  name = "github.com/urfave/cli"
-  branch = "v1"
+# Gopkg.toml example
+#
+# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
+# for detailed Gopkg.toml documentation.
+#
+# required = ["github.com/user/thing/cmd/thing"]
+# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
+#
+# [[constraint]]
+#   name = "github.com/user/project"
+#   version = "1.0.0"
+#
+# [[constraint]]
+#   name = "github.com/user/project2"
+#   branch = "dev"
+#   source = "github.com/myfork/project2"
+#
+# [[override]]
+#  name = "github.com/x/y"
+#  version = "2.4.0"
+
 
 [[constraint]]
-  name = "github.com/koron/go-dproxy"
-  version = "v1.1"
+  name = "docker.io/go-docker"
+  version = "1.0.0"
 
 [[constraint]]
   name = "github.com/BurntSushi/toml"
-  version = "v0.3.0"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/aws/aws-sdk-go/aws/..."
+  name = "github.com/aws/aws-sdk-go"
+  version = "1.4.22"
 
 [[constraint]]
-  revision = "89658bed64c2a8fe05a978e5b87dbec409d57a0f"
-  name = "github.com/docker/docker/..."
+  name = "github.com/docker/distribution"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/tcnksm/go-latest"
-
-[[constraint]]
-  name = "github.com/stretchr/testify"
-  version = "1.1.4"
-
-[[override]]
-  revision = "5d4e5de2f9962c2de8a7872128e2cc09dfdd99aa"
   name = "github.com/docker/libnetwork"
 
 [[constraint]]
+  name = "github.com/hashicorp/go-version"
+
+[[constraint]]
+  name = "github.com/koron/go-dproxy"
+  version = "1.1.0"
+
+[[constraint]]
+  name = "github.com/pkg/errors"
+
+[[constraint]]
+  name = "github.com/sirupsen/logrus"
+  version = "1.0.3"
+
+[[constraint]]
+  name = "github.com/stretchr/testify"
+
+[[constraint]]
   name = "github.com/stvp/rollbar"
-  version = "v0.5.0"
+  version = "0.5.0"
+
+[[constraint]]
+  name = "github.com/tcnksm/go-latest"
+
+[[constraint]]
+  name = "github.com/urfave/cli"
+  revision = "v1"
+
+[[constraint]]
+  name = "golang.org/x/net"

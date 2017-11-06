@@ -7,36 +7,19 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/mobingi/alm-agent/config"
-	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
+	log "github.com/sirupsen/logrus"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/client"
-	"github.com/docker/docker/opts"
-	"github.com/docker/libnetwork/iptables"
-	"github.com/docker/libnetwork/portmapper"
+	"docker.io/go-docker/api/types"
+	"docker.io/go-docker/api/types/container"
+	"docker.io/go-docker/api/types/filters"
+	"docker.io/go-docker/api/types/network"
 	"golang.org/x/net/context"
 )
-
-// Docker is manager of docker
-type Docker struct {
-	Client   *client.Client
-	Image    string
-	Username string
-	Password string
-	Ports    []int
-	Pm       *portmapper.PortMapper
-	CodeDir  string
-	Envs     []string
-}
 
 var (
 	dockerAPIVer          = "v1.24"
@@ -44,36 +27,6 @@ var (
 	containerLogsLocation = "/var/log/alm-agent/container"
 	defaultUA             = "mobingi alm-agent"
 )
-
-// NewDocker is construcor for DockerClient
-func NewDocker(c *config.Config, s *serverConfig.Config) (*Docker, error) {
-	docker := &Docker{
-		Image:    strings.TrimPrefix(s.Image, "http://"),
-		Username: s.DockerHubUserName,
-		Password: s.DockerHubPassword,
-		Ports:    s.Ports,
-		Pm:       portmapper.New(""),
-		CodeDir:  s.CodeDir,
-		Envs: func() []string {
-			var Envs []string
-			Envs = append(Envs, "MO_USER_ID="+c.UserID, "MO_STACK_ID="+c.StackID)
-			for k, v := range s.EnvironmentVariables {
-				es := []string{k, v}
-				Envs = append(Envs, strings.Join(es, "="))
-			}
-			return Envs
-		}(),
-	}
-
-	chain := &iptables.ChainInfo{Name: "DOCKER", Table: "nat"}
-	docker.Pm.SetIptablesChain(chain, "docker0")
-
-	defaultHeaders := map[string]string{"User-Agent": defaultUA}
-	cli, err := client.NewClient(dockerSock, dockerAPIVer, nil, defaultHeaders)
-	docker.Client = cli
-
-	return docker, err
-}
 
 // CheckImageUpdated pulls latest image if exsist.
 func (d *Docker) CheckImageUpdated() (bool, error) {
@@ -91,10 +44,15 @@ func (d *Docker) CheckImageUpdated() (bool, error) {
 
 // GetContainer returns container by name
 func (d *Docker) GetContainer(name string) (*Container, error) {
-	filter := opts.NewFilterOpt()
-	filter.Set(fmt.Sprintf("name=%s", name))
+	args := filters.NewArgs(
+		filters.KeyValuePair{
+			Key:   "name",
+			Value: name,
+		},
+	)
+	//	args.Add("name", name)
 	options := types.ContainerListOptions{
-		Filters: filter.Value(),
+		Filters: args,
 		All:     true,
 	}
 	res, err := d.Client.ContainerList(context.Background(), options)
@@ -118,10 +76,14 @@ func (d *Docker) GetContainer(name string) (*Container, error) {
 
 // GetContainerIDbyImage returns container by Image
 func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
-	filter := opts.NewFilterOpt()
-	filter.Set(fmt.Sprintf("ancestor=%s", ancestor))
+	args := filters.NewArgs(
+		filters.KeyValuePair{
+			Key:   "ancestor",
+			Value: ancestor,
+		},
+	)
 	options := types.ContainerListOptions{
-		Filters: filter.Value(),
+		Filters: args,
 		All:     true,
 	}
 	res, err := d.Client.ContainerList(context.Background(), options)
@@ -170,32 +132,6 @@ func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 	}
 
 	return c, nil
-}
-
-// MapPort allocates listner
-func (d *Docker) MapPort(c *Container) error {
-	for _, port := range d.Ports {
-		dest := &net.TCPAddr{IP: c.IP, Port: port}
-		_, err := d.Pm.Map(dest, net.IPv4(0, 0, 0, 0), port, true)
-		if err != nil {
-			return err
-		}
-		log.Infof("MapPort: %d", port)
-	}
-	return nil
-}
-
-// UnmapPort disallocates listner
-func (d *Docker) UnmapPort() error {
-	for _, port := range d.Ports {
-		key := &net.TCPAddr{IP: net.IPv4(0, 0, 0, 0), Port: port}
-		err := d.Pm.Unmap(key)
-		if err != nil {
-			return err
-		}
-		log.Infof("UnmapPort: %d", port)
-	}
-	return nil
 }
 
 // RenameContainer renames after lounch
@@ -254,15 +190,20 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 	log.Debugf("ContainerConfig: %#v", config)
 
 	hostConfig := &container.HostConfig{}
+	hostConfig.Sysctls = map[string]string{
+		"net.core.somaxconn":           "40960",
+		"net.ipv4.ip_local_port_range": "10240 65535",
+	}
+
 	if dir != "" {
 		bind := fmt.Sprintf("%s:%s", dir, d.CodeDir)
 		hostConfig.Binds = append(hostConfig.Binds, bind)
 
 		initScriptFile := ""
-		if util.FileExists(path.Join(dir, "mobingi-init.sh")) {
-			initScriptFile = path.Join(dir, "mobingi-init.sh")
-		} else if util.FileExists(path.Join(dir, "mobingi-install.sh")) {
-			initScriptFile = path.Join(dir, "mobingi-install.sh")
+		if util.FileExists(filepath.Join(dir, "mobingi-init.sh")) {
+			initScriptFile = filepath.Join(dir, "mobingi-init.sh")
+		} else if util.FileExists(filepath.Join(dir, "mobingi-install.sh")) {
+			initScriptFile = filepath.Join(dir, "mobingi-install.sh")
 		}
 
 		if initScriptFile != "" {

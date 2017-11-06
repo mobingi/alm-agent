@@ -4,7 +4,7 @@ jobs:
   build:
     working_directory: /go/src/github.com/mobingi/alm-agent
     docker:
-      - image: golang:1.8.3
+      - image: golang:1.9
     steps:
       - checkout
       - run:
@@ -14,7 +14,7 @@ jobs:
           name: verifydata
           command: make verifydata
       - restore_cache:
-          key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+          key: godeps-{{ checksum "Gopkg.lock" }}-{{ checksum "Gopkg.toml" }}
       - run:
           name: test and build maincli
           command: make cibuild
@@ -25,10 +25,11 @@ jobs:
           name: put version_info
           command: ./bin/alm-agent -v > ./bin/version_info.json
       - save_cache:
-          key: godeps-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+          key: godeps-{{ checksum "Gopkg.lock" }}-{{ checksum "Gopkg.toml" }}
           paths:
             - "/go/src/golang.org"
             - "/go/src/github.com/golang"
+            - "/go/src/docker.io"
       - store_artifacts:
           path: bin/
           destination: bin

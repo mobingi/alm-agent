@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os/exec"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // METAENDPOINT EC2 Metadata Endpoint

@@ -13,7 +13,7 @@ import (
 	"sort"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/hashicorp/go-version"
 	latest "github.com/tcnksm/go-latest"
 )
@@ -27,10 +27,10 @@ type GoLatest struct {
 }
 
 var (
-	// Version
+	// Version is app version
 	//  - build on CI: majour.minor.epochtime
 	//  - build localy: below
-	Version = "0.2" + "0-dev"
+	Version = "0.3" + "0-dev"
 	// Revision : Commit SHA1.
 	Revision = "local-build"
 	// URLBase : host version_info and binaries.

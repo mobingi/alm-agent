@@ -23,7 +23,7 @@ func TestEnsureUser(t *testing.T) {
 		return
 	}
 
-	util.Executer = &util.MockExecuter{}
+	util.Executor = &util.MockExecutor{}
 	EnsureUser("mobingi", "ssh-rsa PubKey")
 	buf := util.GetMockBuffer()
 	t.Log(buf)

@@ -7,8 +7,8 @@ LDFLAGS := -X 'github.com/mobingi/alm-agent/versions.Version=$(VERSION).$(MINOR_
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Revision=$(CIRCLE_SHA1)'
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Branch=$(CIRCLE_BRANCH)'
 LDFLAGS += -X 'main.RollbarToken=$(ROLLBAR_CLIENT_TOKEN)'
-PACKAGES_ALL = $(shell go list ./... | grep -v '/vendor/')
-PACKAGES_MAIN = $(shell go list ./... | grep -v '/vendor/' | grep -v '/addons/')
+PACKAGES_ALL = $(shell go list ./...')
+PACKAGES_MAIN = $(shell go list ./... | grep -v '/addons/')
 
 setup:
 	go get -u github.com/golang/dep/cmd/dep
@@ -20,9 +20,9 @@ setup:
 deps:
 	dep ensure -v
 
+.PHONY: bindata
 bindata:
 	tomlv _data/*.toml
-	go-bindata ./_data/
 	go-bindata -o ./bindata/bindata.go -pkg bindata -nometadata ./_data/
 
 verifydata:
