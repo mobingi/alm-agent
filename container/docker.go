@@ -252,6 +252,12 @@ func (d *Docker) inspectContainer(c *Container) (types.ContainerJSON, error) {
 	return d.Client.ContainerInspect(context.Background(), c.ID)
 }
 
+// ContainerHealth returns nil or ContainerState.Health
+func (d *Docker) ContainerHealth(c *Container) (*types.Health, error) {
+	ci, err := d.inspectContainer(c)
+	return ci.State.Health, err
+}
+
 // StopContainer stops contaner
 func (d *Docker) StopContainer(c *Container) error {
 	timeout := 3 * time.Second
