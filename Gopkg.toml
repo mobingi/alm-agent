@@ -61,10 +61,15 @@
 
 [[constraint]]
   name = "github.com/tcnksm/go-latest"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/urfave/cli"
-  revision = "v1"
+  version = "1.20.0"
 
 [[constraint]]
   name = "golang.org/x/net"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/jessevdk/go-assets"
