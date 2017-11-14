@@ -7,7 +7,7 @@ LDFLAGS := -X 'github.com/mobingi/alm-agent/versions.Version=$(VERSION).$(MINOR_
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Revision=$(CIRCLE_SHA1)'
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Branch=$(CIRCLE_BRANCH)'
 LDFLAGS += -X 'main.RollbarToken=$(ROLLBAR_CLIENT_TOKEN)'
-PACKAGES_ALL = $(shell go list ./...')
+PACKAGES_ALL = $(shell go list ./...)
 PACKAGES_MAIN = $(shell go list ./... | grep -v '/addons/')
 
 setup:
