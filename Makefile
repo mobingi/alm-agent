@@ -23,11 +23,11 @@ deps:
 .PHONY: bindata
 bindata:
 	tomlv _data/*.toml
-	go-assets-builder --package=bindata --output=./bindata/bindata.go ./_data/*.toml
+	go-assets-builder --package=bindata --output=./bindata/bindata.go _data
 
 verifydata:
 	tomlv _data/*.toml
-	# go-assets-builder --package=bindata --output=./bindata/checkbin ./_data/*.toml
+	# go-assets-builder --package=bindata --output=./bindata/checkbin _data
 	# diff ./bindata/checkbin ./bindata/bindata.go > /dev/null
 	# rm ./bindata/checkbin
 
