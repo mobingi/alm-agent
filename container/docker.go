@@ -167,6 +167,7 @@ func (d *Docker) imagePull() (string, error) {
 	options := types.ImagePullOptions{
 		RegistryAuth: encodedAuth,
 	}
+	log.Debugf("pulling image %s", d.Image)
 	res, err := d.Client.ImagePull(context.Background(), d.Image, options)
 
 	if err != nil {
