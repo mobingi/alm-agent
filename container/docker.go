@@ -100,7 +100,7 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 
 // StartContainer starts docker container
 func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
-
+	log.Infof("pulling image %s", d.Image)
 	_, err := d.imagePull()
 	if err != nil {
 		return nil, err
@@ -167,7 +167,6 @@ func (d *Docker) imagePull() (string, error) {
 	options := types.ImagePullOptions{
 		RegistryAuth: encodedAuth,
 	}
-	log.Infof("pulling image %s", d.Image)
 	res, err := d.Client.ImagePull(context.Background(), d.Image, options)
 
 	if err != nil {
