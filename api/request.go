@@ -1,11 +1,17 @@
 package api
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/url"
+	"os"
+	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/metavars"
 	"github.com/mobingi/alm-agent/server_config"
+	"github.com/mobingi/alm-agent/util"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 type route struct {
@@ -39,17 +45,59 @@ var RoutesV3 = &route{
 	LogsSTS:           "/v3/alm/agent/logs_access_token",
 }
 
+var tokentCachePath = "/opt/mobingi/etc/tokencache.json"
+
 // GetAccessToken requests token of user for auth by API.
 func GetAccessToken() error {
+	err := fetchAccessTokenCache()
+	if err == nil {
+		return nil
+	}
+	log.Debugf("GetAccessToken CacheState: %#v", err)
+
 	values := url.Values{}
 	values.Set("grant_type", "client_credentials")
 	values.Set("client_id", c.getConfig().StackID)
 	values.Set("client_secret", c.getConfig().AuthorizationToken)
 
-	err := Post(RoutesV3.AccessToken, values, &apitoken)
+	err = Post(RoutesV3.AccessToken, values, &apitoken)
+	if err != nil {
+		flushAccessTokenCache()
+		return err
+	}
+	createAccessTokenCache()
+	return nil
+}
+
+func createAccessTokenCache() {
+	apitoken.ExpiresAt = time.Now().Unix() + apitoken.ExpiresIn
+	at, _ := json.Marshal(apitoken)
+	ioutil.WriteFile(tokentCachePath, []byte(at), 0600)
+	return
+}
+
+func flushAccessTokenCache() {
+	if util.FileExists(tokentCachePath) {
+		os.Remove(tokentCachePath)
+	}
+	return
+}
+
+func fetchAccessTokenCache() error {
+	at, err := ioutil.ReadFile(tokentCachePath)
 	if err != nil {
 		return err
 	}
+	json.Unmarshal([]byte(at), &apitoken)
+	log.Debugf("fetchAccessTokenCache: %#v", apitoken)
+
+	// reuse in 7hours
+	if apitoken.ExpiresAt-time.Now().Unix() < 25200 {
+		flushAccessTokenCache()
+		return errors.New("apitoken should be renew")
+	}
+
+	log.Debug("use local cache of AccessToken")
 	return nil
 }
 
