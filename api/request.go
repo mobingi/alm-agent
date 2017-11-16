@@ -45,7 +45,7 @@ var RoutesV3 = &route{
 	LogsSTS:           "/v3/alm/agent/logs_access_token",
 }
 
-var tokentCachePath = "/opt/mobingi/etc/tokencache.json"
+var tokenCachePath = "/opt/mobingi/etc/tokencache.json"
 
 // GetAccessToken requests token of user for auth by API.
 func GetAccessToken() error {
@@ -72,19 +72,19 @@ func GetAccessToken() error {
 func createAccessTokenCache() {
 	apitoken.ExpiresAt = time.Now().Unix() + apitoken.ExpiresIn
 	at, _ := json.Marshal(apitoken)
-	ioutil.WriteFile(tokentCachePath, []byte(at), 0600)
+	ioutil.WriteFile(tokenCachePath, []byte(at), 0600)
 	return
 }
 
 func flushAccessTokenCache() {
-	if util.FileExists(tokentCachePath) {
-		os.Remove(tokentCachePath)
+	if util.FileExists(tokenCachePath) {
+		os.Remove(tokenCachePath)
 	}
 	return
 }
 
 func fetchAccessTokenCache() error {
-	at, err := ioutil.ReadFile(tokentCachePath)
+	at, err := ioutil.ReadFile(tokenCachePath)
 	if err != nil {
 		return err
 	}
