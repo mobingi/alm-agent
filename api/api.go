@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/config"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -30,6 +30,8 @@ type clientInterface interface {
 type apiToken struct {
 	TokenType string `json:"token_type"`
 	Token     string `json:"access_token"`
+	ExpiresIn int64  `json:"expires_in"`
+	ExpiresAt int64  `json:"expires_at"`
 }
 
 // StsToken for CWLogs

@@ -48,7 +48,7 @@ func NewSysDocker(c *config.Config, s *SystemContainer) (*Docker, error) {
 
 // StartSysContainer starts docker container
 func (d *Docker) StartSysContainer(s *SystemContainer) (*Container, error) {
-
+	log.Infof("pulling image %s", d.Image)
 	_, err := d.imagePull()
 	if err != nil {
 		return nil, err

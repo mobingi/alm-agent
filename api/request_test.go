@@ -6,9 +6,9 @@ import (
 	"net/url"
 	"testing"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/config"
 	"github.com/mobingi/alm-agent/server_config"
+	log "github.com/sirupsen/logrus"
 )
 
 func mockGet(fn func(path string, values url.Values, target interface{}) error) {
@@ -22,6 +22,51 @@ func mockPost(fn func(path string, values url.Values, target interface{}) error)
 }
 
 func TestGetAccessToken(t *testing.T) {
+	log.SetLevel(log.DebugLevel)
+	var apitoken = &apiToken{}
+	tc := &config.Config{
+		APIHost:            "https://test.example.com",
+		StackID:            "teststack",
+		AuthorizationToken: "testtoken",
+	}
+
+	SetConfig(tc)
+	origPost := Post
+	defer func() { Post = origPost }()
+	mockPost(
+		func(path string, values url.Values, target interface{}) error {
+			res := `{
+				"token_type": "Bearer",
+				"access_token": "eyJ0eXAiOiJKV1",
+				"expires_in": 43200
+			}`
+			err := json.Unmarshal([]byte(res), &apitoken)
+			if err != nil {
+				t.Fatal("Failed Unmarshal into apiToken.")
+			}
+			return nil
+		},
+	)
+
+	err := GetAccessToken()
+	if err != nil {
+		t.Fatal("Failed GetAccessToken.")
+	}
+
+	expected := "Bearer"
+	actual := apitoken.TokenType
+	if actual != expected {
+		t.Fatalf("Expected: %s\n But: %s", expected, actual)
+	}
+
+	expectedInt := int64(43200)
+	actualInt := apitoken.ExpiresIn
+	if actualInt != expectedInt {
+		t.Fatalf("Expected: %d\n But: %d", expectedInt, actualInt)
+	}
+}
+
+func TestGetSTSToken(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
 	var testtoken = &StsToken{}
 	tc := &config.Config{

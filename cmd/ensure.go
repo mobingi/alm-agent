@@ -34,11 +34,11 @@ func Ensure(c *cli.Context) error {
 	conf, err := config.LoadFromFile(c.String("config"))
 
 	syscons := &container.SystemContainers{}
-	syscondata, _ := bindata.Asset("_data/sys_containers.toml")
+	syscondata := bindata.Assets.Files["/_data/sys_containers.toml"].Data
 	toml.Decode(string(syscondata), &syscons)
 
 	addcons := &container.SystemContainers{}
-	addcondata, _ := bindata.Asset("_data/addon_containers.toml")
+	addcondata := bindata.Assets.Files["/_data/addon_containers.toml"].Data
 	toml.Decode(string(addcondata), &addcons)
 
 	if err != nil {

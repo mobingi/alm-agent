@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"runtime/debug"
 	"sort"
 	"strings"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -64,6 +66,12 @@ func beforeActions(c *cli.Context) error {
 		versions.AutoUpdate(golatest())
 	}
 	log.Debugf("Set provider to %#v", c.GlobalString("provider"))
+
+	rand.Seed(int64(os.Getpid()))
+
+	splay := rand.Intn(3000)
+	log.Debugf("Wait %d milliseconds...", splay)
+	time.Sleep(time.Duration(splay) * time.Millisecond)
 	return nil
 }
 

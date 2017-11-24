@@ -100,7 +100,7 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 
 // StartContainer starts docker container
 func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
-
+	log.Infof("pulling image %s", d.Image)
 	_, err := d.imagePull()
 	if err != nil {
 		return nil, err
@@ -167,7 +167,7 @@ func (d *Docker) imagePull() (string, error) {
 	options := types.ImagePullOptions{
 		RegistryAuth: encodedAuth,
 	}
-	log.Infof("pulling image %s", d.Image)
+	log.Debugf("pulling image %s", d.Image)
 	res, err := d.Client.ImagePull(context.Background(), d.Image, options)
 
 	if err != nil {
@@ -250,6 +250,12 @@ func (d *Docker) containerStart(c *Container) error {
 
 func (d *Docker) inspectContainer(c *Container) (types.ContainerJSON, error) {
 	return d.Client.ContainerInspect(context.Background(), c.ID)
+}
+
+// ContainerHealth returns nil or ContainerState.Health
+func (d *Docker) ContainerHealth(c *Container) (*types.Health, error) {
+	ci, err := d.inspectContainer(c)
+	return ci.State.Health, err
 }
 
 // StopContainer stops contaner

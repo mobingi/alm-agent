@@ -7,14 +7,14 @@ LDFLAGS := -X 'github.com/mobingi/alm-agent/versions.Version=$(VERSION).$(MINOR_
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Revision=$(CIRCLE_SHA1)'
 LDFLAGS += -X 'github.com/mobingi/alm-agent/versions.Branch=$(CIRCLE_BRANCH)'
 LDFLAGS += -X 'main.RollbarToken=$(ROLLBAR_CLIENT_TOKEN)'
-PACKAGES_ALL = $(shell go list ./...')
+PACKAGES_ALL = $(shell go list ./...)
 PACKAGES_MAIN = $(shell go list ./... | grep -v '/addons/')
 
 setup:
 	go get -u github.com/golang/dep/cmd/dep
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
-	go get -u github.com/jteeuwen/go-bindata/...
+	go get -u github.com/jessevdk/go-assets-builder
 	go get github.com/BurntSushi/toml/cmd/tomlv
 
 deps:
@@ -23,13 +23,13 @@ deps:
 .PHONY: bindata
 bindata:
 	tomlv _data/*.toml
-	go-bindata -o ./bindata/bindata.go -pkg bindata -nometadata ./_data/
+	go-assets-builder --package=bindata --output=./bindata/bindata.go _data
 
 verifydata:
 	tomlv _data/*.toml
-	go-bindata -o ./checkbin -pkg bindata -nometadata ./_data/
-	diff ./checkbin ./bindata/bindata.go > /dev/null
-	rm ./checkbin
+	# go-assets-builder --package=bindata --output=./bindata/checkbin _data
+	# diff ./bindata/checkbin ./bindata/bindata.go > /dev/null
+	# rm ./bindata/checkbin
 
 test: deps
 	go test -v ${PACKAGES_ALL} -cover
