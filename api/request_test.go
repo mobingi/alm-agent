@@ -132,7 +132,7 @@ func TestGetServerConfigFromAPI(t *testing.T) {
 	defer func() { Get = origGet }()
 	mockGet(
 		func(path string, values url.Values, target interface{}) error {
-			res, _ := ioutil.ReadFile("../test/fixtures/serverconfig.v1.json")
+			res, _ := ioutil.ReadFile("../test/fixtures/serverconfig.v2.json")
 			err := json.Unmarshal([]byte(res), &sc)
 			if err != nil {
 				t.Fatal("Failed Unmarshal into ServerConfig.")
