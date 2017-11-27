@@ -1,5 +1,5 @@
 {
-  "container_updated": "1495677005",
+  "container_updated": 1495677005,
   "container_image": "mobingi/ubuntu-apache2-php7:7.1",
   "container_git_repo": "git://github.com/mobingilabs/default-site-php",
   "container_git_reference": "master",
