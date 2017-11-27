@@ -19,18 +19,18 @@ type Addon interface{}
 
 // Config means application stack
 type Config struct {
-	Image                string
-	DockerHubUserName    string
-	DockerHubPassword    string
-	CodeDir              string
-	GitReference         string
-	GitRepo              string
-	GitPrivateKey        string
-	Ports                []int
-	Updated              uint
-	Users                map[string]*PubKey
-	EnvironmentVariables map[string]string
-	Addons               []Addon `json:"addon"`
+	Image                string             `json:"container_image"`
+	DockerHubUserName    string             `json:"container_registry_username"`
+	DockerHubPassword    string             `json:"container_registry_password"`
+	CodeDir              string             `json:"container_code_dir"`
+	GitReference         string             `json:"container_git_reference"`
+	GitRepo              string             `json:"container_git_repo"`
+	GitPrivateKey        string             `json:"container_git_private_key"`
+	Ports                []int              `json:"container_ports"`
+	Updated              uint               `json:"container_updated"`
+	Users                map[string]*PubKey `json:"container_users"`
+	EnvironmentVariables map[string]string  `json:"container_env_vars"`
+	Addons               []Addon            `json:"container_addons"`
 }
 
 var versionPath = "/opt/mobingi/etc/configVersion"
