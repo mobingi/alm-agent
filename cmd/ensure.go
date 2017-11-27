@@ -74,7 +74,7 @@ func Ensure(c *cli.Context) error {
 
 	update, err := serverConfig.NeedsUpdate(s)
 	if update {
-		for x, y := range s.Users {
+		for _, y := range s.Users {
 			login.EnsureUser(y.UserName, y.PublicKey)
 		}
 	}
