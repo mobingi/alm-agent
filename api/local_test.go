@@ -35,7 +35,7 @@ func TestWriteTempToken(t *testing.T) {
 	assert.Contains(string(buf), "STSTOKENXXX")
 }
 
-func TestFetServerConfigFromFile(t *testing.T) {
+func TestGetServerConfigFromFile(t *testing.T) {
 	assert := assert.New(t)
 	sc := &serverConfig.Config{}
 	getServerConfigFromFile("../test/fixtures/serverconfig.v2.json", sc)
