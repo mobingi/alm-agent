@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"os"
+	"os/exec"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -17,6 +20,13 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
+
+func tracerPath() string {
+	selfPath, _ := os.Executable()
+	d, _ := filepath.Split(selfPath)
+	tracerPath := filepath.Join(d, "alm-logtracer")
+	return tracerPath
+}
 
 // Ensure start or replace container with newest config
 func Ensure(c *cli.Context) error {
@@ -289,6 +299,10 @@ func Ensure(c *cli.Context) error {
 		newContainer, err := d.StartContainer("standby", codeDir)
 		if err != nil {
 			return cli.NewExitError(err, 1)
+		}
+
+		if util.FileExists(tracerPath()) {
+			exec.Command(tracerPath(), newContainer.ID).Start()
 		}
 
 		d.UnmapPort()
