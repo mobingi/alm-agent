@@ -20,7 +20,6 @@ setup:
 deps:
 	dep ensure -v
 
-.PHONY: bindata
 bindata:
 	tomlv _data/*.toml
 	go-assets-builder --package=bindata --output=./bindata/bindata.go _data
@@ -64,3 +63,5 @@ list:
 
 version:
 	@echo ${VERSION}.${MINOR_VERSION}
+
+.PHONY: setup deps bindata verifydata test race lint fmt build cibuild clean addon list version
