@@ -57,6 +57,7 @@ clean:
 
 addon:
 	cd addons/aws/; go build -ldflags "$(LDFLAGS)" -o ../../bin/$(NAME)-addon-aws
+	cd addons/common_logtracer/; go build -ldflags "$(LDFLAGS)" -o ../../bin/alm-logtracer
 
 list:
 	@ls -1 bin
