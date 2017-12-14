@@ -196,7 +196,8 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 	}
 
 	if dir != "" {
-		bind := fmt.Sprintf("%s:%s", dir, d.CodeDir)
+		codedir := d.fetchCodeDir()
+		bind := fmt.Sprintf("%s:%s", dir, codedir)
 		hostConfig.Binds = append(hostConfig.Binds, bind)
 
 		initScriptFile := ""
@@ -281,4 +282,35 @@ func (d *Docker) CreateContainerExec(id string, cmd []string) (types.IDResponse,
 // StartContainerExec do exec on running container
 func (d *Docker) StartContainerExec(id string, esc types.ExecStartCheck) error {
 	return d.Client.ContainerExecStart(context.Background(), id, esc)
+}
+
+func (d *Docker) fetchCodeDir() string {
+	if d.CodeDir != "" {
+		return d.CodeDir
+	}
+
+	codeDirFromImage := d.getValueByLabelFromImage("com.mobingi.code_dir")
+	if codeDirFromImage != "" {
+		return codeDirFromImage
+	}
+
+	return "/var/www/html"
+}
+
+func (d *Docker) getValueByLabelFromImage(label string) string {
+	args := filters.NewArgs(
+		filters.Arg("reference", d.Image),
+	)
+
+	options := types.ImageListOptions{
+		Filters: args,
+	}
+
+	ctx := context.Background()
+	images, err := d.Client.ImageList(ctx, options)
+	if err != nil {
+		return ""
+	}
+
+	return images[0].Labels[label]
 }
