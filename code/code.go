@@ -65,7 +65,7 @@ func newRelease(hash string) *Release {
 }
 
 func (c *Code) loadCurrentRelease() *Release {
-	current := filepath.Join(releaseDir, "current")
+	current := filepath.Join(baseDir, "current")
 	r := &Release{}
 	if util.FileExists(current) {
 		releaseInfoRaw, _ := ioutil.ReadFile(current)
@@ -82,19 +82,26 @@ func (c *Code) loadCurrentRelease() *Release {
 
 func (r *Release) putAsCurrent() {
 	releaseInfo := strings.Join([]string{r.Hash, r.Path}, ",")
-	ioutil.WriteFile(filepath.Join(releaseDir, "current"), []byte(releaseInfo), 0644)
+	ioutil.WriteFile(filepath.Join(baseDir, "current"), []byte(releaseInfo), 0644)
 }
 
 // ReleaseDirs are directories under /srv/code/releases
 type ReleaseDirs []os.FileInfo
 
+// Len to use ReleaseDirs as sort Interface.
+// do not remove
 func (d ReleaseDirs) Len() int {
 	return len(d)
 }
 
+// Swap to use ReleaseDirs as sort Interface.
+// do not remove
 func (d ReleaseDirs) Swap(i, j int) {
 	d[i], d[j] = d[j], d[i]
 }
+
+// Less to use ReleaseDirs as sort Interface.
+// do not remove
 func (d ReleaseDirs) Less(i, j int) bool {
 	return d[j].ModTime().Unix() < d[i].ModTime().Unix()
 }
@@ -113,40 +120,35 @@ func New(s *serverConfig.Config) *Code {
 }
 
 // CheckUpdate checks code and cleans up old releases
-func (c *Code) CheckUpdate() (bool, error) {
-	if !util.FileExists(cacheDir) {
-		return true, nil
+func (c *Code) cleanupReleases() error {
+	if !util.FileExists(releaseDir) {
+		return nil
 	}
 
 	dirs, err := ioutil.ReadDir(releaseDir)
-
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	if len(dirs) == 0 {
-		return true, nil
+		return nil
 	}
 
+	fmt.Println(dirs)
 	sort.Sort(ReleaseDirs(dirs))
 
 	if len(dirs) > 10 {
 		for _, dir := range dirs[10:] {
-			err := os.RemoveAll(filepath.Join(baseDir, dir.Name()))
+			delDirPath := filepath.Join(releaseDir, dir.Name())
+			log.Infof("Cleaning up old release... %s", delDirPath)
+			err := os.RemoveAll(delDirPath)
 			if err != nil {
-				return false, err
+				return err
 			}
 		}
 	}
 
-	c.Path = filepath.Join(baseDir, dirs[0].Name())
-	g := &Git{
-		url:  c.URL,
-		path: c.Path,
-		ref:  c.Ref,
-	}
-
-	return g.checkUpdate()
+	return nil
 }
 
 // Get creates releases
@@ -179,6 +181,7 @@ func (c *Code) Get() (string, error) {
 		}
 		re.putAsCurrent()
 		c.Updated = true
+		c.cleanupReleases()
 		return re.Path, nil
 	}
 
