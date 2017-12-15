@@ -137,8 +137,8 @@ func (c *Code) cleanupReleases() error {
 	fmt.Println(dirs)
 	sort.Sort(ReleaseDirs(dirs))
 
-	if len(dirs) > 10 {
-		for _, dir := range dirs[10:] {
+	if len(dirs) > 5 {
+		for _, dir := range dirs[5:] {
 			delDirPath := filepath.Join(releaseDir, dir.Name())
 			log.Infof("Cleaning up old release... %s", delDirPath)
 			err := os.RemoveAll(delDirPath)
