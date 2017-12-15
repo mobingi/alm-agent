@@ -85,27 +85,6 @@ func (r *Release) putAsCurrent() {
 	ioutil.WriteFile(filepath.Join(baseDir, "current"), []byte(releaseInfo), 0644)
 }
 
-// ReleaseDirs are directories under /srv/code/releases
-type ReleaseDirs []os.FileInfo
-
-// Len to use ReleaseDirs as sort Interface.
-// do not remove
-func (d ReleaseDirs) Len() int {
-	return len(d)
-}
-
-// Swap to use ReleaseDirs as sort Interface.
-// do not remove
-func (d ReleaseDirs) Swap(i, j int) {
-	d[i], d[j] = d[j], d[i]
-}
-
-// Less to use ReleaseDirs as sort Interface.
-// do not remove
-func (d ReleaseDirs) Less(i, j int) bool {
-	return d[j].ModTime().Unix() < d[i].ModTime().Unix()
-}
-
 // New creates New Code obj
 func New(s *serverConfig.Config) *Code {
 	ref := s.GitReference
@@ -119,7 +98,6 @@ func New(s *serverConfig.Config) *Code {
 	}
 }
 
-// CheckUpdate checks code and cleans up old releases
 func (c *Code) cleanupReleases() error {
 	if !util.FileExists(releaseDir) {
 		return nil
@@ -134,8 +112,9 @@ func (c *Code) cleanupReleases() error {
 		return nil
 	}
 
-	fmt.Println(dirs)
-	sort.Sort(ReleaseDirs(dirs))
+	sort.Slice(dirs, func(i, j int) bool {
+		return dirs[j].ModTime().Unix() < dirs[i].ModTime().Unix()
+	})
 
 	if len(dirs) > 5 {
 		for _, dir := range dirs[5:] {
