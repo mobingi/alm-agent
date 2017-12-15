@@ -41,12 +41,11 @@ var releaseDir = filepath.Join(baseDir, "releases")
 
 // Code is application repository
 type Code struct {
-	URL           string
-	Ref           string
-	Path          string
-	Key           string
-	LatestRelease string
-	Updated       bool
+	URL     string
+	Ref     string
+	Path    string
+	Key     string
+	Updated bool
 }
 
 // Release is exported code
