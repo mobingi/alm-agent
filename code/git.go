@@ -9,10 +9,11 @@ import (
 	"regexp"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/util"
+	log "github.com/sirupsen/logrus"
 )
 
+// Git is wrapper of git command.
 type Git struct {
 	url  string
 	path string
@@ -39,7 +40,7 @@ func (g *Git) checkUpdate() (bool, error) {
 	}
 
 	opts := &util.ExecOpts{}
-	opts.Env = []string{"GIT_SSH=" + filepath.Join(sshDir, gitSshScriptName)}
+	opts.Env = []string{"GIT_SSH=" + filepath.Join(sshDir, gitSSHScriptName)}
 	opts.Dir = g.path
 
 	out, err = util.Executor.ExecWithOpts(opts, "git", "fetch")
@@ -59,14 +60,13 @@ func (g *Git) checkUpdate() (bool, error) {
 
 	if len(out) > 0 {
 		return true, nil
-	} else {
-		return false, nil
 	}
+	return false, nil
 }
 
 func (g *Git) get() error {
 	opts := &util.ExecOpts{}
-	opts.Env = []string{"GIT_SSH=" + filepath.Join(sshDir, gitSshScriptName)}
+	opts.Env = []string{"GIT_SSH=" + filepath.Join(sshDir, gitSSHScriptName)}
 
 	if isTag.MatchString(g.ref) {
 		log.Infof("Executing git clone %s %s", g.url, g.path)
@@ -82,14 +82,14 @@ func (g *Git) get() error {
 			log.Error(string(out))
 		}
 		return err
-	} else {
-		log.Infof("Executing git clone -b %s %s %s", g.ref, g.url, g.path)
-		out, err := util.Executor.ExecWithOpts(opts, "git", "clone", "-b", g.ref, g.url, g.path)
-		if err != nil {
-			log.Error(string(out))
-		}
-		return err
 	}
+
+	log.Infof("Executing git clone -b %s %s %s", g.ref, g.url, g.path)
+	out, err := util.Executor.ExecWithOpts(opts, "git", "clone", "-b", g.ref, g.url, g.path)
+	if err != nil {
+		log.Error(string(out))
+	}
+	return err
 }
 
 func execPipeline(dir string, commands ...[]string) ([]byte, error) {

@@ -11,16 +11,16 @@ import (
 	"sort"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
 	knownHosts       = "/etc/ssh/ssh_known_hosts"
 	sshDir           = "/opt/mobingi/etc/ssh"
 	sshKeyName       = "id_alm_agent"
-	gitSshScriptName = "git_ssh.sh"
+	gitSSHScriptName = "git_ssh.sh"
 )
 
 // ref. `man git-clone`
@@ -35,6 +35,7 @@ var (
 	scpLikeSyntax   = regexp.MustCompile("^([^@]+@)?([^:]+):/?(.+)$")
 )
 
+// Code is application repository
 type Code struct {
 	URL  string
 	Ref  string
@@ -42,6 +43,7 @@ type Code struct {
 	Key  string
 }
 
+// Dirs are directories under /srv/code
 type Dirs []os.FileInfo
 
 func (d Dirs) Len() int {
@@ -55,6 +57,7 @@ func (d Dirs) Less(i, j int) bool {
 	return d[j].ModTime().Unix() < d[i].ModTime().Unix()
 }
 
+// New creates New Code obj
 func New(s *serverConfig.Config) *Code {
 	ref := s.GitReference
 	if ref == "" {
@@ -67,6 +70,7 @@ func New(s *serverConfig.Config) *Code {
 	}
 }
 
+// CheckUpdate checks code and cleans up old releases
 func (c *Code) CheckUpdate() (bool, error) {
 	base := "/srv/code"
 	if !util.FileExists(base) {
@@ -104,6 +108,8 @@ func (c *Code) CheckUpdate() (bool, error) {
 	return g.checkUpdate()
 }
 
+// Get creates releases
+// returns code dirpash to mount by container.
 func (c *Code) Get() (string, error) {
 	baseDir := filepath.Join("/srv", "code")
 	if !util.FileExists(baseDir) {
@@ -122,6 +128,19 @@ func (c *Code) Get() (string, error) {
 	return g.path, err
 }
 
+func (c *Code) treatCachedCopy() {
+}
+
+func (c *Code) getCurrentRev() {
+}
+
+func (c *Code) exportCode() {
+}
+
+func (c *Code) cleanupReleases() {
+}
+
+// PrivateRepo sets up remote credential
 func (c *Code) PrivateRepo() error {
 	err := createIdentityFile(c.Key)
 	if err != nil {
@@ -143,7 +162,7 @@ func (c *Code) PrivateRepo() error {
 		return err
 	}
 
-	err = writeGitSshScript()
+	err = writeGitSSHScript()
 	if err != nil {
 		return err
 	}
@@ -216,13 +235,13 @@ func checkKnownHosts(url *url.URL) error {
 	return nil
 }
 
-func writeGitSshScript() error {
+func writeGitSSHScript() error {
 	log.Debug("Step: writeGitSshScript")
 	c := `#!/bin/sh
 exec ssh -i %s "$@"
 `
 	s := fmt.Sprintf(c, filepath.Join(sshDir, sshKeyName))
-	err := ioutil.WriteFile(filepath.Join(sshDir, gitSshScriptName), []byte(s), 0700)
+	err := ioutil.WriteFile(filepath.Join(sshDir, gitSSHScriptName), []byte(s), 0700)
 	if err != nil {
 		return err
 	}
