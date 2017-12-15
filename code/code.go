@@ -43,6 +43,8 @@ type Code struct {
 	Key  string
 }
 
+var baseDir = "/srv/code"
+
 // Dirs are directories under /srv/code
 type Dirs []os.FileInfo
 
@@ -72,12 +74,11 @@ func New(s *serverConfig.Config) *Code {
 
 // CheckUpdate checks code and cleans up old releases
 func (c *Code) CheckUpdate() (bool, error) {
-	base := "/srv/code"
-	if !util.FileExists(base) {
+	if !util.FileExists(baseDir) {
 		return true, nil
 	}
 
-	dirs, err := ioutil.ReadDir(base)
+	dirs, err := ioutil.ReadDir(baseDir)
 
 	if err != nil {
 		return false, err
@@ -91,14 +92,14 @@ func (c *Code) CheckUpdate() (bool, error) {
 
 	if len(dirs) > 10 {
 		for _, dir := range dirs[10:] {
-			err := os.RemoveAll(filepath.Join(base, dir.Name()))
+			err := os.RemoveAll(filepath.Join(baseDir, dir.Name()))
 			if err != nil {
 				return false, err
 			}
 		}
 	}
 
-	c.Path = filepath.Join(base, dirs[0].Name())
+	c.Path = filepath.Join(baseDir, dirs[0].Name())
 	g := &Git{
 		url:  c.URL,
 		path: c.Path,
@@ -111,7 +112,6 @@ func (c *Code) CheckUpdate() (bool, error) {
 // Get creates releases
 // returns code dirpash to mount by container.
 func (c *Code) Get() (string, error) {
-	baseDir := filepath.Join("/srv", "code")
 	if !util.FileExists(baseDir) {
 		if err := os.MkdirAll(baseDir, 0755); err != nil {
 			return "", err
