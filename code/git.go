@@ -45,7 +45,39 @@ func (g *Git) getRemoteCommitHash() (string, error) {
 	return remoteHash, nil
 }
 
+func (g *Git) fixOrigin() error {
+	// check origin url and update remote by git remote set-url origin {{newUrl}}
+	opts := &util.ExecOpts{}
+	opts.Dir = g.path
+
+	// same as git remote get-url, but older git does not support it
+	out, err := execPipeline(
+		g.path,
+		[]string{"git", "remote", "-v"},
+		[]string{"grep", "fetch"},
+		[]string{"cut", "-f", "2"},
+	)
+	if err != nil {
+		log.Error(string(out))
+		return err
+	}
+	currentRemoteRaw := strings.Split(strings.Trim(string(out), "\n"), " ")
+	currentRemote := currentRemoteRaw[0]
+
+	if currentRemote != g.url {
+		out, err = util.Executor.ExecWithOpts(opts, "git", "remote", "set-url", "origin", g.url)
+		if err != nil {
+			log.Error(string(out))
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (g *Git) deepFetch(opts *util.ExecOpts) error {
+	g.fixOrigin()
+
 	// Fetch All
 	// git fetch --prune
 	// git tag -l | xargs git tag -d
