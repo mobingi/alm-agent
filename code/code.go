@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/mobingi/alm-agent/server_config"
@@ -34,28 +35,67 @@ var (
 	hasSchemeSyntax = regexp.MustCompile("^[^:]+://")
 	scpLikeSyntax   = regexp.MustCompile("^([^@]+@)?([^:]+):/?(.+)$")
 )
+var baseDir = "/srv/code"
+var cacheDir = filepath.Join(baseDir, "cached-copy")
+var releaseDir = filepath.Join(baseDir, "releases")
 
 // Code is application repository
 type Code struct {
-	URL  string
-	Ref  string
-	Path string
-	Key  string
+	URL           string
+	Ref           string
+	Path          string
+	Key           string
+	LatestRelease string
+	Updated       bool
 }
 
-var baseDir = "/srv/code"
+// Release is exported code
+type Release struct {
+	Hash string
+	Path string
+}
 
-// Dirs are directories under /srv/code
-type Dirs []os.FileInfo
+func newRelease(hash string) *Release {
+	t := time.Now().Format("20060102150405")
+	releasePath := filepath.Join(releaseDir, t)
+	return &Release{
+		Hash: hash,
+		Path: releasePath,
+	}
+}
 
-func (d Dirs) Len() int {
+func (c *Code) loadCurrentRelease() *Release {
+	current := filepath.Join(releaseDir, "current")
+	r := &Release{}
+	if util.FileExists(current) {
+		releaseInfoRaw, _ := ioutil.ReadFile(current)
+		releaseInfo := strings.Split(strings.Trim(string(releaseInfoRaw), "\n"), ",")
+
+		// avoid format error
+		if len(releaseInfo) == 2 {
+			r.Hash = releaseInfo[0]
+			r.Path = releaseInfo[1]
+		}
+	}
+	return r
+}
+
+func (r *Release) putAsCurrent() {
+	releaseInfo := strings.Join([]string{r.Hash, r.Path}, ",")
+	ioutil.WriteFile(filepath.Join(releaseDir, "current"), []byte(releaseInfo), 0644)
+}
+
+// ReleaseDirs are directories under /srv/code/releases
+type ReleaseDirs []os.FileInfo
+
+func (d ReleaseDirs) Len() int {
 	return len(d)
 }
 
-func (d Dirs) Swap(i, j int) {
+func (d ReleaseDirs) Swap(i, j int) {
 	d[i], d[j] = d[j], d[i]
 }
-func (d Dirs) Less(i, j int) bool {
+func (d ReleaseDirs) Less(i, j int) bool {
 	return d[j].ModTime().Unix() < d[i].ModTime().Unix()
 }
 
@@ -74,11 +114,11 @@ func New(s *serverConfig.Config) *Code {
 
 // CheckUpdate checks code and cleans up old releases
 func (c *Code) CheckUpdate() (bool, error) {
-	if !util.FileExists(baseDir) {
+	if !util.FileExists(cacheDir) {
 		return true, nil
 	}
 
-	dirs, err := ioutil.ReadDir(baseDir)
+	dirs, err := ioutil.ReadDir(releaseDir)
 
 	if err != nil {
 		return false, err
@@ -88,7 +128,7 @@ func (c *Code) CheckUpdate() (bool, error) {
 		return true, nil
 	}
 
-	sort.Sort(Dirs(dirs))
+	sort.Sort(ReleaseDirs(dirs))
 
 	if len(dirs) > 10 {
 		for _, dir := range dirs[10:] {
@@ -112,32 +152,38 @@ func (c *Code) CheckUpdate() (bool, error) {
 // Get creates releases
 // returns code dirpash to mount by container.
 func (c *Code) Get() (string, error) {
-	if !util.FileExists(baseDir) {
-		if err := os.MkdirAll(baseDir, 0755); err != nil {
+	log.Debug("Code: Get")
+	if !util.FileExists(releaseDir) {
+		if err := os.MkdirAll(releaseDir, 0755); err != nil {
 			return "", err
 		}
 	}
 
-	t := time.Now().Format("20060102150405")
 	g := &Git{
 		url:  c.URL,
-		path: filepath.Join(baseDir, t),
+		path: cacheDir,
 		ref:  c.Ref,
 	}
 	err := g.get()
-	return g.path, err
-}
+	revCurrent := c.loadCurrentRelease().Hash
+	revRemote, err := g.getRemoteCommitHash()
+	if err != nil {
+		return "", err
+	}
 
-func (c *Code) treatCachedCopy() {
-}
+	log.Debugf("Current: %s , Remote: %s", revCurrent, revRemote)
+	if revCurrent != revRemote {
+		re := newRelease(revRemote)
+		if err := g.release(revRemote, re.Path); err != nil {
+			return "", err
+		}
+		re.putAsCurrent()
+		c.Updated = true
+		return re.Path, nil
+	}
 
-func (c *Code) getCurrentRev() {
-}
-
-func (c *Code) exportCode() {
-}
-
-func (c *Code) cleanupReleases() {
+	re := c.loadCurrentRelease()
+	return re.Path, nil
 }
 
 // PrivateRepo sets up remote credential
