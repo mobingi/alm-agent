@@ -228,6 +228,10 @@ func Ensure(c *cli.Context) error {
 		}
 		log.Debugf("%#v", newContainer)
 
+		if util.FileExists(tracerPath()) {
+			exec.Command(tracerPath(), newContainer.ID).Start()
+		}
+
 		log.Debug("Step: d.MapPort")
 		err = d.MapPort(newContainer)
 		if err != nil {
