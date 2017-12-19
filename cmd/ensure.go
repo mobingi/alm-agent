@@ -305,10 +305,6 @@ func Ensure(c *cli.Context) error {
 			return cli.NewExitError(err, 1)
 		}
 
-		if util.FileExists(tracerPath()) {
-			exec.Command(tracerPath(), newContainer.ID).Start()
-		}
-
 		d.UnmapPort()
 		d.MapPort(newContainer)
 
@@ -322,6 +318,10 @@ func Ensure(c *cli.Context) error {
 		}
 
 		d.RenameContainer(newContainer, "active")
+
+		if util.FileExists(tracerPath()) {
+			exec.Command(tracerPath(), newContainer.ID).Start()
+		}
 	}
 
 	log.Debug("Step: serverConfig.WriteUpdated")
