@@ -57,7 +57,7 @@ func main() {
 		defer responseBody.Close()
 
 		go func() {
-			logfile := logDirPath + fmt.Sprintf("dockerrun.%s.log", ctid)
+			logfile := logDirPath + "dockerrun.active.log"
 			dst, err := os.Create(logfile)
 			if err != nil {
 				panic(err)
