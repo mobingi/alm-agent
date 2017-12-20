@@ -20,7 +20,6 @@ setup:
 deps:
 	dep ensure -v
 
-.PHONY: bindata
 bindata:
 	tomlv _data/*.toml
 	go-assets-builder --package=bindata --output=./bindata/bindata.go _data
@@ -57,9 +56,12 @@ clean:
 
 addon:
 	cd addons/aws/; go build -ldflags "$(LDFLAGS)" -o ../../bin/$(NAME)-addon-aws
+	cd addons/common_logtracer/; go build -ldflags "$(LDFLAGS)" -o ../../bin/alm-logtracer
 
 list:
 	@ls -1 bin
 
 version:
 	@echo ${VERSION}.${MINOR_VERSION}
+
+.PHONY: setup deps bindata verifydata test race lint fmt build cibuild clean addon list version

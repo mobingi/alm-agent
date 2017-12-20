@@ -23,6 +23,8 @@ func mockPost(fn func(path string, values url.Values, target interface{}) error)
 
 func TestGetAccessToken(t *testing.T) {
 	log.SetLevel(log.DebugLevel)
+	flushAccessTokenCache()
+	defer flushAccessTokenCache()
 	var apitoken = &apiToken{}
 	tc := &config.Config{
 		APIHost:            "https://test.example.com",
@@ -67,6 +69,8 @@ func TestGetAccessToken(t *testing.T) {
 }
 
 func TestGetSTSToken(t *testing.T) {
+	flushAccessTokenCache()
+	defer flushAccessTokenCache()
 	log.SetLevel(log.DebugLevel)
 	var testtoken = &StsToken{}
 	tc := &config.Config{
