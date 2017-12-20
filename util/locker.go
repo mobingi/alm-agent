@@ -45,6 +45,7 @@ func UnLock(name string) error {
 	log.Debugf("try util.UnLock %s", name)
 	syscall.Close(lockmap[name])
 
+	os.Remove(lockfile(name))
 	delete(lockmap, name)
 	log.Debugf("UnLocked %s", lockmap)
 	return nil
