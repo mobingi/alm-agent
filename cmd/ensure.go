@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"os"
+	"os/exec"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -17,6 +20,13 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
+
+func tracerPath() string {
+	selfPath, _ := os.Executable()
+	d, _ := filepath.Split(selfPath)
+	tracerPath := filepath.Join(d, "alm-logtracer")
+	return tracerPath
+}
 
 // Ensure start or replace container with newest config
 func Ensure(c *cli.Context) error {
@@ -218,6 +228,10 @@ func Ensure(c *cli.Context) error {
 		}
 		log.Debugf("%#v", newContainer)
 
+		if util.FileExists(tracerPath()) {
+			exec.Command(tracerPath(), newContainer.ID).Start()
+		}
+
 		log.Debug("Step: d.MapPort")
 		err = d.MapPort(newContainer)
 		if err != nil {
@@ -245,7 +259,6 @@ func Ensure(c *cli.Context) error {
 		}
 
 		codeDir := ""
-		codeUpdated := false
 		if s.GitRepo != "" {
 			code := code.New(s)
 			if code.Key != "" {
@@ -255,20 +268,13 @@ func Ensure(c *cli.Context) error {
 				}
 			}
 
-			codeUpdated, err = code.CheckUpdate()
+			codeDir, err = code.Get()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
-
-			if codeUpdated {
-				codeDir, err = code.Get()
-				if err != nil {
-					return cli.NewExitError(err, 1)
-				}
-			} else {
-				codeDir = code.Path
-			}
 		}
+
+		log.Debugf("CodeDir is %s", codeDir)
 
 		api.SendContainerStatus("updating")
 		if oldContainer != nil {
@@ -304,6 +310,10 @@ func Ensure(c *cli.Context) error {
 		}
 
 		d.RenameContainer(newContainer, "active")
+
+		if util.FileExists(tracerPath()) {
+			exec.Command(tracerPath(), newContainer.ID).Start()
+		}
 	}
 
 	log.Debug("Step: serverConfig.WriteUpdated")
