@@ -9,18 +9,19 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
 	knownHosts       = "/etc/ssh/ssh_known_hosts"
 	sshDir           = "/opt/mobingi/etc/ssh"
 	sshKeyName       = "id_alm_agent"
-	gitSshScriptName = "git_ssh.sh"
+	gitSSHScriptName = "git_ssh.sh"
 )
 
 // ref. `man git-clone`
@@ -34,27 +35,56 @@ var (
 	hasSchemeSyntax = regexp.MustCompile("^[^:]+://")
 	scpLikeSyntax   = regexp.MustCompile("^([^@]+@)?([^:]+):/?(.+)$")
 )
+var baseDir = "/srv/code"
+var cacheDir = filepath.Join(baseDir, "cached-copy")
+var releaseDir = filepath.Join(baseDir, "releases")
 
+// Code is application repository
 type Code struct {
-	URL  string
-	Ref  string
+	URL     string
+	Ref     string
+	Path    string
+	Key     string
+	Updated bool
+}
+
+// Release is exported code
+type Release struct {
+	Hash string
 	Path string
-	Key  string
 }
 
-type Dirs []os.FileInfo
-
-func (d Dirs) Len() int {
-	return len(d)
+func newRelease(hash string) *Release {
+	t := time.Now().Format("20060102150405")
+	releasePath := filepath.Join(releaseDir, t)
+	return &Release{
+		Hash: hash,
+		Path: releasePath,
+	}
 }
 
-func (d Dirs) Swap(i, j int) {
-	d[i], d[j] = d[j], d[i]
-}
-func (d Dirs) Less(i, j int) bool {
-	return d[j].ModTime().Unix() < d[i].ModTime().Unix()
+func (c *Code) loadCurrentRelease() *Release {
+	current := filepath.Join(baseDir, "current")
+	r := &Release{}
+	if util.FileExists(current) {
+		releaseInfoRaw, _ := ioutil.ReadFile(current)
+		releaseInfo := strings.Split(strings.Trim(string(releaseInfoRaw), "\n"), ",")
+
+		// avoid format error
+		if len(releaseInfo) == 2 {
+			r.Hash = releaseInfo[0]
+			r.Path = releaseInfo[1]
+		}
+	}
+	return r
 }
 
+func (r *Release) putAsCurrent() {
+	releaseInfo := strings.Join([]string{r.Hash, r.Path}, ",")
+	ioutil.WriteFile(filepath.Join(baseDir, "current"), []byte(releaseInfo), 0644)
+}
+
+// New creates New Code obj
 func New(s *serverConfig.Config) *Code {
 	ref := s.GitReference
 	if ref == "" {
@@ -67,61 +97,77 @@ func New(s *serverConfig.Config) *Code {
 	}
 }
 
-func (c *Code) CheckUpdate() (bool, error) {
-	base := "/srv/code"
-	if !util.FileExists(base) {
-		return true, nil
+func (c *Code) cleanupReleases() error {
+	if !util.FileExists(releaseDir) {
+		return nil
 	}
 
-	dirs, err := ioutil.ReadDir(base)
-
+	dirs, err := ioutil.ReadDir(releaseDir)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	if len(dirs) == 0 {
-		return true, nil
+		return nil
 	}
 
-	sort.Sort(Dirs(dirs))
+	sort.Slice(dirs, func(i, j int) bool {
+		return dirs[j].ModTime().Unix() < dirs[i].ModTime().Unix()
+	})
 
-	if len(dirs) > 10 {
-		for _, dir := range dirs[10:] {
-			err := os.RemoveAll(filepath.Join(base, dir.Name()))
+	if len(dirs) > 5 {
+		for _, dir := range dirs[5:] {
+			delDirPath := filepath.Join(releaseDir, dir.Name())
+			log.Infof("Cleaning up old release... %s", delDirPath)
+			err := os.RemoveAll(delDirPath)
 			if err != nil {
-				return false, err
+				return err
 			}
 		}
 	}
 
-	c.Path = filepath.Join(base, dirs[0].Name())
-	g := &Git{
-		url:  c.URL,
-		path: c.Path,
-		ref:  c.Ref,
-	}
-
-	return g.checkUpdate()
+	return nil
 }
 
+// Get creates releases
+// returns code dirpash to mount by container.
 func (c *Code) Get() (string, error) {
-	baseDir := filepath.Join("/srv", "code")
-	if !util.FileExists(baseDir) {
-		if err := os.MkdirAll(baseDir, 0755); err != nil {
+	log.Debug("Code: Get")
+	if !util.FileExists(releaseDir) {
+		if err := os.MkdirAll(releaseDir, 0755); err != nil {
 			return "", err
 		}
 	}
 
-	t := time.Now().Format("20060102150405")
 	g := &Git{
 		url:  c.URL,
-		path: filepath.Join(baseDir, t),
+		path: cacheDir,
 		ref:  c.Ref,
 	}
 	err := g.get()
-	return g.path, err
+	revCurrent := c.loadCurrentRelease().Hash
+	revRemote, err := g.getRemoteCommitHash()
+	if err != nil {
+		return "", err
+	}
+
+	log.Debugf("Current: %s , Remote: %s", revCurrent, revRemote)
+	if revCurrent != revRemote {
+		re := newRelease(revRemote)
+		if err := g.release(revRemote, re.Path); err != nil {
+			return "", err
+		}
+		re.putAsCurrent()
+		c.Updated = true
+		c.cleanupReleases()
+		return re.Path, nil
+	}
+
+	re := c.loadCurrentRelease()
+	return re.Path, nil
 }
 
+// PrivateRepo sets up remote credential
 func (c *Code) PrivateRepo() error {
 	err := createIdentityFile(c.Key)
 	if err != nil {
@@ -143,7 +189,7 @@ func (c *Code) PrivateRepo() error {
 		return err
 	}
 
-	err = writeGitSshScript()
+	err = writeGitSSHScript()
 	if err != nil {
 		return err
 	}
@@ -216,13 +262,13 @@ func checkKnownHosts(url *url.URL) error {
 	return nil
 }
 
-func writeGitSshScript() error {
+func writeGitSSHScript() error {
 	log.Debug("Step: writeGitSshScript")
 	c := `#!/bin/sh
 exec ssh -i %s "$@"
 `
 	s := fmt.Sprintf(c, filepath.Join(sshDir, sshKeyName))
-	err := ioutil.WriteFile(filepath.Join(sshDir, gitSshScriptName), []byte(s), 0700)
+	err := ioutil.WriteFile(filepath.Join(sshDir, gitSSHScriptName), []byte(s), 0700)
 	if err != nil {
 		return err
 	}

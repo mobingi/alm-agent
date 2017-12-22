@@ -259,7 +259,6 @@ func Ensure(c *cli.Context) error {
 		}
 
 		codeDir := ""
-		codeUpdated := false
 		if s.GitRepo != "" {
 			code := code.New(s)
 			if code.Key != "" {
@@ -269,20 +268,13 @@ func Ensure(c *cli.Context) error {
 				}
 			}
 
-			codeUpdated, err = code.CheckUpdate()
+			codeDir, err = code.Get()
 			if err != nil {
 				return cli.NewExitError(err, 1)
 			}
-
-			if codeUpdated {
-				codeDir, err = code.Get()
-				if err != nil {
-					return cli.NewExitError(err, 1)
-				}
-			} else {
-				codeDir = code.Path
-			}
 		}
+
+		log.Debugf("CodeDir is %s", codeDir)
 
 		api.SendContainerStatus("updating")
 		if oldContainer != nil {
