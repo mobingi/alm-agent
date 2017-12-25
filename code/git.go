@@ -83,6 +83,7 @@ func (g *Git) deepFetch(opts *util.ExecOpts) error {
 
 	// Fetch All
 	// git fetch --prune
+	// git fetch origin ${ref} --force
 	// git tag -l | xargs git tag -d
 	// git fetch --tags
 	log.Debugf("Fetching remote %s", g.url)
@@ -107,6 +108,14 @@ func (g *Git) deepFetch(opts *util.ExecOpts) error {
 		log.Error(string(out))
 		return err
 	}
+
+	log.Debugf("Fetching remote ref %s", g.url)
+	out, err = util.Executor.ExecWithOpts(opts, "git", "fetch", "origin", g.ref, "--force")
+	if err != nil {
+		log.Error(string(out))
+		return err
+	}
+
 	return nil
 }
 
