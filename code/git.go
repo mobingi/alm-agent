@@ -36,6 +36,10 @@ func (g *Git) getRemoteCommitHash() (string, error) {
 	}
 
 	remoteHashRaw := strings.Fields(strings.Trim(string(out), "\n"))
+	if len(remoteHashRaw) == 0 {
+		remoteHashRaw = []string{""}
+	}
+
 	remoteHash := remoteHashRaw[0]
 	if remoteHash == "" {
 		return "", fmt.Errorf("git ref %s not found", g.ref)
