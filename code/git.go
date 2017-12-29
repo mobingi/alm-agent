@@ -26,18 +26,21 @@ func (g *Git) getRemoteCommitHash() (string, error) {
 	// git ls-remote origin master -q | cut -f 1
 	opts := &util.ExecOpts{}
 	opts.Dir = g.path
+	opts.Env = []string{"GIT_SSH=" + filepath.Join(sshDir, gitSSHScriptName)}
 
-	out, err := execPipeline(
-		g.path,
-		[]string{"git", "ls-remote", "origin", g.ref},
-		[]string{"cut", "-f", "1"},
-	)
+	log.Infof("git ls-remote origin %s", g.ref)
+	out, err := util.Executor.ExecWithOpts(opts, "git", "ls-remote", "origin", g.ref)
 	if err != nil {
 		log.Error(string(out))
 		return "", err
 	}
 
-	remoteHash := strings.Trim(string(out), "\n")
+	remoteHashRaw := strings.Fields(strings.Trim(string(out), "\n"))
+	if len(remoteHashRaw) == 0 {
+		remoteHashRaw = []string{""}
+	}
+
+	remoteHash := remoteHashRaw[0]
 	if remoteHash == "" {
 		return "", fmt.Errorf("git ref %s not found", g.ref)
 	}
@@ -80,6 +83,7 @@ func (g *Git) deepFetch(opts *util.ExecOpts) error {
 
 	// Fetch All
 	// git fetch --prune
+	// git fetch origin ${ref} --force
 	// git tag -l | xargs git tag -d
 	// git fetch --tags
 	log.Debugf("Fetching remote %s", g.url)
@@ -104,6 +108,14 @@ func (g *Git) deepFetch(opts *util.ExecOpts) error {
 		log.Error(string(out))
 		return err
 	}
+
+	log.Debugf("Fetching remote ref %s", g.url)
+	out, err = util.Executor.ExecWithOpts(opts, "git", "fetch", "origin", g.ref, "--force")
+	if err != nil {
+		log.Error(string(out))
+		return err
+	}
+
 	return nil
 }
 
