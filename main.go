@@ -69,7 +69,7 @@ func beforeActions(c *cli.Context) error {
 
 	rand.Seed(int64(os.Getpid()))
 
-	splay := rand.Intn(3000)
+	splay := rand.Intn(30000)
 	log.Debugf("Wait %d milliseconds...", splay)
 	time.Sleep(time.Duration(splay) * time.Millisecond)
 	return nil
