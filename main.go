@@ -67,11 +67,12 @@ func beforeActions(c *cli.Context) error {
 	}
 	log.Debugf("Set provider to %#v", c.GlobalString("provider"))
 
-	rand.Seed(int64(os.Getpid()))
-
-	splay := rand.Intn(30000)
-	log.Debugf("Wait %d milliseconds...", splay)
-	time.Sleep(time.Duration(splay) * time.Millisecond)
+	if c.Command.Name == "ensure" {
+		rand.Seed(int64(os.Getpid()))
+		splay := rand.Intn(30000)
+		log.Debugf("Wait %d milliseconds...", splay)
+		time.Sleep(time.Duration(splay) * time.Millisecond)
+	}
 	return nil
 }
 
