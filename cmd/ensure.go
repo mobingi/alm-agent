@@ -212,9 +212,7 @@ func Ensure(c *cli.Context) error {
 		return nil
 	}
 
-	if c.Command.Name == "register" {
-		api.SendContainerStatus("starting")
-	} else {
+	if !initialize {
 		api.SendContainerStatus("updating")
 	}
 
