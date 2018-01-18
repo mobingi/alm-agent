@@ -62,7 +62,7 @@ func Ensure(c *cli.Context) error {
 	}
 
 	if initialize {
-		api.SendContainerStatus("starting", "")
+		api.SendContainerStatus("starting")
 	}
 
 	stsToken, err := api.GetStsToken()
