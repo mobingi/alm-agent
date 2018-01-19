@@ -159,7 +159,7 @@ func GetStsToken() (*StsToken, error) {
 	values.Set("service", "logs")
 
 	now := time.Now().Unix()
-	err := Get(RoutesV3.Sts, values, &stsToken)
+	err = Get(RoutesV3.Sts, values, &stsToken)
 	if err != nil {
 		flushTokenCache(stsForCWLogsCachedTimePath)
 		return nil, err
