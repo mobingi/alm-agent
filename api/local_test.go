@@ -19,7 +19,7 @@ func Test_writeTempToken(t *testing.T) {
 	awsConfDir = filepath.Join(tmpAWSDir, ".aws")
 	defer func() { awsConfDir = origawsConfDir }()
 
-	sts := &stsToken{
+	ststoken := &stsToken{
 		AccessKeyID:     "ASIAXXXXXXXXXXXXXXX",
 		SecretAccessKey: "SAXXX",
 		SessionToken:    "STSTOKENXXX",
