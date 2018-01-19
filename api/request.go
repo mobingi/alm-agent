@@ -147,7 +147,7 @@ func getServerConfigFromAPI(sc *serverConfig.Config) error {
 }
 
 // GetStsToken to STS token for CWLogs
-func GetStsToken() (*StsToken, error) {
+func GetStsToken() error {
 	err := fetchStsTokenCache()
 	if err == nil {
 		return nil
@@ -162,11 +162,16 @@ func GetStsToken() (*StsToken, error) {
 	err = Get(RoutesV3.Sts, values, &stsToken)
 	if err != nil {
 		flushTokenCache(stsForCWLogsCachedTimePath)
-		return nil, err
+		return err
+	}
+
+	err = writeTempToken()
+	if err != nil {
+		return err
 	}
 
 	createCachedTime(now)
-	return &stsToken, nil
+	return nil
 }
 
 func createCachedTime(time int64) {

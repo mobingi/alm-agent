@@ -17,7 +17,7 @@ var (
 	logregion = "ap-northeast-1"
 	c         clientInterface
 	apitoken  apiToken
-	stsToken  StsToken
+	stsToken  stsToken
 )
 
 type clientInterface interface {
@@ -34,8 +34,8 @@ type apiToken struct {
 	ExpiresAt int64  `json:"expires_at"`
 }
 
-// StsToken for CWLogs
-type StsToken struct {
+// stsToken for CWLogs
+type stsToken struct {
 	AccessKeyID     string
 	SecretAccessKey string
 	SessionToken    string

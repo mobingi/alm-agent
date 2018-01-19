@@ -72,7 +72,7 @@ func TestGetSTSToken(t *testing.T) {
 	flushTokenCache(tokenCachePath)
 	defer flushTokenCache(tokenCachePath)
 	log.SetLevel(log.DebugLevel)
-	var testtoken = &StsToken{}
+	var testtoken = &stsToken{}
 	tc := &config.Config{
 		APIHost:            "https://test.example.com",
 		StackID:            "teststack",
