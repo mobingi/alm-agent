@@ -170,7 +170,7 @@ func GetStsToken() (*StsToken, error) {
 }
 
 func createCachedTime(time int64) {
-	ioutil.WriteFile(stsForCWLogsCachedTimePath, []byte(fmt.Sprintf("%d", now)), 0600)
+	ioutil.WriteFile(stsForCWLogsCachedTimePath, []byte(fmt.Sprintf("%d", time)), 0600)
 	return
 }
 
