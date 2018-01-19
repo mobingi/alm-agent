@@ -17,7 +17,7 @@ var (
 	logregion = "ap-northeast-1"
 	c         clientInterface
 	apitoken  apiToken
-	stsToken  stsToken
+	ststoken  stsToken
 )
 
 type clientInterface interface {
