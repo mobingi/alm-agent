@@ -2,9 +2,11 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/mobingi/alm-agent/metavars"
@@ -45,7 +47,10 @@ var RoutesV3 = &route{
 	LogsSTS:           "/v3/alm/agent/logs_access_token",
 }
 
-var tokenCachePath = "/opt/mobingi/etc/tokencache.json"
+var (
+	tokenCachePath             = "/opt/mobingi/etc/tokencache.json"
+	stsForCWLogsCachedTimePath = "/opt/mobingi/etc/stsForCWLogsCachedTime"
+)
 
 // GetAccessToken requests token of user for auth by API.
 func GetAccessToken() error {
@@ -62,7 +67,7 @@ func GetAccessToken() error {
 
 	err = Post(RoutesV3.AccessToken, values, &apitoken)
 	if err != nil {
-		flushAccessTokenCache()
+		flushTokenCache(tokenCachePath)
 		return err
 	}
 	createAccessTokenCache()
@@ -76,9 +81,9 @@ func createAccessTokenCache() {
 	return
 }
 
-func flushAccessTokenCache() {
-	if util.FileExists(tokenCachePath) {
-		os.Remove(tokenCachePath)
+func flushTokenCache(path string) {
+	if util.FileExists(path) {
+		os.Remove(path)
 	}
 	return
 }
@@ -93,7 +98,7 @@ func fetchAccessTokenCache() error {
 
 	// reuse in 7hours
 	if apitoken.ExpiresAt-time.Now().Unix() < 25200 {
-		flushAccessTokenCache()
+		flushTokenCache(tokenCachePath)
 		return errors.New("apitoken should be renew")
 	}
 
@@ -142,17 +147,57 @@ func getServerConfigFromAPI(sc *serverConfig.Config) error {
 }
 
 // GetStsToken to STS token for CWLogs
-func GetStsToken() (*StsToken, error) {
+func GetStsToken() error {
+	err := fetchStsTokenCache()
+	if err == nil {
+		return nil
+	}
+	log.Debugf("GetStsToken CacheState: %#v", err)
+
 	values := url.Values{}
 	values.Set("stack_id", c.getConfig().StackID)
 	values.Set("service", "logs")
 
-	err := Get(RoutesV3.Sts, values, &stsToken)
+	now := time.Now().Unix()
+	err = Get(RoutesV3.Sts, values, &ststoken)
 	if err != nil {
-		return nil, err
+		flushTokenCache(stsForCWLogsCachedTimePath)
+		return err
 	}
 
-	return &stsToken, nil
+	err = writeTempToken()
+	if err != nil {
+		return err
+	}
+
+	createCachedTime(now)
+	return nil
+}
+
+func createCachedTime(time int64) {
+	ioutil.WriteFile(stsForCWLogsCachedTimePath, []byte(fmt.Sprintf("%d", time)), 0600)
+	return
+}
+
+func fetchStsTokenCache() error {
+	dat, err := ioutil.ReadFile(stsForCWLogsCachedTimePath)
+	if err != nil {
+		return err
+	}
+
+	t, err := strconv.ParseInt(string(dat), 10, 64)
+	if err != nil {
+		return err
+	}
+
+	// reuse in 25minutes
+	if time.Now().Unix()-t > 1500 {
+		flushTokenCache(stsForCWLogsCachedTimePath)
+		return errors.New("ststoken should be renew")
+	}
+
+	log.Debug("use local cache of StsToken")
+	return nil
 }
 
 // SendAgentStatus send agent status to API

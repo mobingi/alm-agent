@@ -9,15 +9,15 @@ import (
 
 	"github.com/pkg/errors"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
+	log "github.com/sirupsen/logrus"
 )
 
 var awsConfDir = "/root/.aws"
 
-// WriteTempToken to save STS token for CWLogs container
-func WriteTempToken(token *StsToken) error {
+// writeTempToken o save STS token for CWLogs container
+func writeTempToken() error {
 	region := logregion
 
 	creadsForlogs := `[plugins]
@@ -33,7 +33,7 @@ region=%s
 		os.Mkdir(awsConfDir, 0700)
 	}
 
-	logscreadsContent := fmt.Sprintf(creadsForlogs, token.AccessKeyID, token.SecretAccessKey, token.SessionToken, region)
+	logscreadsContent := fmt.Sprintf(creadsForlogs, ststoken.AccessKeyID, ststoken.SecretAccessKey, ststoken.SessionToken, region)
 
 	err := ioutil.WriteFile(filepath.Join(awsConfDir, "awslogs_creds.conf"), []byte(logscreadsContent), 0600)
 	if err != nil {

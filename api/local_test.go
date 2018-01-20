@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestWriteTempToken(t *testing.T) {
+func Test_writeTempToken(t *testing.T) {
 	assert := assert.New(t)
 	tmpAWSDir, _ := ioutil.TempDir("", "TestWriteTempToken")
 	defer os.RemoveAll(tmpAWSDir)
@@ -19,12 +19,12 @@ func TestWriteTempToken(t *testing.T) {
 	awsConfDir = filepath.Join(tmpAWSDir, ".aws")
 	defer func() { awsConfDir = origawsConfDir }()
 
-	sts := &StsToken{
+	ststoken := &stsToken{
 		AccessKeyID:     "ASIAXXXXXXXXXXXXXXX",
 		SecretAccessKey: "SAXXX",
 		SessionToken:    "STSTOKENXXX",
 	}
-	WriteTempToken(sts)
+	writeTempToken()
 
 	buf, err := ioutil.ReadFile(filepath.Join(awsConfDir, "awslogs_creds.conf"))
 	if err != nil {
