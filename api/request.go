@@ -142,10 +142,10 @@ func getServerConfigFromAPI(sc *serverConfig.Config) error {
 }
 
 // GetStsToken to STS token for CWLogs
-func GetStsToken() (*StsToken, error) {
+func GetStsToken() error {
 	err := stsToken.fetchCache()
 	if err == nil {
-		return &stsToken, nil
+		return nil
 	}
 	log.Debug(err)
 
@@ -155,16 +155,16 @@ func GetStsToken() (*StsToken, error) {
 
 	err = Get(RoutesV3.Sts, values, &stsToken)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	stsToken.createCache()
 	err = stsToken.writeTempToken()
 	if err != nil {
 		stsToken.flushCache()
-		return nil, err
+		return err
 	}
-	return &stsToken, nil
+	return nil
 }
 
 // SendAgentStatus send agent status to API
