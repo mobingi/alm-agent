@@ -159,6 +159,11 @@ func GetStsToken() (*StsToken, error) {
 	}
 
 	stsToken.createCache()
+	err = stsToken.writeTempToken()
+	if err != nil {
+		stsToken.flushCache()
+		return nil, err
+	}
 	return &stsToken, nil
 }
 

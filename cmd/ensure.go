@@ -71,8 +71,6 @@ func Ensure(c *cli.Context) error {
 		return cli.NewExitError(err, 1)
 	}
 
-	api.WriteTempToken(stsToken)
-
 	log.Debug("Step: api.GetServerConfig")
 	log.Debugf("Flag: %#v", c.String("serverconfig"))
 	s, err := api.GetServerConfig(c.String("serverconfig"))

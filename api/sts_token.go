@@ -2,16 +2,19 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/mobingi/alm-agent/util"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
+var awsConfDir = "/root/.aws"
 var stsTokenCachePath = "/opt/mobingi/etc/sts_cache.json"
 
 // StsToken for grant access for AWS resources
@@ -55,4 +58,29 @@ func (sts *StsToken) flushCache() {
 		os.Remove(stsTokenCachePath)
 	}
 	return
+}
+
+func (sts *StsToken) writeTempToken() error {
+	region := logregion
+
+	creadsForlogs := `[plugins]
+cwlogs = cwlogs
+[default]
+aws_access_key_id=%s
+aws_secret_access_key=%s
+aws_session_token=%s
+region=%s
+`
+
+	if !util.FileExists(awsConfDir) {
+		os.Mkdir(awsConfDir, 0700)
+	}
+
+	logscreadsContent := fmt.Sprintf(creadsForlogs, sts.AccessKeyID, sts.SecretAccessKey, sts.SessionToken, region)
+
+	err := ioutil.WriteFile(filepath.Join(awsConfDir, "awslogs_creds.conf"), []byte(logscreadsContent), 0600)
+	if err != nil {
+		return errors.Wrap(err, "failed to write awslogs_creds.conf.")
+	}
+	return nil
 }
