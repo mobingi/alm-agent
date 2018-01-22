@@ -34,13 +34,6 @@ type apiToken struct {
 	ExpiresAt int64  `json:"expires_at"`
 }
 
-// StsToken for CWLogs
-type StsToken struct {
-	AccessKeyID     string
-	SecretAccessKey string
-	SessionToken    string
-}
-
 type client struct {
 	config *config.Config
 }
