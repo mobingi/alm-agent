@@ -65,13 +65,11 @@ func Ensure(c *cli.Context) error {
 		api.SendContainerStatus("starting")
 	}
 
-	stsToken, err := api.GetStsToken()
+	err = api.GetStsToken()
 	if err != nil {
 		api.SendAgentStatus("error", err.Error())
 		return cli.NewExitError(err, 1)
 	}
-
-	api.WriteTempToken(stsToken)
 
 	log.Debug("Step: api.GetServerConfig")
 	log.Debugf("Flag: %#v", c.String("serverconfig"))
