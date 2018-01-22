@@ -21,12 +21,12 @@ type StsToken struct {
 	SessionToken    string
 }
 
-// use Cache 40-55min randomly
+// use Cache 20-29min randomly
 func (sts *StsToken) fetchCache() error {
 	if util.FileExists(stsTokenCachePath) {
 		rand.Seed(time.Now().UnixNano())
 		t := time.Now()
-		it := 55 - rand.Intn(15)
+		it := 29 - rand.Intn(9)
 		at := t.Add(-(time.Duration(it) * time.Minute))
 
 		file, _ := os.Open(stsTokenCachePath)
