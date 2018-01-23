@@ -142,17 +142,29 @@ func getServerConfigFromAPI(sc *serverConfig.Config) error {
 }
 
 // GetStsToken to STS token for CWLogs
-func GetStsToken() (*StsToken, error) {
+func GetStsToken() error {
+	err := stsToken.fetchCache()
+	if err == nil {
+		return nil
+	}
+	log.Debug(err)
+
 	values := url.Values{}
 	values.Set("stack_id", c.getConfig().StackID)
 	values.Set("service", "logs")
 
-	err := Get(RoutesV3.Sts, values, &stsToken)
+	err = Get(RoutesV3.Sts, values, &stsToken)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &stsToken, nil
+	stsToken.createCache()
+	err = stsToken.writeTempToken()
+	if err != nil {
+		stsToken.flushCache()
+		return err
+	}
+	return nil
 }
 
 // SendAgentStatus send agent status to API

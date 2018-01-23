@@ -62,16 +62,14 @@ func Ensure(c *cli.Context) error {
 	}
 
 	if initialize {
-		api.SendAgentStatus("starting", "")
+		api.SendContainerStatus("starting")
 	}
 
-	stsToken, err := api.GetStsToken()
+	err = api.GetStsToken()
 	if err != nil {
 		api.SendAgentStatus("error", err.Error())
 		return cli.NewExitError(err, 1)
 	}
-
-	api.WriteTempToken(stsToken)
 
 	log.Debug("Step: api.GetServerConfig")
 	log.Debugf("Flag: %#v", c.String("serverconfig"))
@@ -190,130 +188,94 @@ func Ensure(c *cli.Context) error {
 		log.Debugf("%#v", addonContainer)
 	}
 
-	if initialize {
-		// All of old Start command
-		codeDir := ""
-		if s.GitRepo != "" {
-			code := code.New(s)
-			if code.Key != "" {
-				log.Debug("Step: code.PrivateRepo")
-				err = code.PrivateRepo()
-				if err != nil {
-					return cli.NewExitError(err, 1)
-				}
-			}
+	// User Container
+	log.Debug("Step: container.NewDocker")
 
-			codeDir, err = code.Get()
-			if err != nil {
-				return cli.NewExitError(err, 1)
-			}
-		}
+	d, err := container.NewDocker(conf, s)
+	if err != nil {
+		api.SendAgentStatus("error", err.Error())
+		return cli.NewExitError(err, 1)
+	}
+	log.Debugf("%#v", d)
 
-		// User Container
-		log.Debug("Step: container.NewDocker")
-		api.SendContainerStatus("starting")
+	oldContainer, err := d.GetContainer("active")
+	if err != nil {
+		return cli.NewExitError(err, 1)
+	}
 
-		d, err := container.NewDocker(conf, s)
-		if err != nil {
-			api.SendAgentStatus("error", err.Error())
-			return cli.NewExitError(err, 1)
-		}
-		log.Debugf("%#v", d)
+	if oldContainer == nil || oldContainer.State == "exited" {
+		update = true
+	}
+	if !update {
+		return nil
+	}
 
-		log.Debug("Step: d.StartContainer")
-		newContainer, err := d.StartContainer("active", codeDir)
-		if err != nil {
-			api.SendAgentStatus("error", err.Error())
-			return cli.NewExitError(err, 1)
-		}
-		log.Debugf("%#v", newContainer)
-
-		if util.FileExists(tracerPath()) {
-			exec.Command(tracerPath(), newContainer.ID).Start()
-		}
-
-		log.Debug("Step: d.MapPort")
-		err = d.MapPort(newContainer)
-		if err != nil {
-			api.SendAgentStatus("error", err.Error())
-			return cli.NewExitError(err, 1)
-		}
-	} else {
-		// All of old Update commdnad
-		d, err := container.NewDocker(conf, s)
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-
-		oldContainer, err := d.GetContainer("active")
-		if err != nil {
-			return cli.NewExitError(err, 1)
-		}
-
-		if oldContainer == nil || oldContainer.State == "exited" {
-			update = true
-		}
-
-		if !update {
-			return nil
-		}
-
-		codeDir := ""
-		if s.GitRepo != "" {
-			code := code.New(s)
-			if code.Key != "" {
-				err = code.PrivateRepo()
-				if err != nil {
-					return cli.NewExitError(err, 1)
-				}
-			}
-
-			codeDir, err = code.Get()
-			if err != nil {
-				return cli.NewExitError(err, 1)
-			}
-		}
-
-		log.Debugf("CodeDir is %s", codeDir)
-
+	if !initialize {
 		api.SendContainerStatus("updating")
-		if oldContainer != nil {
-			d.MapPort(oldContainer) // For regenerating port map information
-		}
+	}
 
-		// standby exists?
-		stc, _ := d.GetContainer("standby")
-		if stc != nil {
-			if stc.State == "exited" {
-				d.RemoveContainer(stc)
-			} else {
-				d.StopContainer(stc)
-				d.RemoveContainer(stc)
+	codeDir := ""
+	if s.GitRepo != "" {
+		code := code.New(s)
+		if code.Key != "" {
+			log.Debug("Step: code.PrivateRepo")
+			err = code.PrivateRepo()
+			if err != nil {
+				return cli.NewExitError(err, 1)
 			}
 		}
 
-		newContainer, err := d.StartContainer("standby", codeDir)
+		codeDir, err = code.Get()
 		if err != nil {
 			return cli.NewExitError(err, 1)
 		}
+	}
+	log.Debugf("CodeDir is %s", codeDir)
 
-		d.UnmapPort()
-		d.MapPort(newContainer)
+	if oldContainer != nil {
+		d.MapPort(oldContainer) // For regenerating port map information
+	}
 
-		if oldContainer != nil {
-			if oldContainer.State == "running" {
-				d.StopContainer(oldContainer)
-				d.RemoveContainer(oldContainer)
-			} else if oldContainer.State == "exited" {
-				d.RemoveContainer(oldContainer)
-			}
+	// standby exists?
+	stc, _ := d.GetContainer("standby")
+	if stc != nil {
+		if stc.State == "exited" {
+			d.RemoveContainer(stc)
+		} else {
+			d.StopContainer(stc)
+			d.RemoveContainer(stc)
 		}
+	}
 
-		d.RenameContainer(newContainer, "active")
+	log.Debug("Step: d.StartContainer")
+	newContainer, err := d.StartContainer("standby", codeDir)
+	if err != nil {
+		api.SendAgentStatus("error", err.Error())
+		return cli.NewExitError(err, 1)
+	}
+	log.Debugf("%#v", newContainer)
 
-		if util.FileExists(tracerPath()) {
-			exec.Command(tracerPath(), newContainer.ID).Start()
+	log.Debug("Step: d.MapPort")
+	d.UnmapPort()
+	err = d.MapPort(newContainer)
+	if err != nil {
+		api.SendAgentStatus("error", err.Error())
+		return cli.NewExitError(err, 1)
+	}
+
+	if oldContainer != nil {
+		if oldContainer.State == "running" {
+			d.StopContainer(oldContainer)
+			d.RemoveContainer(oldContainer)
+		} else if oldContainer.State == "exited" {
+			d.RemoveContainer(oldContainer)
 		}
+	}
+
+	d.RenameContainer(newContainer, "active")
+
+	if util.FileExists(tracerPath()) {
+		exec.Command(tracerPath(), newContainer.ID).Start()
 	}
 
 	log.Debug("Step: serverConfig.WriteUpdated")
