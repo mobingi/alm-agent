@@ -111,6 +111,13 @@ func Ensure(c *cli.Context) error {
 		log.Debugf("%#v", sysContainer)
 
 		if sysContainer != nil {
+			if syscon.HealthCheck {
+				// https://godoc.org/docker.io/go-docker/api/types#Health
+				// Status is one of starting, healthy or unhealthy
+				result, _ := sc.ContainerHealth(sysContainer)
+				log.Debugf("ContainerHelth: %s", result.Status)
+			}
+
 			if sysImageUpdated {
 				sc.StopContainer(sysContainer)
 				sc.RemoveContainer(sysContainer)
