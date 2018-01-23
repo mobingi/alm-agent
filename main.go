@@ -68,6 +68,10 @@ func beforeActions(c *cli.Context) error {
 	log.Debugf("Set provider to %#v", c.GlobalString("provider"))
 
 	if c.Command.Name == "ensure" {
+		if c.Bool("immediately") {
+			log.Debug("Splay skipped due to immediately flag was set")
+			return nil
+		}
 		rand.Seed(int64(os.Getpid()))
 		splay := rand.Intn(30000)
 		log.Debugf("Wait %d milliseconds...", splay)
@@ -145,6 +149,10 @@ func main() {
 		cli.StringFlag{
 			Name:  "serverconfig, sc",
 			Usage: "Load ServerConfig from `URL`. ask to API by default",
+		},
+		cli.BoolFlag{
+			Name:  "immediately, I",
+			Usage: "It skips sleep to run ensure immediately(only effects for ensure). false by default.",
 		},
 	}
 
