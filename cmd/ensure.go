@@ -115,7 +115,9 @@ func Ensure(c *cli.Context) error {
 				// https://godoc.org/docker.io/go-docker/api/types#Health
 				// Status is one of starting, healthy or unhealthy
 				result, _ := sc.ContainerHealth(sysContainer)
-				log.Debugf("ContainerHelth: %s", result.Status)
+				if result != nil {
+					log.Debugf("ContainerHelth: %s", result.Status)
+				}
 			}
 
 			if sysImageUpdated {
