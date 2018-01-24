@@ -117,6 +117,10 @@ func Ensure(c *cli.Context) error {
 				result, _ := sc.ContainerHealth(sysContainer)
 				if result != nil {
 					log.Debugf("ContainerHelth: %s", result.Status)
+					if result.Status == "unhealthy" {
+						log.Debugf("SystemContainer %s is unhealthy, will be restart force.", syscon.Name)
+						sysImageUpdated = true
+					}
 				}
 			}
 
