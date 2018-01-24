@@ -15,11 +15,12 @@ import (
 
 // SystemContainer uses log
 type SystemContainer struct {
-	Name     string
-	Image    string
-	EnvFuncs []string
-	VolFuncs []string
-	Restart  bool
+	Name        string
+	Image       string
+	EnvFuncs    []string
+	VolFuncs    []string
+	Restart     bool
+	HealthCheck bool
 }
 
 // SystemContainers is slice of SystemContainer
