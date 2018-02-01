@@ -4,11 +4,15 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/url"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/mobingi/alm-agent/config"
 	"github.com/mobingi/alm-agent/server_config"
+	"github.com/mobingi/alm-agent/util"
 	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 )
 
 func mockGet(fn func(path string, values url.Values, target interface{}) error) {
@@ -157,4 +161,33 @@ func TestGetServerConfigFromAPI(t *testing.T) {
 	if actual != expected {
 		t.Fatalf("Expected: %s\n But: %s", expected, actual)
 	}
+}
+
+func Test_saveAgentStatus(t *testing.T) {
+	assert := assert.New(t)
+
+	tmpMobDir, _ := ioutil.TempDir("", "TestAgentStatus")
+	defer os.RemoveAll(tmpMobDir)
+
+	origlastAgentStatusPath := lastAgentStatusPath
+	lastAgentStatusPath = filepath.Join(tmpMobDir, "last_agent_status")
+	defer func() { lastAgentStatusPath = origlastAgentStatusPath }()
+
+	saveAgentStatus("testing")
+	assert.True(util.FileExists(lastAgentStatusPath))
+}
+
+func Test_isNewAgentStatus(t *testing.T) {
+	assert := assert.New(t)
+
+	tmpMobDir, _ := ioutil.TempDir("", "TestAgentStatus")
+	defer os.RemoveAll(tmpMobDir)
+
+	origlastAgentStatusPath := lastAgentStatusPath
+	lastAgentStatusPath = filepath.Join(tmpMobDir, "last_agent_status")
+	defer func() { lastAgentStatusPath = origlastAgentStatusPath }()
+
+	saveAgentStatus("testing")
+	assert.False(isNewAgentStatus("testing"))
+	assert.True(isNewAgentStatus("testinger"))
 }
