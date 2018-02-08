@@ -16,6 +16,7 @@ import (
 var (
 	METAENDPOINT          = "http://169.254.169.254/"
 	ecsMETAENDPOINT       = "http://100.100.100.200/"
+	gceMETAENDPOINT       = "http://metadata.google.internal/"
 	containerLogsLocation = "/var/log/alm-agent/container"
 	agentIDSavePath       = "/opt/mobingi/etc/alm-agent.id"
 )
@@ -63,6 +64,8 @@ func getServerID(provider string) (string, error) {
 		endpoint = METAENDPOINT + "/latest/meta-data/instance-id"
 	case "alicloud":
 		endpoint = ecsMETAENDPOINT + "/latest/meta-data/instance-id"
+	case "gcp":
+		endpoint = gceMETAENDPOINT + "/computeMetadata/v1/instance/id"
 	case "k5":
 		endpoint = METAENDPOINT + "/openstack/latest/meta_data.json"
 	case "localtest":
@@ -71,12 +74,21 @@ func getServerID(provider string) (string, error) {
 		return "", errors.New("Provider `" + provider + "` is not supported.")
 	}
 
-	resp, err := client.Get(endpoint)
+	req, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		log.Warnf("%#v", err)
+		return "", errors.New("Failed to return Request")
+	}
+
+	if provider == "gcp" {
+		req.Header.Set("Metadata-Flavor", "Google")
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Warnf("%#v", err)
 		return "", errors.New("Failed to get ServerID")
 	}
-
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
