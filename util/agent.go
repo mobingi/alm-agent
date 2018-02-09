@@ -10,17 +10,9 @@ import (
 )
 
 var (
-	awsMETAENDPOINT       = "http://169.254.169.254/"
-	k5METAENDPOINT        = awsMETAENDPOINT
-	ecsMETAENDPOINT       = "http://100.100.100.200/"
-	gceMETAENDPOINT       = "http://metadata.google.internal/"
 	containerLogsLocation = "/var/log/alm-agent/container"
 	agentIDSavePath       = "/opt/mobingi/etc/alm-agent.id"
 )
-
-type k5 struct {
-	UUID string `json:"uuid"`
-}
 
 // FetchContainerState fetches state of application in running container.
 func FetchContainerState() string {

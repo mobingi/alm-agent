@@ -6,6 +6,10 @@ type k5Provider struct {
 	*provider
 }
 
+type k5 struct {
+	UUID string `json:"uuid"`
+}
+
 func (p *k5Provider) MetadataEndpoint() string {
 	return "http://169.254.169.254/"
 }
