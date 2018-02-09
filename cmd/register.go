@@ -39,6 +39,8 @@ func Register(c *cli.Context) error {
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent-addon-aws >> /var/log/alm-agent/aws.log 2>&1' >> /tmp/crontab.alm-agent")
 	case "alicloud":
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -P alicloud -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
+	case "gcp":
+		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -P gcp -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
 	case "k5":
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -P k5 -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
 	case "localtest":
