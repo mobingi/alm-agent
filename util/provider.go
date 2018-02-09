@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Provider is common interface for cloud services
+// Provider is common interface for CloudVM
 type Provider interface {
 	MetadataEndpoint() string
 	GetServerID() (string, error)
@@ -41,13 +41,16 @@ func (p *provider) simpleHTTPGet(endpoint string) (string, error) {
 	return string(body), nil
 }
 
-func (p *provider) simpleHTTPGetWithHeader(endpoint string, header []string) (string, error) {
+func (p *provider) simpleHTTPGetWithHeader(endpoint string, headers map[string]string) (string, error) {
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
 
 	req, _ := http.NewRequest("GET", endpoint, nil)
+	for hKey, hVal := range headers {
+		req.Header.Set(hKey, hVal)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
