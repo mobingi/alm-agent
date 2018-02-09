@@ -72,6 +72,12 @@ func newProvider(name string) (Provider, error) {
 	switch name {
 	case "aws":
 		return &awsProvider{}, nil
+	case "alicloud":
+		return &alicloudProvider{}, nil
+	case "gcp":
+		return &gcpProvider{}, nil
+	case "k5":
+		return &k5Provider{}, nil
 	case "localtest":
 		return &nullProvider{}, nil
 	}
