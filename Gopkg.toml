@@ -37,6 +37,7 @@
 
 [[constraint]]
   name = "github.com/docker/libnetwork"
+  branch = "bump_17.12"
 
 [[constraint]]
   name = "github.com/hashicorp/go-version"
