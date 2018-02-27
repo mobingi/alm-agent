@@ -26,9 +26,9 @@ bindata:
 
 verifydata:
 	tomlv _data/*.toml
-	# go-assets-builder --package=bindata --output=./bindata/checkbin _data
-	# diff ./bindata/checkbin ./bindata/bindata.go > /dev/null
-	# rm ./bindata/checkbin
+	statik -src ./_data -dest compare
+	diff statik/statik.go compare/statik/statik.go > /dev/null
+	rm -rf ./compare
 
 test: deps
 	go test -v ${PACKAGES_ALL} -cover
