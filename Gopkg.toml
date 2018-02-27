@@ -72,5 +72,5 @@
   name = "golang.org/x/net"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/jessevdk/go-assets"
+  name = "github.com/rakyll/statik"
+  version = "0.1.1"

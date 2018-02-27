@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	_ "github.com/mobingi/alm-agent/statik"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/mobingi/alm-agent/cmd"

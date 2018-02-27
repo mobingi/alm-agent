@@ -149,12 +149,6 @@
   revision = "4fe82ae3040f80a03d04d2cccb5606a626b8e1ee"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/jessevdk/go-assets"
-  packages = ["."]
-  revision = "4f4301a06e153ff90e17793577ab6bf79f8dc5c5"
-
-[[projects]]
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
   revision = "0b12d6b5"
@@ -191,6 +185,12 @@
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/rakyll/statik"
+  packages = ["fs"]
+  revision = "fd36b3595eb2ec8da4b8153b107f7ea08504899d"
+  version = "v0.1.1"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
@@ -267,6 +267,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9159520c65463001a93c743a5ea27c0ba286b65e94dcedaa32703e26e788fcb5"
+  inputs-digest = "0330c1e5b8b6079ec729bb0ff2b23bc762459ce6d92e56d11087c2cc3d724478"
   solver-name = "gps-cdcl"
   solver-version = 1
