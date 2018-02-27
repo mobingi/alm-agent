@@ -14,7 +14,7 @@ setup:
 	go get -u github.com/golang/dep/cmd/dep
 	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
-	go get -u github.com/jessevdk/go-assets-builder
+	go get -u github.com/rakyll/statik
 	go get github.com/BurntSushi/toml/cmd/tomlv
 
 deps:
@@ -22,7 +22,7 @@ deps:
 
 bindata:
 	tomlv _data/*.toml
-	go-assets-builder --package=bindata --output=./bindata/bindata.go _data
+	statik -src ./_data -f
 
 verifydata:
 	tomlv _data/*.toml
