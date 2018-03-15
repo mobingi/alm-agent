@@ -53,9 +53,12 @@ func globalOptions(c *cli.Context) error {
 		metavars.ReportDisabled = true
 	}
 
+	// initialize or load AgentID
+	util.AgentID()
+
 	// initialize rollbar client
 	rollbar.Token = RollbarToken
-	rollbar.Environment = versions.Branch
+	rollbar.Environment = metavars.AgentID
 	rollbar.Platform = "client"
 
 	return nil
