@@ -1,12 +1,8 @@
 package util
 
 import (
-	"encoding/json"
-	"errors"
 	"io/ioutil"
-	"net/http"
 	"strings"
-	"time"
 
 	"github.com/docker/distribution/uuid"
 	"github.com/mobingi/alm-agent/metavars"
@@ -14,15 +10,9 @@ import (
 )
 
 var (
-	METAENDPOINT          = "http://169.254.169.254/"
-	ecsMETAENDPOINT       = "http://100.100.100.200/"
 	containerLogsLocation = "/var/log/alm-agent/container"
 	agentIDSavePath       = "/opt/mobingi/etc/alm-agent.id"
 )
-
-type k5 struct {
-	Uuid string `json:"uuid"`
-}
 
 // FetchContainerState fetches state of application in running container.
 func FetchContainerState() string {
@@ -41,67 +31,19 @@ func FetchContainerState() string {
 }
 
 // GetServerID returns string that identify VM on running provider. (e.g. instance ID)
-func GetServerID(s string) error {
-	sid, err := getServerID(s)
+func GetServerID(provider string) error {
+	p, err := newProvider(provider)
+	if err != nil {
+		return err
+	}
+
+	sid, err := p.GetServerID()
 	if err != nil {
 		return err
 	}
 
 	metavars.ServerID = sid
 	return nil
-}
-
-func getServerID(provider string) (string, error) {
-	timeout := time.Duration(5 * time.Second)
-	client := http.Client{
-		Timeout: timeout,
-	}
-
-	var endpoint string
-	switch provider {
-	case "aws":
-		endpoint = METAENDPOINT + "/latest/meta-data/instance-id"
-	case "alicloud":
-		endpoint = ecsMETAENDPOINT + "/latest/meta-data/instance-id"
-	case "k5":
-		endpoint = METAENDPOINT + "/openstack/latest/meta_data.json"
-	case "localtest":
-		return "", nil
-	default:
-		return "", errors.New("Provider `" + provider + "` is not supported.")
-	}
-
-	resp, err := client.Get(endpoint)
-	if err != nil {
-		log.Warnf("%#v", err)
-		return "", errors.New("Failed to get ServerID")
-	}
-
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Warnf("%#v", err)
-		return "", errors.New("Failed to get ServerID")
-	}
-
-	if provider == "k5" {
-		id, err := getUuidOfK5(body)
-		if err != nil {
-			return "", errors.New("Failed to get ServerID")
-		}
-		return id, nil
-	}
-
-	return string(body), nil
-}
-
-func getUuidOfK5(b []byte) (string, error) {
-	var k k5
-	if err := json.Unmarshal(b, &k); err != nil {
-		return "", err
-	}
-	return k.Uuid, nil
 }
 
 // AgentID sets metavars.AgentID

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,13 +11,13 @@ import (
 	"github.com/BurntSushi/toml"
 	dproxy "github.com/koron/go-dproxy"
 	"github.com/mobingi/alm-agent/api"
-	"github.com/mobingi/alm-agent/bindata"
 	"github.com/mobingi/alm-agent/code"
 	"github.com/mobingi/alm-agent/config"
 	"github.com/mobingi/alm-agent/container"
 	"github.com/mobingi/alm-agent/login"
 	"github.com/mobingi/alm-agent/server_config"
 	"github.com/mobingi/alm-agent/util"
+	"github.com/rakyll/statik/fs"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
@@ -32,6 +33,7 @@ func tracerPath() string {
 func Ensure(c *cli.Context) error {
 	var initialize bool
 	var err error
+	statikFS, err := fs.New()
 
 	initialize = (c.Command.Name == "register")
 	util.AgentID()
@@ -44,11 +46,13 @@ func Ensure(c *cli.Context) error {
 	conf, err := config.LoadFromFile(c.String("config"))
 
 	syscons := &container.SystemContainers{}
-	syscondata := bindata.Assets.Files["/_data/sys_containers.toml"].Data
+	syscontoml, _ := statikFS.Open("/sys_containers.toml")
+	syscondata, _ := ioutil.ReadAll(syscontoml)
 	toml.Decode(string(syscondata), &syscons)
 
 	addcons := &container.SystemContainers{}
-	addcondata := bindata.Assets.Files["/_data/addon_containers.toml"].Data
+	addcontoml, _ := statikFS.Open("/addon_containers.toml")
+	addcondata, _ := ioutil.ReadAll(addcontoml)
 	toml.Decode(string(addcondata), &addcons)
 
 	if err != nil {
@@ -111,6 +115,19 @@ func Ensure(c *cli.Context) error {
 		log.Debugf("%#v", sysContainer)
 
 		if sysContainer != nil {
+			if syscon.HealthCheck {
+				// https://godoc.org/docker.io/go-docker/api/types#Health
+				// Status is one of starting, healthy or unhealthy
+				result, _ := sc.ContainerHealth(sysContainer)
+				if result != nil {
+					log.Debugf("ContainerHelth: %s", result.Status)
+					if result.Status == "unhealthy" {
+						log.Debugf("SystemContainer %s is unhealthy, will be restart force.", syscon.Name)
+						sysImageUpdated = true
+					}
+				}
+			}
+
 			if sysImageUpdated {
 				sc.StopContainer(sysContainer)
 				sc.RemoveContainer(sysContainer)

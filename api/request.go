@@ -46,6 +46,8 @@ var RoutesV3 = &route{
 }
 
 var tokenCachePath = "/opt/mobingi/etc/tokencache.json"
+var lastContainerStatusPath = "/opt/mobingi/etc/last_container_status"
+var lastAgentStatusPath = "/opt/mobingi/etc/last_agent_status"
 
 // GetAccessToken requests token of user for auth by API.
 func GetAccessToken() error {
@@ -169,6 +171,10 @@ func GetStsToken() error {
 
 // SendAgentStatus send agent status to API
 func SendAgentStatus(status, message string) error {
+	if !isNewStatus(lastAgentStatusPath, status) {
+		log.Debug("SendAgentStatus: skipped. agent status did not changed.")
+		return nil
+	}
 	values := url.Values{}
 	values.Set("stack_id", c.getConfig().StackID)
 	values.Set("agent_id", metavars.AgentID)
@@ -185,11 +191,17 @@ func SendAgentStatus(status, message string) error {
 	if err != nil {
 		return err
 	}
+	saveStatus(lastAgentStatusPath, status)
 	return nil
 }
 
 // SendContainerStatus send container app status to API
 func SendContainerStatus(status string) error {
+	if !isNewStatus(lastContainerStatusPath, status) {
+		log.Debug("SendContainerStatus: skipped. container status did not changed.")
+		return nil
+	}
+
 	values := url.Values{}
 	values.Set("stack_id", c.getConfig().StackID)
 	values.Set("agent_id", metavars.AgentID)
@@ -204,6 +216,7 @@ func SendContainerStatus(status string) error {
 	if err != nil {
 		return err
 	}
+	saveStatus(lastContainerStatusPath, status)
 	return nil
 }
 
