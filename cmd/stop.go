@@ -61,6 +61,6 @@ func Stop(c *cli.Context) error {
 		}
 	}
 
-	api.SendAgentStatus("stopped", err.Error())
+	api.SendAgentStatus("stopped", "")
 	return nil
 }
