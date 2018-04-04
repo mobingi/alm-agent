@@ -70,9 +70,46 @@ func Register(c *cli.Context) error {
 }
 
 var chkconfigContent = `#!/bin/bash
-#
-# chkconfig: 016 01 01
-/opt/mobingi/alm-agent/current/alm-agent stop >> /var/log/alm-agent.log 2>&1
+
+### BEGIN INIT INFO
+# Provides: stop-alm-agent
+# Required-Start: $local_fs $network $remote_fs
+# Should-Start: $time
+# Required-Stop: $local_fs $network $remote_fs
+# Should-Stop:
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: stop-alm-agent
+# Description: stop-alm-agent
+### END INIT INFO
+
+lock_file="/var/lock/subsys/stop-alm-agent"
+
+start()
+{
+  touch ${lock_file}
+}
+
+stop()
+{
+  rm -rf ${lock_file}
+  /opt/mobingi/alm-agent/current/alm-agent stop >> /var/log/alm-agent.log 2>&1
+}
+
+case "$1" in
+  start)
+    start
+  ;;
+  stop)
+		echo "invoke alm-agent stop ..."
+    stop
+  ;;
+  *)
+    echo "Usage: $0 {start|stop}"
+  ;;
+esac
+
+exit 0
 `
 
 func putCheckConfig() error {
