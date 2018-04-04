@@ -39,7 +39,7 @@ func Register(c *cli.Context) error {
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent-addon-aws >> /var/log/alm-agent/aws.log 2>&1' >> /tmp/crontab.alm-agent")
 		err := putCheckConfig()
-		if err != nil {
+		if err == nil {
 			cmdstrs = append(cmdstrs, "/sbin/chkconfig --add stop-alm-agent.sh")
 			cmdstrs = append(cmdstrs, "/sbin/chkconfig stop-alm-agent.sh on")
 		}
