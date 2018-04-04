@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"io/ioutil"
 
 	"github.com/mobingi/alm-agent/util"
 	log "github.com/sirupsen/logrus"
@@ -37,6 +38,11 @@ func Register(c *cli.Context) error {
 	case "aws":
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent-addon-aws >> /var/log/alm-agent/aws.log 2>&1' >> /tmp/crontab.alm-agent")
+		err := putCheckConfig()
+		if err != nil {
+			cmdstrs = append(cmdstrs, "/sbin/chkconfig --add stop-alm-agent.sh")
+			cmdstrs = append(cmdstrs, "/sbin/chkconfig stop-alm-agent.sh on")
+		}
 	case "alicloud":
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -P alicloud -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
 	case "gcp":
@@ -57,6 +63,20 @@ func Register(c *cli.Context) error {
 	}
 
 	err := Ensure(c)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+var chkconfigContent = `#!/bin/bash
+#
+# chkconfig: 016 01 01
+/opt/mobingi/alm-agent/current/alm-agent stop >> /var/log/alm-agent.log 2>&1
+`
+
+func putCheckConfig() error {
+	err := ioutil.WriteFile("/etc/init.d/stop-alm-agent.sh", []byte(chkconfigContent), 00755)
 	if err != nil {
 		return err
 	}
