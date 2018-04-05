@@ -42,6 +42,7 @@ func Register(c *cli.Context) error {
 		if err == nil {
 			cmdstrs = append(cmdstrs, "/sbin/chkconfig --add stop-alm-agent.sh")
 			cmdstrs = append(cmdstrs, "/sbin/chkconfig stop-alm-agent.sh on")
+			cmdstrs = append(cmdstrs, "/etc/init.d/stop-alm-agent.sh start")
 		}
 	case "alicloud":
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -P alicloud -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
