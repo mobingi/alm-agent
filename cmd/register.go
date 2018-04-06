@@ -72,6 +72,9 @@ func Register(c *cli.Context) error {
 
 var chkconfigContent = `#!/bin/bash
 
+# chkconfig:   2345 96 01
+# description: stop-alm-agent
+
 ### BEGIN INIT INFO
 # Provides: stop-alm-agent
 # Required-Start: $local_fs $network $remote_fs
@@ -94,7 +97,8 @@ start()
 stop()
 {
   rm -rf ${lock_file}
-  /opt/mobingi/alm-agent/current/alm-agent stop >> /var/log/alm-agent.log 2>&1
+  LANG=C date > /var/log/alm-agent-stop.last.log
+  /opt/mobingi/alm-agent/current/alm-agent stop >> /var/log/alm-agent-stop.last.log 2>&1
 }
 
 case "$1" in
@@ -102,7 +106,7 @@ case "$1" in
     start
   ;;
   stop)
-		echo "invoke alm-agent stop ..."
+    echo "invoke alm-agent stop ..."
     stop
   ;;
   *)
