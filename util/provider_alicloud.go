@@ -5,7 +5,7 @@ type alicloudProvider struct {
 }
 
 func (p *alicloudProvider) MetadataEndpoint() string {
-	return "http://100.100.100.200/"
+	return "http://100.100.100.200"
 }
 
 func (p *alicloudProvider) GetServerID() (string, error) {

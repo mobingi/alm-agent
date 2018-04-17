@@ -11,7 +11,7 @@ type k5 struct {
 }
 
 func (p *k5Provider) MetadataEndpoint() string {
-	return "http://169.254.169.254/"
+	return "http://169.254.169.254"
 }
 
 func (p *k5Provider) GetServerID() (string, error) {
