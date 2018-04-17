@@ -74,6 +74,8 @@ func newProvider(name string) (Provider, error) {
 		return &awsProvider{}, nil
 	case "alicloud":
 		return &alicloudProvider{}, nil
+	case "azure":
+		return &azureProvider{}, nil
 	case "gcp":
 		return &gcpProvider{}, nil
 	case "k5":

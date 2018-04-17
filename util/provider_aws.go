@@ -5,7 +5,7 @@ type awsProvider struct {
 }
 
 func (p *awsProvider) MetadataEndpoint() string {
-	return "http://169.254.169.254/"
+	return "http://169.254.169.254"
 }
 
 func (p *awsProvider) GetServerID() (string, error) {
