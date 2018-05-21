@@ -5,7 +5,7 @@ type gcpProvider struct {
 }
 
 func (p *gcpProvider) MetadataEndpoint() string {
-	return "http://metadata.google.internal/"
+	return "http://metadata.google.internal"
 }
 
 func (p *gcpProvider) GetServerID() (string, error) {
