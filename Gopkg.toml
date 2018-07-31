@@ -19,11 +19,28 @@
 # [[override]]
 #  name = "github.com/x/y"
 #  version = "2.4.0"
+#
+# [prune]
+#   non-go = false
+#   go-tests = true
+#   unused-packages = true
 
 
-[[constraint]]
-  name = "docker.io/go-docker"
-  version = "1.0.0"
+[[override]]
+  name = "github.com/docker/docker"
+  source = "github.com/docker/engine"
+  # v18.06.0-ce
+  revision = "a3ef7e9a9bda939a73dc353aa8df8b0aa47c9466"
+
+[[override]]
+  name = "github.com/docker/distribution"
+  # https://github.com/docker/engine/blob/v18.06.0-ce/vendor.conf
+  revision = "83389a148052d74ac602f5f1d62f86ff2f3c4aa5"
+
+[[override]]
+  name = "github.com/docker/libnetwork"
+  # https://github.com/docker/engine/blob/v18.06.0-ce/vendor.conf
+  revision = "d00ceed44cc447c77f25cdf5d59e83163bdcb4c9"
 
 [[constraint]]
   name = "github.com/BurntSushi/toml"
@@ -31,13 +48,6 @@
 [[constraint]]
   name = "github.com/aws/aws-sdk-go"
   version = "1.4.22"
-
-[[constraint]]
-  name = "github.com/docker/distribution"
-
-[[constraint]]
-  name = "github.com/docker/libnetwork"
-  branch = "bump_17.12"
 
 [[constraint]]
   name = "github.com/hashicorp/go-version"
@@ -69,8 +79,10 @@
   version = "1.20.0"
 
 [[constraint]]
-  name = "golang.org/x/net"
-
-[[constraint]]
   name = "github.com/rakyll/statik"
   version = "0.1.1"
+
+[prune]
+  # non-go = true
+  go-tests = true
+  unused-packages = true
