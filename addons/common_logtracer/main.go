@@ -13,8 +13,8 @@ import (
 	"sync"
 	"time"
 
-	docker "docker.io/go-docker"
-	"docker.io/go-docker/api/types"
+	docker "github.com/docker/docker"
+	"github.com/docker/docker/api/types"
 )
 
 var logDirPath = "/var/log/alm-agent/container/log/"

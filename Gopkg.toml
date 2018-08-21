@@ -25,7 +25,6 @@
 #   go-tests = true
 #   unused-packages = true
 
-
 [[override]]
   name = "github.com/docker/docker"
   source = "github.com/docker/engine"

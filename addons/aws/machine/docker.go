@@ -3,7 +3,7 @@ package machine
 import (
 	log "github.com/sirupsen/logrus"
 
-	"docker.io/go-docker/api/types"
+	"github.com/docker/docker/api/types"
 	"github.com/mobingi/alm-agent/config"
 	"github.com/mobingi/alm-agent/container"
 	"github.com/mobingi/alm-agent/server_config"
