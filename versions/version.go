@@ -13,8 +13,8 @@ import (
 	"sort"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/hashicorp/go-version"
+	log "github.com/sirupsen/logrus"
 	latest "github.com/tcnksm/go-latest"
 )
 
@@ -57,7 +57,7 @@ func AutoUpdate(v *GoLatest) {
 		log.Warnf("AutoUpdate: Failed to check latest version. Autoupdate was skipped.")
 		return
 	}
-	log.Debugf("AutoUpdate: Current Version is ", v.Version)
+	log.Debugf("AutoUpdate: Current Version is %s", v.Version)
 	if res.Outdated {
 		log.Infof("%s is not latest, %s, upgrade to %s", v.Version, res.Meta.Message, res.Current)
 		ensure(v, res.Current)
