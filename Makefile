@@ -12,7 +12,7 @@ PACKAGES_MAIN = $(shell go list ./... | grep -v '/addons/')
 
 setup:
 	go get -u github.com/golang/dep/cmd/dep
-	go get github.com/golang/lint/golint
+	go get -u golang.org/x/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 	go get -u github.com/rakyll/statik
 	go get github.com/BurntSushi/toml/cmd/tomlv
