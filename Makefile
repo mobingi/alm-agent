@@ -27,7 +27,7 @@ bindata:
 verifydata:
 	tomlv _data/*.toml
 	statik -src ./_data -dest compare -m
-	diff statik/statik.go compare/statik/statik.go > /dev/null
+	diff statik/statik.go compare/statik/statik.go
 	rm -rf ./compare
 
 test: deps
