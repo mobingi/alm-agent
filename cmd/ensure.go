@@ -190,7 +190,7 @@ func Ensure(c *cli.Context) error {
 				ac.StopContainer(addonContainer)
 				ac.RemoveContainer(addonContainer)
 			} else if addcon.Restart {
-				log.Debugf("addon container need to update by flag.", aName)
+				log.Debugf("addon container %s need to update by flag.", aName)
 				ac.StopContainer(addonContainer)
 				ac.RemoveContainer(addonContainer)
 			} else if addonContainer.State == "exited" {

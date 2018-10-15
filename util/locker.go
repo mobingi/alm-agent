@@ -35,7 +35,7 @@ func Lock(name string) error {
 		return errors.New("resource temporarily unavailable")
 	}
 
-	log.Debugf("Locked %s", lockmap)
+	log.Debugf("Locked %v", lockmap)
 	return nil
 }
 
@@ -47,6 +47,6 @@ func UnLock(name string) error {
 
 	os.Remove(lockfile(name))
 	delete(lockmap, name)
-	log.Debugf("UnLocked %s", lockmap)
+	log.Debugf("UnLocked %v", lockmap)
 	return nil
 }
