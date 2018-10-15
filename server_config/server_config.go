@@ -49,8 +49,8 @@ func NeedsUpdate(c *Config) (bool, error) {
 
 	fu, _ := strconv.ParseUint(string(dat), 10, 32)
 
-	log.Debugf("updated of %s is %s", versionPath, fu)
-	log.Debugf("updated of serverconfig is %s", c.Updated)
+	log.Debugf("updated of %s is %d", versionPath, fu)
+	log.Debugf("updated of serverconfig is %d", c.Updated)
 
 	if uint(fu) < c.Updated {
 		return true, nil
