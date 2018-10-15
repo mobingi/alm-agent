@@ -4,7 +4,7 @@ jobs:
   build:
     working_directory: /go/src/github.com/mobingi/alm-agent
     docker:
-      - image: golang:1.10
+      - image: golang:1.11
     steps:
       - checkout
       - run:
