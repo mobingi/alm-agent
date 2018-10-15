@@ -39,9 +39,10 @@ func Register(c *cli.Context) error {
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent-addon-aws >> /var/log/alm-agent/aws.log 2>&1' >> /tmp/crontab.alm-agent")
 		err := putCheckConfig()
-		if err != nil {
+		if err == nil {
 			cmdstrs = append(cmdstrs, "/sbin/chkconfig --add stop-alm-agent.sh")
 			cmdstrs = append(cmdstrs, "/sbin/chkconfig stop-alm-agent.sh on")
+			cmdstrs = append(cmdstrs, "/etc/init.d/stop-alm-agent.sh start")
 		}
 	case "alicloud":
 		cmdstrs = append(cmdstrs, "echo '* * * * * PATH=/sbin:/usr/bin:/bin /opt/mobingi/alm-agent/current/alm-agent -P alicloud -U ensure >> /var/log/alm-agent.log 2>&1' >> /tmp/crontab.alm-agent")
@@ -72,9 +73,50 @@ func Register(c *cli.Context) error {
 }
 
 var chkconfigContent = `#!/bin/bash
-#
-# chkconfig: 016 01 01
-/opt/mobingi/alm-agent/current/alm-agent stop >> /var/log/alm-agent.log 2>&1
+
+# chkconfig:   2345 96 01
+# description: stop-alm-agent
+
+### BEGIN INIT INFO
+# Provides: stop-alm-agent
+# Required-Start: $local_fs $network $remote_fs
+# Should-Start: $time
+# Required-Stop: $local_fs $network $remote_fs
+# Should-Stop:
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: stop-alm-agent
+# Description: stop-alm-agent
+### END INIT INFO
+
+lock_file="/var/lock/subsys/stop-alm-agent"
+
+start()
+{
+  touch ${lock_file}
+}
+
+stop()
+{
+  rm -rf ${lock_file}
+  LANG=C date > /var/log/alm-agent-stop.last.log
+  /opt/mobingi/alm-agent/current/alm-agent stop >> /var/log/alm-agent-stop.last.log 2>&1
+}
+
+case "$1" in
+  start)
+    start
+  ;;
+  stop)
+    echo "invoke alm-agent stop ..."
+    stop
+  ;;
+  *)
+    echo "Usage: $0 {start|stop}"
+  ;;
+esac
+
+exit 0
 `
 
 func putCheckConfig() error {
