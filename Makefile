@@ -31,10 +31,10 @@ verifydata:
 	rm -rf ./compare
 
 test: deps
-	go test -v ${PACKAGES_ALL} -cover
+	vgo test -v ${PACKAGES_ALL} -cover
 
 race: deps
-	go test -v -race ${PACKAGES_ALL} -cover
+	vgo test -v -race ${PACKAGES_ALL} -cover
 
 lint: setup
 	go vet ${PACKAGES_ALL}
@@ -46,10 +46,10 @@ fmt: setup
 	goimports -v -w ${PACKAGES}
 
 build: test
-	go build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
+	vgo build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
 
 cibuild: race
-	go build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
+	vgo build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
 
 clean:
 	rm bin/$(NAME)
