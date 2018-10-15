@@ -49,17 +49,6 @@
   version = "1.4.22"
 
 [[constraint]]
-<<<<<<< HEAD
-=======
-  name = "github.com/docker/distribution"
-  revision = "edc3ab29cdff8694dd6feb85cfeb4b5f1b38ed9c"
-
-[[constraint]]
-  name = "github.com/docker/libnetwork"
-  branch = "bump_17.12"
-
-[[constraint]]
->>>>>>> develop
   name = "github.com/hashicorp/go-version"
 
 [[constraint]]
