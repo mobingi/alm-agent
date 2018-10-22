@@ -2,7 +2,7 @@
 
 yum install -y git gcc tmux amazon-efs-utils
 
-archive=go1.8.3.linux-amd64.tar.gz
+archive=go1.11.1.linux-amd64.tar.gz
 if [ ! -f $archive ]; then
   wget -q https://storage.googleapis.com/golang/$archive
 fi
