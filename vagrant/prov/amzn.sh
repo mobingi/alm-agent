@@ -1,6 +1,6 @@
 #!/bin/bash
 
-yum install -y git gcc tmux
+yum install -y git gcc tmux amazon-efs-utils
 
 archive=go1.8.3.linux-amd64.tar.gz
 if [ ! -f $archive ]; then
