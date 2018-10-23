@@ -33,7 +33,7 @@ type Config struct {
 	Users                []ContainerUser           `json:"container_users"`
 	EnvironmentVariables map[string]string         `json:"container_env_vars"`
 	Addons               []Addon                   `json:"container_addons"`
-	SharedVolume         sharedvolume.SharedVolume `json:"container_shared_volume"`
+	SharedVolume         sharedvolume.SharedVolume `json:"container_storage"`
 }
 
 var versionPath = "/opt/mobingi/etc/configVersion"

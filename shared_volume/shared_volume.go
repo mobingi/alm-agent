@@ -12,6 +12,8 @@ import (
 
 // SharedVolume from serverconfig
 type SharedVolume struct {
+	Type       string `json:"type"`
+	Identifier string `json:"id"`
 }
 
 // Interface is wrapper for docker volume
