@@ -118,6 +118,19 @@ func (d *Docker) prepareSharedVolume(volumesetting *sharedvolume.SharedVolume) e
 			EFSID:  volumesetting.Identifier,
 		}
 		d.SharedVolume = fmt.Sprintf("efsvolume:%s", mountpath)
+	case "local":
+		log.Debug("prepareSharedVolume: found efs setting")
+		var mountpath = volumesetting.MountPath
+		if volumesetting.MountPath == "" {
+			// fallback to default
+			mountpath = sharedvolume.DefarultMouhtPath
+		}
+
+		v = &sharedvolume.LocalVolume{
+			Client: d.Client,
+			Name:   "localvolume",
+		}
+		d.SharedVolume = fmt.Sprintf("localvolume:%s", mountpath)
 	default:
 		log.Debug("prepareSharedVolume: no settings")
 		v = &sharedvolume.NullVolume{}
