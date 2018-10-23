@@ -47,10 +47,10 @@ var (
 //     }
 // ]
 type EFSVolume struct {
-	client *client.Client
-	name   string
-	efsid  string
-	volume *types.Volume
+	Client *client.Client
+	Name   string
+	EFSID  string
+	Volume *types.Volume
 }
 
 // Setup creates new or return exists volume
@@ -62,10 +62,10 @@ func (v *EFSVolume) Setup() error {
 		"o":      o,
 	}
 
-	vol, err := v.client.VolumeCreate(
+	vol, err := v.Client.VolumeCreate(
 		context.Background(),
 		volumetypes.VolumesCreateBody{
-			Name:       v.name,
+			Name:       v.Name,
 			Driver:     "local",
 			DriverOpts: opts,
 		},
@@ -74,24 +74,24 @@ func (v *EFSVolume) Setup() error {
 		return err
 	}
 
-	v.volume = &vol
+	v.Volume = &vol
 	return nil
 }
 
 func (v *EFSVolume) load() {
-	fmt.Printf("%#v\n", v.name)
+	fmt.Printf("%#v\n", v.Name)
 	args := filters.NewArgs(
 		filters.KeyValuePair{
 			Key:   "name",
-			Value: v.name,
+			Value: v.Name,
 		},
 	)
-	vols, _ := v.client.VolumeList(
+	vols, _ := v.Client.VolumeList(
 		context.Background(),
 		args,
 	)
 	if len(vols.Volumes) > 0 {
-		v.volume = vols.Volumes[0]
+		v.Volume = vols.Volumes[0]
 		return
 	}
 
@@ -118,7 +118,7 @@ func (v *EFSVolume) getRegion() string {
 func (v *EFSVolume) efsAddr() string {
 	// addr=fs-xxxxxxxx.efs.ap-northeast-1.amazonaws.com
 
-	strAddr := fmt.Sprintf("addr=%s.efs.%s.amazonaws.com", v.efsid, v.getRegion())
+	strAddr := fmt.Sprintf("addr=%s.efs.%s.amazonaws.com", v.EFSID, v.getRegion())
 	return strAddr
 }
 

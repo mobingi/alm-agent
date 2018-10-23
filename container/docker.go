@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mobingi/alm-agent/shared_volume"
 	"github.com/mobingi/alm-agent/util"
 	log "github.com/sirupsen/logrus"
 
@@ -97,6 +98,37 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 
 	return res[0].ID, nil
 }
+
+// prepareSharedVolume sets up volume
+func (d *Docker) prepareSharedVolume(volumesetting *sharedvolume.SharedVolume) error {
+	var v sharedvolume.Interface
+	// return errors.New("Faild to setup shared volume")
+	switch volumesetting.Type {
+	case "efs":
+		log.Debug("prepareSharedVolume: found efs setting")
+		v = &sharedvolume.EFSVolume{
+			Client: d.Client,
+			Name:   "efsvolume",
+			EFSID:  volumesetting.Identifier,
+		}
+		d.SharedVolume = "efsvolume"
+	default:
+		log.Debug("prepareSharedVolume: no settings")
+		v = &sharedvolume.NullVolume{}
+		d.SharedVolume = ""
+		return nil
+	}
+
+	err := v.Setup()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// cannot use sharedvolume.EFSVolume literal (type sharedvolume.EFSVolume) as type *sharedvolume.Interface in assignment:
+// 	*sharedvolume.Interface is pointer to interface, not interface
 
 // StartContainer starts docker container
 func (d *Docker) StartContainer(name string, dir string) (*Container, error) {

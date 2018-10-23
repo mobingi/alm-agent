@@ -47,23 +47,23 @@ func (v *NullVolume) load() {
 //     }
 // ]
 type LocalVolume struct {
-	client *client.Client
-	name   string
-	volume *types.Volume
+	Client *client.Client
+	Name   string
+	Volume *types.Volume
 }
 
 // Setup creates new or return exists volume
 func (v *LocalVolume) Setup() error {
 	v.load()
-	vol, err := v.client.VolumeCreate(
+	vol, err := v.Client.VolumeCreate(
 		context.Background(),
-		volumetypes.VolumesCreateBody{Name: v.name},
+		volumetypes.VolumesCreateBody{Name: v.Name},
 	)
 	if err != nil {
 		return err
 	}
 
-	v.volume = &vol
+	v.Volume = &vol
 	return nil
 }
 
@@ -71,15 +71,15 @@ func (v *LocalVolume) load() {
 	args := filters.NewArgs(
 		filters.KeyValuePair{
 			Key:   "name",
-			Value: v.name,
+			Value: v.Name,
 		},
 	)
-	vols, _ := v.client.VolumeList(
+	vols, _ := v.Client.VolumeList(
 		context.Background(),
 		args,
 	)
 	if len(vols.Volumes) > 0 {
-		v.volume = vols.Volumes[0]
+		v.Volume = vols.Volumes[0]
 	}
 
 	return
