@@ -47,11 +47,10 @@ var (
 //     }
 // ]
 type EFSVolume struct {
-	Client    *client.Client
-	Name      string
-	EFSID     string
-	MountPath string
-	Volume    *types.Volume
+	Client *client.Client
+	Name   string
+	EFSID  string
+	Volume *types.Volume
 }
 
 // Setup creates new or return exists volume

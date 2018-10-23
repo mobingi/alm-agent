@@ -113,12 +113,11 @@ func (d *Docker) prepareSharedVolume(volumesetting *sharedvolume.SharedVolume) e
 		}
 
 		v = &sharedvolume.EFSVolume{
-			Client:    d.Client,
-			Name:      "efsvolume",
-			EFSID:     volumesetting.Identifier,
-			MountPath: mountpath,
+			Client: d.Client,
+			Name:   "efsvolume",
+			EFSID:  volumesetting.Identifier,
 		}
-		d.SharedVolume = "efsvolume"
+		d.SharedVolume = fmt.Sprintf("efsvolume:%s", mountpath)
 	default:
 		log.Debug("prepareSharedVolume: no settings")
 		v = &sharedvolume.NullVolume{}
@@ -268,6 +267,10 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 			}
 
 			hostConfig.Binds = append(hostConfig.Binds, "/tmp/init:/tmp/init")
+		}
+
+		if d.SharedVolume != "" {
+			hostConfig.Binds = append(hostConfig.Binds, d.SharedVolume)
 		}
 	}
 

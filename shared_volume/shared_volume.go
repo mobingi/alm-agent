@@ -55,7 +55,6 @@ func (v *NullVolume) load() {
 type LocalVolume struct {
 	Client *client.Client
 	Name   string
-	Path   string
 	Volume *types.Volume
 }
 
