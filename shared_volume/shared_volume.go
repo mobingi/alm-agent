@@ -2,7 +2,6 @@ package sharedvolume
 
 import (
 	"context"
-	"fmt"
 
 	client "docker.io/go-docker"
 	"docker.io/go-docker/api/types"
@@ -20,6 +19,18 @@ type SharedVolume struct {
 type Interface interface {
 	Setup() error
 	load()
+}
+
+// NullVolume is dummy volume for without volume
+type NullVolume struct{}
+
+// Setup do nothing
+func (v *NullVolume) Setup() error {
+	return nil
+}
+
+func (v *NullVolume) load() {
+	return
 }
 
 // LocalVolume is simple volume
@@ -57,7 +68,6 @@ func (v *LocalVolume) Setup() error {
 }
 
 func (v *LocalVolume) load() {
-	fmt.Printf("%#v\n", v.name)
 	args := filters.NewArgs(
 		filters.KeyValuePair{
 			Key:   "name",
@@ -69,7 +79,6 @@ func (v *LocalVolume) load() {
 		args,
 	)
 	if len(vols.Volumes) > 0 {
-		fmt.Printf("%#v", vols.Volumes[0])
 		v.volume = vols.Volumes[0]
 	}
 
