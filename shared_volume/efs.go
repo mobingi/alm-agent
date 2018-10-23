@@ -50,10 +50,11 @@ type EFSVolume struct {
 	client *client.Client
 	name   string
 	efsid  string
+	volume *types.Volume
 }
 
 // Setup creates new or return exists volume
-func (v *EFSVolume) Setup() (*types.Volume, error) {
+func (v *EFSVolume) Setup() error {
 	o := fmt.Sprintf("%s,%s", v.efsAddr(), strings.Join(mountopts[:], ","))
 	opts := map[string]string{
 		"device": ":/",
@@ -70,12 +71,14 @@ func (v *EFSVolume) Setup() (*types.Volume, error) {
 		},
 	)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	return &vol, nil
+
+	v.volume = &vol
+	return nil
 }
 
-func (v *EFSVolume) status() *types.Volume {
+func (v *EFSVolume) load() {
 	fmt.Printf("%#v\n", v.name)
 	args := filters.NewArgs(
 		filters.KeyValuePair{
@@ -88,11 +91,11 @@ func (v *EFSVolume) status() *types.Volume {
 		args,
 	)
 	if len(vols.Volumes) > 0 {
-		fmt.Printf("%#v", vols.Volumes[0])
-		return vols.Volumes[0]
+		v.volume = vols.Volumes[0]
+		return
 	}
 
-	return nil
+	return
 }
 
 func (v *EFSVolume) getRegion() string {
@@ -117,4 +120,8 @@ func (v *EFSVolume) efsAddr() string {
 
 	strAddr := fmt.Sprintf("addr=%s.efs.%s.amazonaws.com", v.efsid, v.getRegion())
 	return strAddr
+}
+
+func (v *EFSVolume) verify() {
+	return
 }

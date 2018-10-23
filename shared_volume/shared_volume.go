@@ -12,8 +12,8 @@ import (
 
 // Interface is wrapper for docker volume
 type Interface interface {
-	Setup() (*types.Volume, error)
-	status() *types.Volume
+	Setup() error
+	load()
 }
 
 // LocalVolume is simple volume
@@ -32,21 +32,25 @@ type Interface interface {
 type LocalVolume struct {
 	client *client.Client
 	name   string
+	volume *types.Volume
 }
 
 // Setup creates new or return exists volume
-func (v *LocalVolume) Setup() (*types.Volume, error) {
+func (v *LocalVolume) Setup() error {
+	v.load()
 	vol, err := v.client.VolumeCreate(
 		context.Background(),
 		volumetypes.VolumesCreateBody{Name: v.name},
 	)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	return &vol, nil
+
+	v.volume = &vol
+	return nil
 }
 
-func (v *LocalVolume) status() *types.Volume {
+func (v *LocalVolume) load() {
 	fmt.Printf("%#v\n", v.name)
 	args := filters.NewArgs(
 		filters.KeyValuePair{
@@ -60,8 +64,8 @@ func (v *LocalVolume) status() *types.Volume {
 	)
 	if len(vols.Volumes) > 0 {
 		fmt.Printf("%#v", vols.Volumes[0])
-		return vols.Volumes[0]
+		v.volume = vols.Volumes[0]
 	}
 
-	return nil
+	return
 }
