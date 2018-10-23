@@ -106,11 +106,17 @@ func (d *Docker) prepareSharedVolume(volumesetting *sharedvolume.SharedVolume) e
 	switch volumesetting.Type {
 	case "efs":
 		log.Debug("prepareSharedVolume: found efs setting")
+		var mountpath = volumesetting.MountPath
+		if volumesetting.MountPath == "" {
+			// fallback to default
+			mountpath = sharedvolume.DefarultMouhtPath
+		}
+
 		v = &sharedvolume.EFSVolume{
 			Client:    d.Client,
 			Name:      "efsvolume",
 			EFSID:     volumesetting.Identifier,
-			MountPath: volumesetting.MountPath,
+			MountPath: mountpath,
 		}
 		d.SharedVolume = "efsvolume"
 	default:
