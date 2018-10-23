@@ -9,10 +9,16 @@ import (
 	volumetypes "docker.io/go-docker/api/types/volume"
 )
 
+var (
+	// DefarultMouhtPath is path to mount on container by default
+	DefarultMouhtPath = "/mnt/storage"
+)
+
 // SharedVolume from serverconfig
 type SharedVolume struct {
 	Type       string `json:"type"`
 	Identifier string `json:"id"`
+	MountPath  string `json:"mountpath"`
 }
 
 // Interface is wrapper for docker volume
@@ -49,6 +55,7 @@ func (v *NullVolume) load() {
 type LocalVolume struct {
 	Client *client.Client
 	Name   string
+	Path   string
 	Volume *types.Volume
 }
 
