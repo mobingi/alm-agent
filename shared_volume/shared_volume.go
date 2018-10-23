@@ -10,6 +10,10 @@ import (
 	volumetypes "docker.io/go-docker/api/types/volume"
 )
 
+// SharedVolume from serverconfig
+type SharedVolume struct {
+}
+
 // Interface is wrapper for docker volume
 type Interface interface {
 	Setup() error
