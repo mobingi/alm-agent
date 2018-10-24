@@ -55,6 +55,7 @@ type EFSVolume struct {
 
 // Setup creates new or return exists volume
 func (v *EFSVolume) Setup() error {
+	v.load()
 	o := fmt.Sprintf("%s,%s", v.efsAddr(), strings.Join(mountopts[:], ","))
 	opts := map[string]string{
 		"device": ":/",

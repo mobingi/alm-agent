@@ -61,6 +61,9 @@ type LocalVolume struct {
 // Setup creates new or return exists volume
 func (v *LocalVolume) Setup() error {
 	v.load()
+	if v.Volume != nil {
+		return nil
+	}
 	vol, err := v.Client.VolumeCreate(
 		context.Background(),
 		volumetypes.VolumesCreateBody{Name: v.Name},
