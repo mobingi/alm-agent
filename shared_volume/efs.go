@@ -121,7 +121,9 @@ func (v *EFSVolume) verifyAndCleanup() error {
 	log.Debug("Step: EFSVolume.verify")
 	if v.Volume.Options != nil {
 		if v.Volume.Options["type"] == "nfs" {
-			return nil
+			if strings.HasPrefix(v.Volume.Options["o"], v.efsAddr()) {
+				return nil
+			}
 		}
 	}
 
