@@ -164,7 +164,7 @@ func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 
 	err = d.containerStart(c)
 	if err != nil {
-		return nil, err
+		return c, err
 	}
 
 	ct, _ := d.Client.ContainerInspect(context.Background(), c.ID)
@@ -179,7 +179,7 @@ func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 
 	c.IP, err = d.getIPAddress(c)
 	if err != nil {
-		return nil, err
+		return c, err
 	}
 
 	return c, nil
