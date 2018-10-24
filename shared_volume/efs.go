@@ -56,8 +56,13 @@ type EFSVolume struct {
 // Setup creates new or return exists volume
 func (v *EFSVolume) Setup() error {
 	log.Infof("EFSVolume.Setup: %s", v.Name)
-	v.load()
+	err := v.load()
+	if err != nil {
+		return err
+	}
+
 	if v.Volume != nil {
+		log.Debugf("found exists volume: %#v", v.Volume)
 		return nil
 	}
 
@@ -82,10 +87,11 @@ func (v *EFSVolume) Setup() error {
 	}
 
 	v.Volume = &vol
+	log.Debugf("created new volume: %#v", v.Volume)
 	return nil
 }
 
-func (v *EFSVolume) load() {
+func (v *EFSVolume) load() error {
 	args := filters.NewArgs(
 		filters.KeyValuePair{
 			Key:   "name",
@@ -97,19 +103,41 @@ func (v *EFSVolume) load() {
 		args,
 	)
 	if len(vols.Volumes) > 0 {
-		log.Debugf("EFSVolume.load: %s", v.Name)
 		v.Volume = vols.Volumes[0]
-		v.verify()
-		return
+		err := v.verifyAndCleanup()
+		if err != nil {
+			log.Errorf("%#v", err)
+			return err
+		}
+		return nil
 	}
 
-	return
+	return nil
 }
 
 // verify check parameters of exists volume.
 // and clear if not correct
-func (v *EFSVolume) verify() {
-	return
+func (v *EFSVolume) verifyAndCleanup() error {
+	log.Debug("Step: EFSVolume.verify")
+	if v.Volume.Options != nil {
+		if v.Volume.Options["type"] == "nfs" {
+			return nil
+		}
+	}
+
+	log.Warnf("found abnormal volume, tring to remove... : %#v", v.Volume)
+	v.Volume = nil
+	err := v.Client.VolumeRemove(
+		context.Background(),
+		v.Name,
+		true,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (v *EFSVolume) getRegion() string {

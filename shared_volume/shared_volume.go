@@ -24,7 +24,7 @@ type SharedVolume struct {
 // Interface is wrapper for docker volume
 type Interface interface {
 	Setup() error
-	load()
+	load() error
 }
 
 // NullVolume is dummy volume for without volume
@@ -35,8 +35,8 @@ func (v *NullVolume) Setup() error {
 	return nil
 }
 
-func (v *NullVolume) load() {
-	return
+func (v *NullVolume) load() error {
+	return nil
 }
 
 // LocalVolume is simple volume
@@ -76,7 +76,7 @@ func (v *LocalVolume) Setup() error {
 	return nil
 }
 
-func (v *LocalVolume) load() {
+func (v *LocalVolume) load() error {
 	args := filters.NewArgs(
 		filters.KeyValuePair{
 			Key:   "name",
@@ -91,5 +91,5 @@ func (v *LocalVolume) load() {
 		v.Volume = vols.Volumes[0]
 	}
 
-	return
+	return nil
 }
