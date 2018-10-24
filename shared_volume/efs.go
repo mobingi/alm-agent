@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 
@@ -12,6 +11,7 @@ import (
 	"docker.io/go-docker/api/types"
 	"docker.io/go-docker/api/types/filters"
 	volumetypes "docker.io/go-docker/api/types/volume"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -55,7 +55,13 @@ type EFSVolume struct {
 
 // Setup creates new or return exists volume
 func (v *EFSVolume) Setup() error {
+	log.Infof("EFSVolume.Setup: %s", v.Name)
 	v.load()
+	if v.Volume != nil {
+		return nil
+	}
+
+	log.Infof("EFSVolume.VolumeCreate: %s", v.Name)
 	o := fmt.Sprintf("%s,%s", v.efsAddr(), strings.Join(mountopts[:], ","))
 	opts := map[string]string{
 		"device": ":/",
@@ -80,7 +86,6 @@ func (v *EFSVolume) Setup() error {
 }
 
 func (v *EFSVolume) load() {
-	fmt.Printf("%#v\n", v.Name)
 	args := filters.NewArgs(
 		filters.KeyValuePair{
 			Key:   "name",
@@ -92,10 +97,18 @@ func (v *EFSVolume) load() {
 		args,
 	)
 	if len(vols.Volumes) > 0 {
+		log.Debugf("EFSVolume.load: %s", v.Name)
 		v.Volume = vols.Volumes[0]
+		v.verify()
 		return
 	}
 
+	return
+}
+
+// verify check parameters of exists volume.
+// and clear if not correct
+func (v *EFSVolume) verify() {
 	return
 }
 
@@ -121,8 +134,4 @@ func (v *EFSVolume) efsAddr() string {
 
 	strAddr := fmt.Sprintf("addr=%s.efs.%s.amazonaws.com", v.EFSID, v.getRegion())
 	return strAddr
-}
-
-func (v *EFSVolume) verify() {
-	return
 }
