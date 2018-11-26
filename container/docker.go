@@ -102,6 +102,15 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 // prepareSharedVolume sets up volume
 func (d *Docker) prepareSharedVolume(volumesetting *sharedvolume.SharedVolume) error {
 	var v sharedvolume.Interface
+
+	// empty volumesetting
+	if volumesetting == nil {
+		log.Debug("prepareSharedVolume: no settings")
+		v = &sharedvolume.NullVolume{}
+		d.SharedVolume = ""
+		return nil
+	}
+
 	// return errors.New("Faild to setup shared volume")
 	switch volumesetting.Type {
 	case "efs":
