@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mobingi/alm-agent/shared_volume"
 	"github.com/mobingi/alm-agent/util"
 	log "github.com/sirupsen/logrus"
 
@@ -98,6 +99,65 @@ func (d *Docker) GetContainerIDbyImage(ancestor string) (string, error) {
 	return res[0].ID, nil
 }
 
+// prepareSharedVolume sets up volume
+func (d *Docker) prepareSharedVolume(volumesetting *sharedvolume.SharedVolume) error {
+	var v sharedvolume.Interface
+
+	// empty volumesetting
+	if volumesetting == nil {
+		log.Debug("prepareSharedVolume: no settings")
+		v = &sharedvolume.NullVolume{}
+		d.SharedVolume = ""
+		return nil
+	}
+
+	// return errors.New("Faild to setup shared volume")
+	switch volumesetting.Type {
+	case "efs":
+		log.Debug("prepareSharedVolume: found efs setting")
+		var mountpath = volumesetting.MountPath
+		if volumesetting.MountPath == "" {
+			// fallback to default
+			mountpath = sharedvolume.DefarultMouhtPath
+		}
+
+		v = &sharedvolume.EFSVolume{
+			Client: d.Client,
+			Name:   "efsvolume",
+			EFSID:  volumesetting.Identifier,
+		}
+		d.SharedVolume = fmt.Sprintf("efsvolume:%s", mountpath)
+	case "local":
+		log.Debug("prepareSharedVolume: found efs setting")
+		var mountpath = volumesetting.MountPath
+		if volumesetting.MountPath == "" {
+			// fallback to default
+			mountpath = sharedvolume.DefarultMouhtPath
+		}
+
+		v = &sharedvolume.LocalVolume{
+			Client: d.Client,
+			Name:   "localvolume",
+		}
+		d.SharedVolume = fmt.Sprintf("localvolume:%s", mountpath)
+	default:
+		log.Debug("prepareSharedVolume: no settings")
+		v = &sharedvolume.NullVolume{}
+		d.SharedVolume = ""
+		return nil
+	}
+
+	err := v.Setup()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// cannot use sharedvolume.EFSVolume literal (type sharedvolume.EFSVolume) as type *sharedvolume.Interface in assignment:
+// 	*sharedvolume.Interface is pointer to interface, not interface
+
 // StartContainer starts docker container
 func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 	log.Infof("pulling image %s", d.Image)
@@ -113,7 +173,7 @@ func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 
 	err = d.containerStart(c)
 	if err != nil {
-		return nil, err
+		return c, err
 	}
 
 	ct, _ := d.Client.ContainerInspect(context.Background(), c.ID)
@@ -128,7 +188,7 @@ func (d *Docker) StartContainer(name string, dir string) (*Container, error) {
 
 	c.IP, err = d.getIPAddress(c)
 	if err != nil {
-		return nil, err
+		return c, err
 	}
 
 	return c, nil
@@ -229,6 +289,10 @@ func (d *Docker) containerCreate(name string, dir string) (*Container, error) {
 			}
 
 			hostConfig.Binds = append(hostConfig.Binds, "/tmp/init:/tmp/init")
+		}
+
+		if d.SharedVolume != "" {
+			hostConfig.Binds = append(hostConfig.Binds, d.SharedVolume)
 		}
 	}
 
