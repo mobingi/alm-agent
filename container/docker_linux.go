@@ -1,7 +1,6 @@
 package container
 
 import (
-	"errors"
 	"net"
 	"strings"
 
@@ -16,15 +15,14 @@ import (
 
 // Docker is manager of docker
 type Docker struct {
-	Client       *client.Client
-	Image        string
-	Username     string
-	Password     string
-	Ports        []int
-	Pm           *portmapper.PortMapper
-	CodeDir      string
-	Envs         []string
-	SharedVolume string
+	Client   *client.Client
+	Image    string
+	Username string
+	Password string
+	Ports    []int
+	Pm       *portmapper.PortMapper
+	CodeDir  string
+	Envs     []string
 }
 
 // NewDocker is construcor for DockerClient
@@ -53,12 +51,6 @@ func NewDocker(c *config.Config, s *serverConfig.Config) (*Docker, error) {
 	defaultHeaders := map[string]string{"User-Agent": defaultUA}
 	cli, err := client.NewClient(dockerSock, dockerAPIVer, nil, defaultHeaders)
 	docker.Client = cli
-
-	log.Debug("Step: PrepareSharedVolume")
-	err = docker.prepareSharedVolume(s.SharedVolume)
-	if err != nil {
-		return nil, errors.New("Faild to setup shared volume")
-	}
 
 	return docker, err
 }
