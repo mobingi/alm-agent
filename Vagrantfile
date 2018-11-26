@@ -22,9 +22,9 @@ Vagrant.configure("2") do |config|
       aws.keypair_name = ENV['AWS_KEYPAIR_NAME']
       override.ssh.username = 'ec2-user'
       override.ssh.private_key_path = ENV['AWS_KEYPAIR_PATH']
-      # Amazon Linux AMI 2017.03.1 (HVM), SSD Volume Type
+      # Amazon Linux AMI 2018.03.0 (HVM), SSD Volume Type
       aws.region = 'ap-northeast-1'
-      aws.region_config 'ap-northeast-1', ami: 'ami-4af5022c'
+      aws.region_config 'ap-northeast-1', ami: 'ami-06cd52961ce9f0d85'
       ## << Ref: https://github.com/mitchellh/vagrant-aws/issues/473 aws.region is not loaded from Vagrantfile
 
       aws.user_data = "#!/bin/bash\nsed -i -e 's/^Defaults.*requiretty/# Defaults requiretty/g' /etc/sudoers"
@@ -40,6 +40,6 @@ Vagrant.configure("2") do |config|
     end
 
     c.vm.provision :shell, path: File.expand_path('../vagrant/prov/amzn.sh', __FILE__)
-    c.vm.synced_folder '.', '/home/ec2-user/src/github.com/mobingi/alm-agent'
+    c.vm.synced_folder '.', '/home/ec2-user/src/github.com/mobingi/alm-agent', type: :rsync
   end
 end

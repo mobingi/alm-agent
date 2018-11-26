@@ -1,8 +1,8 @@
 #!/bin/bash
 
-yum install -y git gcc tmux
+yum install -y git gcc tmux amazon-efs-utils docker
 
-archive=go1.8.3.linux-amd64.tar.gz
+archive=go1.11.1.linux-amd64.tar.gz
 if [ ! -f $archive ]; then
   wget -q https://storage.googleapis.com/golang/$archive
 fi
@@ -18,3 +18,7 @@ if ! grep GOPATH /home/ec2-user/.bashrc; then
   echo 'export GOPATH=/home/ec2-user' >> /home/ec2-user/.bashrc
   echo 'sudo chown -R ec2-user.ec2-user /home/ec2-user/src' >> /home/ec2-user/.bashrc
 fi
+
+# for efs support development
+
+mkdir -p /mnt/shared
