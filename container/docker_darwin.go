@@ -11,15 +11,14 @@ import (
 
 // Docker is manager of docker
 type Docker struct {
-	Client       *client.Client
-	Image        string
-	Username     string
-	Password     string
-	Ports        []int
-	Pm           interface{}
-	CodeDir      string
-	Envs         []string
-	SharedVolume string
+	Client   *client.Client
+	Image    string
+	Username string
+	Password string
+	Ports    []int
+	Pm       interface{}
+	CodeDir  string
+	Envs     []string
 }
 
 // NewDocker is construcor for DockerClient
