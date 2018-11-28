@@ -268,6 +268,9 @@ func Ensure(c *cli.Context) error {
 	newContainer, err := d.StartContainer("standby", codeDir)
 	if err != nil {
 		api.SendAgentStatus("error", err.Error())
+		if newContainer != nil {
+			d.RemoveContainer(newContainer)
+		}
 		return cli.NewExitError(err, 1)
 	}
 	log.Debugf("%#v", newContainer)
