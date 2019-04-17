@@ -65,5 +65,6 @@ workflows:
     jobs:
       - build
       - deploy:
+          context: go-modaemon-deploy
           requires:
             - build
