@@ -11,14 +11,14 @@ PACKAGES_ALL = $(shell go list ./...)
 PACKAGES_MAIN = $(shell go list ./... | grep -v '/addons/')
 
 setup:
-	go get -u github.com/golang/dep/cmd/dep
+	go get -u golang.org/x/vgo
 	go get -u golang.org/x/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 	go get -u github.com/rakyll/statik
 	go get github.com/BurntSushi/toml/cmd/tomlv
 
 deps:
-	dep ensure -v
+	vgo get -v
 
 bindata:
 	tomlv _data/*.toml
@@ -31,10 +31,10 @@ verifydata:
 	rm -rf ./compare
 
 test: deps
-	go test -v ${PACKAGES_ALL} -cover
+	vgo test -v ${PACKAGES_ALL} -cover
 
 race: deps
-	go test -v -race ${PACKAGES_ALL} -cover
+	vgo test -v -race ${PACKAGES_ALL} -cover
 
 lint: setup
 	go vet ${PACKAGES_ALL}
@@ -46,17 +46,17 @@ fmt: setup
 	goimports -v -w ${PACKAGES}
 
 build: test
-	go build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
+	vgo build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
 
 cibuild: race
-	go build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
+	vgo build -ldflags "$(LDFLAGS)" -o bin/$(NAME)
 
 clean:
 	rm bin/$(NAME)
 
 addon:
-	cd addons/aws/; go build -ldflags "$(LDFLAGS)" -o ../../bin/$(NAME)-addon-aws
-	cd addons/common_logtracer/; go build -ldflags "$(LDFLAGS)" -o ../../bin/alm-logtracer
+	cd addons/aws/; vgo build -ldflags "$(LDFLAGS)" -o ../../bin/$(NAME)-addon-aws
+	cd addons/common_logtracer/; vgo build -ldflags "$(LDFLAGS)" -o ../../bin/alm-logtracer
 
 list:
 	@ls -1 bin
